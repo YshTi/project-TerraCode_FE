@@ -1,0 +1,23 @@
+.section {
+  padding: 80px 16px;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 16px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.text {
+  margin-bottom: 24px;
+}
+
+.button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  background-color: #5dbe5c;
+  cursor: pointer;
+}

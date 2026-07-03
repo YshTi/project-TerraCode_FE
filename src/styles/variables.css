@@ -1,0 +1,44 @@
+:root {
+    /* Fonts */
+    --font-main: "Montserrat", sans-serif;
+
+
+    /* Main colors */
+    --color-white: #fff;
+    --color-black: #000;
+
+    --color-green-50: #eef8ee;
+    --color-green-100: #def2de;
+    --color-green-300: #8dd18c;
+    --color-green-500: #5dbe5c;
+    --color-green-600: #4a9849;
+    --color-green-800: #254c24;
+    --color-green-900: #1b391b;
+
+    --color-gray-50: #f2f2f2;
+    --color-gray-100: #d8d8d8;
+    --color-gray-300: #b2b2b2;
+    --color-gray-500: #7f7f7f;
+    --color-gray-700: #4c4c4c;
+    --color-gray-900: #191919;
+
+    --color-red: #b00101;
+
+
+    /* Semantic colors */
+    --color-background: var(--color-white);
+    --color-background-soft: var(--color-gray-50);
+    --color-background-green: var(--color-green-50);
+
+    --color-text-primary: var(--color-black);
+    --color-text-secondary: var(--color-gray-700);
+    --color-text-muted: var(--color-gray-500);
+    --color-text-inverse: var(--color-white);
+
+    --color-accent: var(--color-green-500);
+    --color-accent-hover: var(--color-green-600);
+    --color-accent-light: var(--color-green-100);
+    --color-accent-dark: var(--color-green-900);
+
+    --color-error: var(--color-red);
+}
