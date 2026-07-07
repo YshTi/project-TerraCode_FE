@@ -4,10 +4,15 @@ import styles from "./auth-header.module.css";
 
 export function AuthHeader() {
   return (
-    <header className={styles.header}>
-      <Link className={styles.logo} href="/">
-        <SpriteIcon id="icon-eco" width={24} height={24} />
-        <span>Природні Мандри</span>
+    <header className={styles.authHeader}>
+      <Link className={styles.logoHeader} href="/">
+        <SpriteIcon
+          id="icon-eco"
+          width={24}
+          height={24}
+          className={styles.logoIcon}
+        />
+        <span className={styles.logoText}>Природні Мандри</span>
       </Link>
     </header>
   );
