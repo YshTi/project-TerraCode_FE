@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ButtonLink } from "@/components/button/button";
+import { ButtonLink } from "@/components/buttons/button";
 import styles from "./main-auth-nav.module.css";
 
 const authLinks = [
