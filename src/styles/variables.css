@@ -30,12 +30,12 @@
     --color-background-soft: var(--color-gray-50);
     --color-background-green: var(--color-green-50);
 
-    --color-text-primary: var(--color-black);
+    --color-text-primary: var(--color-green-900);
     --color-text-secondary: var(--color-gray-700);
     --color-text-muted: var(--color-gray-500);
     --color-text-inverse: var(--color-white);
 
-    --color-accent: var(--color-green-500);
+    --color-accent: var(--color-green-600);
     --color-accent-hover: var(--color-green-600);
     --color-accent-light: var(--color-green-100);
     --color-accent-dark: var(--color-green-900);
