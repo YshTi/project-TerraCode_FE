@@ -1,15 +1,14 @@
 import Link from "next/link";
-import { Container } from "@/components/container/container";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import styles from "./auth-header.module.css";
 
 export function AuthHeader() {
   return (
     <header className={styles.header}>
-      <Container className={styles.container}>
-        <Link className={styles.logo} href="/">
-          Природні Мандри
-        </Link>
-      </Container>
+      <Link className={styles.logo} href="/">
+        <SpriteIcon id="icon-eco" width={24} height={24} />
+        <span>Природні Мандри</span>
+      </Link>
     </header>
   );
 }
