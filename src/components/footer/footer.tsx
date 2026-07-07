@@ -15,7 +15,6 @@ export function Footer() {
           © 2026 Природні Мандри. Всі права захищені.
         </p>
       </Container>
-      <AuthFooter />
     </footer>
   );
 }
