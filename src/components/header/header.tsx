@@ -1,8 +1,6 @@
 import Link from "next/link";
 
 import { Container } from "@/components/container/container";
-import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
-import { UserBar } from "@/components/header/user-bar/user-bar";
 
 import styles from "./header.module.css";
 
@@ -20,8 +18,6 @@ export function Header() {
           <Link href="/travellers">Еко-Мандрівники</Link>
         </nav>
 
-        <MainAuthNav />
-        <UserBar />
       </Container>
     </header>
   );
