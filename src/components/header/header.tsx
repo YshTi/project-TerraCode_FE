@@ -1,5 +1,8 @@
 import Link from "next/link";
+
 import { Container } from "@/components/container/container";
+import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
+
 import styles from "./header.module.css";
 
 export function Header() {
@@ -11,10 +14,12 @@ export function Header() {
         </Link>
 
         <nav className={styles.nav}>
+          <Link href="/">Головна</Link>
           <Link href="/stories">Історії</Link>
-          <Link href="/travellers">Мандрівники</Link>
-          <Link href="/auth/login">Увійти</Link>
+          <Link href="/travellers">Еко-Мандрівники</Link>
         </nav>
+
+        <MainAuthNav />
       </Container>
     </header>
   );
