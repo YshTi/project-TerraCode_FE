@@ -1,32 +1,26 @@
 .authBar {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  width: 100%;
 }
 
 .link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  height: 32px;
-  padding: 4px 10px;
-  border-radius: 6px;
+  width: 50%;
+  height: 48px;
+  padding: 12px 24px;
 
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
+  color: var(--color-text-primary);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+
+  border-bottom: 1px solid var(--color-gray-100);
   cursor: pointer;
 }
 
-.login {
-  color: var(--color-accent-dark);
-  background-color: var(--color-accent-light);
-  border: 1px solid var(--color-accent-light);
-}
-
-.register {
-  color: var(--color-text-inverse);
-  background-color: var(--color-accent);
-  border: 1px solid var(--color-accent);
+.active {
+  border-bottom-color: var(--color-gray-700);
 }
