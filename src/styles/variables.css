@@ -35,7 +35,7 @@
     --color-text-muted: var(--color-gray-500);
     --color-text-inverse: var(--color-white);
 
-    --color-accent: var(--color-green-500);
+    --color-accent: var(--color-green-600);
     --color-accent-hover: var(--color-green-600);
     --color-accent-light: var(--color-green-100);
     --color-accent-dark: var(--color-green-900);

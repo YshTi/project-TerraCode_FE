@@ -1,0 +1,17 @@
+.authNav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.loginButton {
+    width: 65px;
+}
+
+.registerButton {
+    width: 137px;
+}
+
+.active {
+    position: relative;
+}
