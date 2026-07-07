@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/container/container";
 import styles from "./footer.module.css";
+import { AuthFooter } from "@/components/auth-footer/auth-footer";
 
 export function Footer() {
   return (
@@ -14,6 +15,7 @@ export function Footer() {
           © 2026 Природні Мандри. Всі права захищені.
         </p>
       </Container>
+      <AuthFooter />
     </footer>
   );
 }
