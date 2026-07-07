@@ -1,0 +1,71 @@
+.button {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    padding: 3px 9px;
+
+    border-radius: 6px;
+    border: 1px solid transparent;
+
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.5;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+        color 200ms ease,
+        background-color 200ms ease,
+        border-color 200ms ease;
+}
+
+/* Filled green button */
+.primary {
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.primary:hover,
+.primary:focus-visible {
+    color: var(--color-gray-900);
+    background-color: var(--color-green-100);
+    border-color: var(--color-accent);
+}
+
+.primary:active {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* Outlined / light button */
+.secondary {
+    color: var(--color-gray-900);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.secondary:hover,
+.secondary:focus-visible {
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+.secondary:active {
+    color: var(--color-text-inverse);
+    background-color: var(--color-green-800);
+    border-color: rgba(255, 255, 255, 0);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
