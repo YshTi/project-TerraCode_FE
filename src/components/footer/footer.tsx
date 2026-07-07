@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/container/container";
 import styles from "./footer.module.css";
-import { AuthFooter } from "@/components/auth-footer/auth-footer";
 
 export function Footer() {
   return (
