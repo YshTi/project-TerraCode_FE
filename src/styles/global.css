@@ -1,3 +1,15 @@
+:root {
+    --header-height: 72px;
+}
+
+html {
+    scroll-padding-top: var(--header-height);
+}
+
+main {
+    padding-top: var(--header-height);
+}
+
 body {
     min-width: 320px;
     font-family: var(--font-main);
