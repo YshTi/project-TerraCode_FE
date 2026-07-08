@@ -94,7 +94,11 @@ export function MobileMenu({
               </ButtonLink>
 
               <div className={styles.userBarWrapper}>
-                <UserBar user={user!} />
+                <UserBar
+                  name={user!.name}
+                  avatarUrl={user!.avatarUrl}
+                  profileHref="/profile"
+                />
               </div>
             </>
           ) : (
