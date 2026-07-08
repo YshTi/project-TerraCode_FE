@@ -104,7 +104,7 @@ export function Header() {
                 Опублікувати статтю
               </ButtonLink>
 
-              <UserBar user={user} />
+              <UserBar name={user.name} avatarUrl={user.avatarUrl} profileHref="/profile" />
             </>
           ) : (
             <MainAuthNav />
