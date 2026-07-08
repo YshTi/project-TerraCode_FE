@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
        if (isAxiosError(error)) {
       const errorMessage = error.response?.data?.message || error.message;
 
-      return NextResponse.json(
-        { error: errorMessage, response: error.response?.data },
-        { status: error.response?.status || 500 }
-      );
+     return NextResponse.json(
+  { error: errorMessage, response: error.response?.data },
+  { status: error.response?.status || 500 }
+);
     }
    
     const message = error instanceof Error ? error.message : 'Internal Server Error';
