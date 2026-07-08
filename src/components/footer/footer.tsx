@@ -1,5 +1,8 @@
 import Link from "next/link";
+
 import { Container } from "@/components/container/container";
+import { Copyright } from "@/components/copyright/copyright";
+
 import styles from "./footer.module.css";
 
 export function Footer() {
@@ -10,9 +13,7 @@ export function Footer() {
           Природні Мандри
         </Link>
 
-        <p className={styles.text}>
-          © 2026 Природні Мандри. Всі права захищені.
-        </p>
+        <Copyright />
       </Container>
     </footer>
   );
