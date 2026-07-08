@@ -16,13 +16,33 @@
     gap: 40px;
 }
 
+/* LOGO */
+
 .logoLink {
     display: flex;
+    align-items: center;
+    gap: 8px;
     width: 124px;
     height: 36px;
     color: var(--color-green-900);
     text-decoration: none;
 }
+
+.logoIcon {
+    width: 36px;
+    height: 36px;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+.logoText {
+    font-size: 16px;
+    line-height: 1.2;
+    font-weight: 400;
+    color: currentColor;
+}
+
+/* SOCIAL */
 
 .socialContainer {
     display: flex;
@@ -38,6 +58,8 @@
 
 .link:hover,
 .link:focus,
+.logoLink:hover,
+.logoLink:focus,
 .navLink:hover,
 .navLink:focus {
     color: var(--color-green-600);
@@ -49,6 +71,8 @@
     height: 32px;
     fill: currentColor;
 }
+
+/* NAV */
 
 .navigation {
     display: flex;
@@ -81,6 +105,8 @@
     line-height: 1.5;
     text-align: center;
 }
+
+/* TABLET */
 
 @media screen and (min-width: 768px) {
     .container {
@@ -123,6 +149,8 @@
         margin-top: 32px;
     }
 }
+
+/* DESKTOP */
 
 @media screen and (min-width: 1440px) {
     .container {
