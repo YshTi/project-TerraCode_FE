@@ -1,49 +1,62 @@
 import Link from 'next/link';
-import css from './footer.module.css';
+
+import { AuthHeader } from '@/components/auth-header/auth-header';
 import { SpriteIcon } from '@/components/sprite-icon/sprite-icon';
+
+import css from './footer.module.css';
 
 export const Footer = () => {
   return (
     <footer className={css.footer}>
       <div className={css.container}>
         <div className={css.linksContainer}>
-
-          <Link
-            href="/"
-            className={css.logoLink}
-            aria-label="Природні Мандри — на головну"
-          >
-            <SpriteIcon
-              id="icon-eco"
-              width={24}
-              height={24}
-              className={css.logoIcon}
-            />
-
-            <span className={css.logoText}>
-              Природні <br /> Мандри
-            </span>
-          </Link>
+          <div className={css.logoLink}>
+            <AuthHeader />
+          </div>
 
           <div className={css.socialContainer}>
-            <a href="https://www.facebook.com/" className={css.link}>
+            <a
+              href="https://www.facebook.com/"
+              className={css.link}
+              aria-label="Ми на Facebook"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <SpriteIcon id="icon-Facebook" className={css.socialLink} />
             </a>
 
-            <a href="https://www.instagram.com/" className={css.link}>
+            <a
+              href="https://www.instagram.com/"
+              className={css.link}
+              aria-label="Ми на Instagram"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <SpriteIcon id="icon-Instagram" className={css.socialLink} />
             </a>
 
-            <a href="https://x.com/" className={css.link}>
+            <a
+              href="https://x.com/"
+              className={css.link}
+              aria-label="Ми на X"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <SpriteIcon id="icon-X" className={css.socialLink} />
             </a>
 
-            <a href="https://www.youtube.com/" className={css.link}>
+            <a
+              href="https://www.youtube.com/"
+              className={css.link}
+              aria-label="Ми на YouTube"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <SpriteIcon id="icon-Youtube" className={css.socialLink} />
             </a>
           </div>
 
-          <nav className={css.navigation}>
+          <nav className={css.navigation} aria-label="Навігація сайтом">
             <Link href="/" className={css.navLink}>
               Головна
             </Link>
@@ -56,7 +69,6 @@ export const Footer = () => {
               Еко-Мандрівники
             </Link>
           </nav>
-
         </div>
 
         <hr className={css.hr} />
@@ -64,7 +76,6 @@ export const Footer = () => {
         <p className={css.copyRight}>
           © 2025 Природні Мандри. Усі права захищені.
         </p>
-
       </div>
     </footer>
   );
