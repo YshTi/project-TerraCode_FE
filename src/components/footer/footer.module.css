@@ -18,25 +18,10 @@
 
 .logoLink {
     display: flex;
-    align-items: center;
-    gap: 8px;
     width: 124px;
     height: 36px;
     color: var(--color-green-900);
     text-decoration: none;
-}
-
-.logoIcon {
-    width: 24px;
-    height: 24px;
-    fill: currentColor;
-    stroke: currentColor;
-}
-
-.logoText {
-    font-size: 16px;
-    line-height: 1;
-    color: currentColor;
 }
 
 .socialContainer {

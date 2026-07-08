@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import css from './footer.module.css';
+import Logo from '@/components/logo/logo';
 import { SpriteIcon } from '@/components/sprite-icon/sprite-icon';
+import css from './footer.module.css';
 
 export const Footer = () => {
   return (
@@ -12,10 +13,7 @@ export const Footer = () => {
             className={css.logoLink}
             aria-label="Природні Мандри — на головну"
           >
-            <SpriteIcon id="icon-eco" width={24} height={24} className={css.logoIcon} />
-            <span className={css.logoText}>
-              Природні <br /> Мандри
-            </span>
+            <Logo />
           </Link>
 
           <div className={css.socialContainer}>
