@@ -55,8 +55,26 @@
     border: 1px solid rgba(0, 0, 0, 0.15);
     border-radius: 6px;
 
-    color: var(--color-black);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+
+    color: var(--color-text-primary);
     background: transparent;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-green-500);
+}
+
+.inputError {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.inputError:focus {
+    border-color: var(--color-error);
 }
 
 .input::placeholder {
@@ -95,6 +113,7 @@
 
     .input {
         height: 43px;
+        font-size: 18px;
     }
 
     .input::placeholder {

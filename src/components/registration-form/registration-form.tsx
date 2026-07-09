@@ -87,7 +87,7 @@ export function RegistrationForm() {
                 return;
                 }
 
-                router.push("/auth/login");
+                router.push("/");
             } finally {
                 setSubmitting(false);
             }
@@ -109,7 +109,9 @@ export function RegistrationForm() {
               </label>
 
               <input
-                className={styles.input}
+                className={`${styles.input} ${
+                  touched.name && errors.name ? styles.inputError : ""
+                }`}
                 id="name"
                 name="name"
                 type="text"
@@ -134,7 +136,9 @@ export function RegistrationForm() {
               </label>
 
               <input
-                className={styles.input}
+                className={`${styles.input} ${
+                  touched.email && errors.email ? styles.inputError : ""
+                }`}
                 id="email"
                 name="email"
                 type="email"
@@ -159,7 +163,9 @@ export function RegistrationForm() {
               </label>
 
               <input
-                className={styles.input}
+                className={`${styles.input} ${
+                  touched.password && errors.password ? styles.inputError : ""
+                }`}
                 id="password"
                 name="password"
                 type="password"
