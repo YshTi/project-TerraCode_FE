@@ -10,7 +10,7 @@ import styles from "./mobile-menu.module.css";
 
 type User = {
   name: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 };
 
 type MobileMenuProps = {
@@ -29,6 +29,8 @@ export function MobileMenu({
   navLinks,
   onClose,
 }: MobileMenuProps) {
+  const shouldShowUserMenu = isLoggedIn && user;
+
   return (
     <div className={styles.mobileMenu}>
       <Container className={styles.mobileMenuContainer}>
@@ -36,7 +38,7 @@ export function MobileMenu({
           <AuthHeader />
 
           <div className={styles.tabletTopActions}>
-            {isLoggedIn ? (
+            {shouldShowUserMenu ? (
               <ButtonLink
                 href="/stories/new"
                 className={styles.tabletPublishButton}
@@ -71,7 +73,7 @@ export function MobileMenu({
             </NavLink>
           ))}
 
-          {isLoggedIn && (
+          {shouldShowUserMenu && (
             <NavLink
               href="/profile"
               className={styles.mobileNavLink}
@@ -83,7 +85,7 @@ export function MobileMenu({
         </nav>
 
         <div className={styles.mobileActions}>
-          {isLoggedIn ? (
+          {shouldShowUserMenu ? (
             <>
               <ButtonLink
                 href="/stories/new"
@@ -95,8 +97,8 @@ export function MobileMenu({
 
               <div className={styles.userBarWrapper}>
                 <UserBar
-                  name={user!.name}
-                  avatarUrl={user!.avatarUrl}
+                  name={user.name}
+                  avatarUrl={user.avatarUrl}
                   profileHref="/profile"
                 />
               </div>
