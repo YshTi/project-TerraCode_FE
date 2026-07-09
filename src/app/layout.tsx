@@ -6,6 +6,7 @@ import "@/styles/variables.css";
 import "@/styles/reset.css";
 import "@/styles/global.css";
 
+import { AuthProvider } from "@/contexts/auth-context";
 import { Header } from "@/components/header/header";
 import { Footer } from "@/components/footer/footer";
 
@@ -29,9 +30,11 @@ export default function RootLayout({
   return (
     <html lang="uk" className={montserrat.variable}>
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );
