@@ -1,25 +1,13 @@
-import Link from "next/link";
-
-import { Container } from "@/components/container/container";
-import { Copyright } from "@/components/copyright/copyright";
-
-import styles from "./footer.module.css";
+import Link from 'next/link';
 
 import { AuthHeader } from '@/components/auth-header/auth-header';
+import { Copyright } from '@/components/copyright/copyright';
 import { SpriteIcon } from '@/components/sprite-icon/sprite-icon';
 
 import css from './footer.module.css';
 
 export const Footer = () => {
   return (
-    <footer className={styles.footer}>
-      <Container className={styles.container}>
-        <Link className={styles.logo} href="/">
-          Природні Мандри
-        </Link>
-
-        <Copyright />
-      </Container>
     <footer className={css.footer}>
       <div className={css.container}>
         <div className={css.linksContainer}>
@@ -86,9 +74,7 @@ export const Footer = () => {
 
         <hr className={css.hr} />
 
-        <p className={css.copyRight}>
-          © 2025 Природні Мандри. Усі права захищені.
-        </p>
+        <Copyright />
       </div>
     </footer>
   );
