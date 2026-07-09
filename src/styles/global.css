@@ -8,9 +8,13 @@ html {
 
 main {
     padding-top: var(--header-height);
+    flex: 1 0 auto;
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     min-width: 320px;
     font-family: var(--font-main);
     font-size: 16px;
