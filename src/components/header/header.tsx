@@ -11,6 +11,7 @@ import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { UserBar } from "@/components/header/user-bar/user-bar";
 import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
 import { useAuth } from "@/contexts/auth-context";
+import { ThemeSwitch } from "@/components/theme-switch/theme-switch";
 
 import styles from "./header.module.css";
 
@@ -88,6 +89,8 @@ export function Header() {
             </NavLink>
           )}
         </nav>
+
+        <ThemeSwitch />
 
         <div className={styles.desktopActions}>
           {isLoading ? null : user ? (

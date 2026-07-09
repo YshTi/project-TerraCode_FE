@@ -27,6 +27,8 @@
 
     /* Semantic colors */
     --color-background: var(--color-white);
+    --color-background-primary: var(--color-green-50);
+    --color-background-secondary: var(--color-green-100);
     --color-background-soft: var(--color-gray-50);
     --color-background-green: var(--color-green-50);
 
@@ -41,4 +43,24 @@
     --color-accent-dark: var(--color-green-900);
 
     --color-error: var(--color-red);
+}
+
+[data-theme="dark"] {
+    --color-background: var(--color-gray-900);
+    --color-background-primary: var(--color-gray-900);
+    --color-background-secondary: #222;
+    --color-background-soft: #252525;
+    --color-background-green: #203320;
+
+    --color-text-primary: var(--color-green-50);
+    --color-text-secondary: var(--color-gray-100);
+    --color-text-muted: var(--color-gray-300);
+    --color-text-inverse: var(--color-gray-900);
+
+    --color-accent: var(--color-green-500);
+    --color-accent-hover: var(--color-green-300);
+    --color-accent-light: var(--color-green-800);
+    --color-accent-dark: var(--color-green-50);
+
+    --color-error: #ff6b6b;
 }
