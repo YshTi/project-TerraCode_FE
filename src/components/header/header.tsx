@@ -10,7 +10,7 @@ import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { UserBar } from "@/components/header/user-bar/user-bar";
 import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
-
+import { useAuth } from "@/contexts/auth-context";
 
 import styles from "./header.module.css";
 
@@ -22,15 +22,7 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Test logged-in user
-  const user = {
-    name: "Імʼя",
-    avatarUrl: "",
-  };
-
-  // Test guest user
-  // const user = null;
+  const { user, isLoading } = useAuth();
 
   const isLoggedIn = Boolean(user);
 
@@ -98,13 +90,17 @@ export function Header() {
         </nav>
 
         <div className={styles.desktopActions}>
-          {isLoggedIn ? (
+          {isLoading ? null : user ? (
             <>
               <ButtonLink href="/stories/new" className={styles.publishButton}>
                 Опублікувати статтю
               </ButtonLink>
 
-              <UserBar name={user.name} avatarUrl={user.avatarUrl} profileHref="/profile" />
+              <UserBar
+                name={user.name}
+                avatarUrl={user.avatarUrl}
+                profileHref="/profile"
+              />
             </>
           ) : (
             <MainAuthNav />
@@ -112,7 +108,7 @@ export function Header() {
         </div>
 
         <div className={styles.tabletActions}>
-          {isLoggedIn ? (
+          {isLoading ? null : user ? (
             <ButtonLink href="/stories/new" className={styles.publishButton}>
               Опублікувати статтю
             </ButtonLink>
