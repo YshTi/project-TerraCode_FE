@@ -24,13 +24,13 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Test logged-in user
-  // const user = {
-  //   name: "Імʼя",
-  //   avatarUrl: "",
-  // };
+  const user = {
+    name: "Імʼя",
+    avatarUrl: "",
+  };
 
   // Test guest user
-  const user = null;
+  // const user = null;
 
   const isLoggedIn = Boolean(user);
 
