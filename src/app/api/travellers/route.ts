@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const page = Number(req.nextUrl.searchParams.get('page') ?? 1);
     const limit = Number(req.nextUrl.searchParams.get('limit') ?? 12); // Чітко 12 за ТЗ
 
-    const res = await api('/travellers', {
+    const res = await api('/users', {
       params: {
         page, 
         limit,
