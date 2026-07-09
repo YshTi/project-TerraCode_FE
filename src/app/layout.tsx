@@ -6,8 +6,8 @@ import "@/styles/variables.css";
 import "@/styles/reset.css";
 import "@/styles/global.css";
 
-import { Header } from "@/components/header/header";
-import { Footer } from "@/components/footer/footer";
+import { AppShell } from "@/components/app-shell/app-shell";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -29,9 +29,9 @@ export default function RootLayout({
   return (
     <html lang="uk" className={montserrat.variable}>
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
       </body>
     </html>
   );

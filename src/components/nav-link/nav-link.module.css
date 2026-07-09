@@ -1,0 +1,50 @@
+.navLink {
+    min-height: 32px;
+    padding: 3px 15px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    color: var(--color-text-primary);
+    background-color: transparent;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+        color 200ms ease,
+        background-color 200ms ease,
+        border-color 200ms ease;
+}
+
+.navLink[aria-current="page"] {
+    font-weight: 500;
+    background-color: var(--color-green-100);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.navLink:not([aria-current="page"]):hover {
+    color: var(--color-accent);
+    background-color: var(--color-green-100);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.navLink:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.navLink:focus-visible {
+    outline: none;
+    background-color: var(--color-green-100);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.navLink:active {
+    color: var(--color-text-inverse);
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+}
