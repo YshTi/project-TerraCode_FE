@@ -78,6 +78,7 @@
     .navLink {
         color: #163b1f;
         text-decoration: none;
+        font-size: 18px;
     }
 
     .navLink:hover {
@@ -90,6 +91,12 @@
         gap: 16px;
 
         margin-left: 32px;
+    }
+
+    .publishButton {
+        width: 240px;
+        height: 38px;
+        font-size: 20px;
     }
 
     .tabletActions,
