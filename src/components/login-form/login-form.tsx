@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
 
-import { FieldError } from "@/components/field-error/field-error";
 import { Button } from "@/components/buttons/button";
+import { FieldError } from "@/components/field-error/field-error";
 import { useAuth } from "@/contexts/auth-context";
 
 import styles from "./login-form.module.css";
@@ -23,6 +24,8 @@ const loginSchema = Yup.object({
 export function LoginForm() {
   const router = useRouter();
   const { refreshUser } = useAuth();
+
+  const [hasAuthError, setHasAuthError] = useState(false);
 
   return (
     <section className={styles.login}>
@@ -42,6 +45,7 @@ export function LoginForm() {
         validationSchema={loginSchema}
         onSubmit={async (values, { setErrors, setSubmitting, setStatus }) => {
           setStatus(undefined);
+          setHasAuthError(false);
 
           try {
             const response = await fetch("/api/auth/login", {
@@ -56,6 +60,7 @@ export function LoginForm() {
 
             if (!response.ok) {
               if (response.status === 401) {
+                setHasAuthError(true);
                 setStatus("Невірна пошта або пароль");
                 return;
               }
@@ -92,7 +97,10 @@ export function LoginForm() {
           errors,
           touched,
           isSubmitting,
+          isValid,
+          dirty,
           status,
+          setStatus,
         }) => (
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
@@ -102,16 +110,27 @@ export function LoginForm() {
 
               <input
                 className={`${styles.input} ${
-                  touched.email && errors.email ? styles.inputError : ""
+                  (touched.email && errors.email) || hasAuthError
+                    ? styles.inputError
+                    : ""
                 }`}
                 id="email"
                 name="email"
                 type="email"
                 placeholder="hello@podorozhnyky.ua"
                 value={values.email}
-                onChange={handleChange}
+                onChange={(e) => {
+                  if (hasAuthError) {
+                    setHasAuthError(false);
+                    setStatus(undefined);
+                  }
+
+                  handleChange(e);
+                }}
                 onBlur={handleBlur}
-                aria-invalid={Boolean(touched.email && errors.email)}
+                aria-invalid={
+                  Boolean(touched.email && errors.email) || hasAuthError
+                }
                 aria-describedby={
                   touched.email && errors.email ? "email-error" : undefined
                 }
@@ -129,16 +148,28 @@ export function LoginForm() {
 
               <input
                 className={`${styles.input} ${
-                  touched.password && errors.password ? styles.inputError : ""
+                  (touched.password && errors.password) || hasAuthError
+                    ? styles.inputError
+                    : ""
                 }`}
                 id="password"
                 name="password"
                 type="password"
                 placeholder="Ваш пароль"
                 value={values.password}
-                onChange={handleChange}
+                onChange={(e) => {
+                  if (hasAuthError) {
+                    setHasAuthError(false);
+                    setStatus(undefined);
+                  }
+
+                  handleChange(e);
+                }}
                 onBlur={handleBlur}
-                aria-invalid={Boolean(touched.password && errors.password)}
+                aria-invalid={
+                  Boolean(touched.password && errors.password) ||
+                  hasAuthError
+                }
                 aria-describedby={
                   touched.password && errors.password
                     ? "password-error"
@@ -152,13 +183,16 @@ export function LoginForm() {
             </div>
 
             {status && (
-              <FieldError id="login-request-error" message={status} />
+              <FieldError
+                id="login-request-error"
+                message={status}
+              />
             )}
 
             <Button
               type="submit"
               className={styles.submitButton}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !dirty || !isValid || hasAuthError}
             >
               Увійти
             </Button>
