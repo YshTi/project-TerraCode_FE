@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/providers/auth-provider";
 
 import styles from "./login-form.module.css";
 
