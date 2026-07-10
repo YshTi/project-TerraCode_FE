@@ -1,0 +1,86 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 9999;
+}
+
+.modal {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 64px 16px 16px;
+    width: 335px;
+    position: relative;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.closeIcon {
+    fill: var(--text-primary);
+    stroke: var(--text-primary);
+    stroke-width: 1;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 32px;
+    line-height: 1.4;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.button {
+    width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+    .modal {
+        width: 704px;
+        max-width: 768px;
+        padding: 64px;
+    }
+
+    .actions {
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+
+    .title {
+        font-size: 32px;
+    }
+}
+
+@media only screen and (min-width: 1440px) {
+    .modal {
+        width: 768px;
+    }
+
+    .title {
+        font-size: 48px;
+    }
+}
