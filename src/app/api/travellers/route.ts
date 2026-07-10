@@ -1,30 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAxiosError } from 'axios';
-import { api } from '@/lib/api/backend';
+import { backendFetch } from '@/lib/api/backend';
 
 export async function GET(req: NextRequest) {
   try {
     const page = Number(req.nextUrl.searchParams.get('page') ?? 1);
-    const limit = Number(req.nextUrl.searchParams.get('limit') ?? 12); // Чітко 12 за ТЗ
+    const limit = Number(req.nextUrl.searchParams.get('limit') ?? 12); 
 
-    const res = await api('/users', {
-      params: {
-        page, 
-        limit,
-      },
-    });
+  const res = await backendFetch(`/users?page=${page}&limit=${limit}`);
 
-    return NextResponse.json(res.data, { status: res.status });
-  } catch (error) {
-       if (isAxiosError(error)) {
-      const errorMessage = error.response?.data?.message || error.message;
-
-     return NextResponse.json(
-  { error: errorMessage, response: error.response?.data },
-  { status: error.response?.status || 500 }
-);
+      if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: errorData.message || "Помилка бекенду" }, 
+        { status: res.status }
+      );
     }
-   
+
+   const data = await res.json();
+
+    // Повертаємо дані клієнту
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error("Помилка у проксі-роуті travellers:", error);
     const message = error instanceof Error ? error.message : 'Internal Server Error';
     return NextResponse.json({ error: message }, { status: 500 });
   }

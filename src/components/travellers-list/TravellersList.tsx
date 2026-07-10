@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import axios from "axios"; 
-import TravellerCard from "@/components/traveller-card/traveller-card"; 
+import TravellerCard from "@/components/traveller-card/traveller-card.tsx"; 
 import css from "./TravellersList.module.css";
-import { toast } from "react-hot-toast"; //яку саме бібліотеку вик-мо для пуш
-
+import { Loader } from "../loader/loader";
+import { Button } from "../buttons/button";
 
 
 interface Traveller {
@@ -22,9 +22,8 @@ interface TravellersListProps {
 export default function TravellersList ({ initialTravellers }: TravellersListProps) {
 
 const [travellers, setTravellers] = useState<Traveller[]>(initialTravellers)
-const [page, perPage] = useState(1);
+const [page, setPage] = useState(1);
 const [loading, setLoading] = useState(false);
-
 const [hasMore, setHasMore] = useState(initialTravellers.length === 12);
 
 // Pagination
@@ -44,20 +43,21 @@ const loadMore = async () => {
 
             const newTravellers = res.data?.data || [];
 
-            setTravellers((prev) => [...prev, newTravellers]);
+            setTravellers((prev) => [...prev, ...newTravellers]);
             setPage(nextPage);
 
             if (newTravellers.length < 12 || newTravellers.length ===0){
                 setHasMore(false);
             }
     } catch (err) {
-        //push-message
+        // pppppppppppush-message
 
-        toast.error("Щось пішло не так");
+       
     } finally {
         setLoading(false);
     }
 };
+
 return (
 <div className={css.container}>
 {travellers.length === 0 ? (
@@ -66,22 +66,25 @@ return (
     <div className={css.container}>
 
         <ul className={css.travellersList}>
+
             {travellers.map((traveller) => (
-                <li>
-                    //TravellerCard
-                    <TravellerCard traveller={traveller}/>
+                <li key={traveller._id}>
+                    {/* Перевірити    карткуууууууууу */}
+                     <TravellerCard traveller={traveller}/>
                 </li>
             ))}
         </ul>
-{hasMore && (
-            <button 
-              type="button" 
-              className={css.button} 
-              onClick={handleLoadMore}
-              disabled={loading}
+
+{loading && <Loader/>}
+
+{hasMore && !loading && (
+           <Button 
+              variant="primary" 
+              onClick={loadMore}
             >
-              {loading ? "Завантаження..." : "Показати ще"}
-            </button>
+              Показати ще
+            </Button>
+         )}
     </div>
 )}
 

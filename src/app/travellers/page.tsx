@@ -1,7 +1,8 @@
+import React from "react";
 import { Metadata } from "next";
-import { api } from "@/lib/api/backend.ts";
 import TravellersList from "@/components/travellers-list/TravellersList";
-import css from "@/components/travellers-list";
+import { backendFetch } from "@/lib/api/backend";
+import css from "@/components/travellers-list/TravellersList.module.css"
 
 export const metadata: Metadata = {
   title: "Мандрівники | Природні мандри",
@@ -9,42 +10,38 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Мандрівники | Природні мандри",
     description: "Приєднуйся до спільноти мандрівників та читай цікаві статті.",
-    url: "____", // Змінити
+    url: "", //додати
     siteName: "Природні мандри",
-    images: [
-      {
-        url: "__", // Змінити
-        width: 1200,
-        height: 630,
-        alt: "Природні мандри банер",
-      },
-    ],
     type: "website",
   },
 };
 
 async function getFirstTravellers() {
-    try {
-        const res = await api('/users', {
-      params: {
-        page: 1,
-        limit: 12,
-    },
-  });
-  return res.data?.data || [];
-}
-catch(error){
-console.error("Помилка при отриманні мандрівників на сервері:", error);
-return [];
-}
+  try {
+  
+    const response = await backendFetch("/users?page=1&limit=12");
+    
+    if (!response.ok) {
+      throw new Error("Failed to fetch travellers from backend");
+    }
+
+    const resData = await response.json();
+    return resData?.data || []; 
+  } catch (error) {
+    console.error("Помилка при отриманні мандрівників на сервері:", error);
+    return [];
+  }
 }
 
 export default async function TravellersPage() {
-    const initialTravellers = await getFirstTravellers();
-    return(
-        <main>
-            <h1 className={css.travellersTitle}>Мандрівники</h1>
-            <TravellersList initialTravellers={initialTravellers}/>
-        </main>
-    );
+  const initialTravellers = await getFirstTravellers();
+
+  return (
+    <main>
+      <h1 className={css.container}>
+        Мандрівники
+      </h1>
+      <TravellersList initialTravellers={initialTravellers} />
+    </main>
+  );
 }

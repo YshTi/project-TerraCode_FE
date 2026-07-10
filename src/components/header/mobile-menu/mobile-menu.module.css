@@ -1,0 +1,138 @@
+.mobileMenu {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    background-color: var(--color-green-50);
+    overflow-y: auto;
+}
+
+.mobileMenuContainer {
+    min-height: 100dvh;
+
+    display: flex;
+    flex-direction: column;
+
+    padding-top: 16px;
+    padding-bottom: 92px;
+}
+
+.mobileMenuTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tabletTopActions {
+    display: none;
+}
+
+.closeButton {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+
+    cursor: pointer;
+}
+
+.closeIcon {
+    width: 24px;
+    height: 24px;
+}
+
+.mobileNav {
+    margin-top: 24px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+}
+
+.mobileNavLink {
+    color: var(--color-text-primary);
+    font-size: 16px;
+    text-decoration: none;
+}
+
+.mobileNav:has(.mobileNavLink:not([aria-current="page"]):hover) .mobileNavLink[aria-current="page"],
+.mobileNav:has(.mobileNavLink:not([aria-current="page"]):focus-visible) .mobileNavLink[aria-current="page"] {
+    font-weight: 400;
+    color: var(--color-text-primary);
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.mobileActions {
+    margin-top: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    gap: 24px;
+}
+
+.mobileOnlyAuth {
+    width: 100%;
+}
+
+.mobilePublishButton,
+.tabletPublishButton {
+    font-size: 16px;
+    width: 196px;
+}
+
+.mobilePublishButton {
+    width: 100%;
+    max-width: 280px;
+}
+
+.userBarWrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* tablet */
+@media screen and (min-width: 768px) {
+    .mobileMenu {
+        width: 100%;
+    }
+
+    .mobileMenuContainer {
+        padding-bottom: 92px;
+    }
+
+    .tabletTopActions {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: 16px;
+    }
+
+    .mobilePublishButton,
+    .mobileOnlyAuth {
+        display: none;
+    }
+
+    .mobileNav {
+        margin-top: 64px;
+    }
+}
+
+/* desktop */
+@media screen and (min-width: 1440px) {
+    .mobileMenu {
+        display: none;
+    }
+}
