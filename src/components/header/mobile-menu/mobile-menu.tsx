@@ -21,6 +21,7 @@ type MobileMenuProps = {
     label: string;
   }[];
   onClose: () => void;
+  onLogout: () => Promise<void> | void;
 };
 
 export function MobileMenu({
@@ -28,8 +29,14 @@ export function MobileMenu({
   isLoggedIn,
   navLinks,
   onClose,
+  onLogout,
 }: MobileMenuProps) {
   const shouldShowUserMenu = isLoggedIn && user;
+
+  const handleLogout = async () => {
+    await onLogout();
+    onClose();
+  };
 
   return (
     <div className={styles.mobileMenu}>
@@ -100,6 +107,7 @@ export function MobileMenu({
                   name={user.name}
                   avatarUrl={user.avatarUrl}
                   profileHref="/profile"
+                  onLogout={handleLogout}
                 />
               </div>
             </>

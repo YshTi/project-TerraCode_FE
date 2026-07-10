@@ -1,88 +1,193 @@
 "use client";
 
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { useState } from "react";
+import { Formik } from "formik";
 import * as Yup from "yup";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/buttons/button";
+import { FieldError } from "@/components/field-error/field-error";
+import { useAuth } from "@/contexts/auth-context";
 
 import styles from "./login-form.module.css";
 
-type LoginFormValues = {
-  email: string;
-  password: string;
-};
-
-const initialValues: LoginFormValues = {
-  email: "",
-  password: "",
-};
-
 const loginSchema = Yup.object({
   email: Yup.string()
-    .email("Введіть коректну пошту")
-    .required("Пошта обовʼязкова"),
-  password: Yup.string()
-    .min(8, "Пароль має містити мінімум 8 символів")
-    .required("Пароль обовʼязковий"),
+    .trim()
+    .email("Введіть коректну електронну адресу")
+    .max(64, "Пошта має містити не більше 64 символів")
+    .required("Введіть електронну адресу"),
+
+  password: Yup.string().required("Введіть пароль"),
 });
 
 export function LoginForm() {
-  const handleSubmit = (values: LoginFormValues) => {
-    console.log("Login values:", values);
-  };
+  const router = useRouter();
+  const { refreshUser } = useAuth();
+
+  const [hasAuthError, setHasAuthError] = useState(false);
 
   return (
-    <section className={styles.loginFormSection}>
-      <h1 className={styles.title}>Вхід</h1>
-      <p className={styles.description}>
-        Вітаємо знову у спільноту мандрівників!
-      </p>
+    <section className={styles.login}>
+      <div className={styles.heading}>
+        <h1 className={styles.title}>Вхід</h1>
+
+        <p className={styles.description}>Увійдіть, щоб продовжити подорож!</p>
+      </div>
 
       <Formik
-        initialValues={initialValues}
+        initialValues={{
+          email: "",
+          password: "",
+        }}
         validationSchema={loginSchema}
-        onSubmit={handleSubmit}
-      >
-        {({ isSubmitting }) => (
-          <Form className={styles.form}>
-            <label className={styles.label}>
-              Пошта*
-              <Field
-                className={styles.input}
-                type="email"
-                name="email"
-                placeholder="hello@podorozhnyky.ua"
-              />
-              <ErrorMessage
-                name="email"
-                component="p"
-                className={styles.error}
-              />
-            </label>
+        onSubmit={async (values, { setErrors, setSubmitting, setStatus }) => {
+          setStatus(undefined);
+          setHasAuthError(false);
 
-            <label className={styles.label}>
-              Пароль*
-              <Field
-                className={styles.input}
+          try {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(values),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+              if (response.status === 401) {
+                setHasAuthError(true);
+                setStatus("Невірна пошта або пароль");
+                return;
+              }
+
+              if (data.errors) {
+                setErrors({
+                  email: data.errors.email?.[0],
+                  password: data.errors.password?.[0],
+                });
+                return;
+              }
+
+              setStatus(data.message || "Не вдалося увійти");
+              return;
+            }
+
+            await refreshUser();
+
+            router.push("/");
+            router.refresh();
+          } catch {
+            setStatus("Помилка з'єднання з сервером");
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({
+          handleSubmit,
+          handleChange,
+          handleBlur,
+          values,
+          errors,
+          touched,
+          isSubmitting,
+          isValid,
+          dirty,
+          status,
+          setStatus,
+        }) => (
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="email">
+                Пошта*
+              </label>
+
+              <input
+                className={`${styles.input} ${
+                  (touched.email && errors.email) || hasAuthError
+                    ? styles.inputError
+                    : ""
+                }`}
+                id="email"
+                name="email"
+                type="email"
+                placeholder="hello@podorozhnyky.ua"
+                value={values.email}
+                onChange={(event) => {
+                  if (hasAuthError) {
+                    setHasAuthError(false);
+                    setStatus(undefined);
+                  }
+
+                  handleChange(event);
+                }}
+                onBlur={handleBlur}
+                aria-invalid={
+                  Boolean(touched.email && errors.email) || hasAuthError
+                }
+                aria-describedby={
+                  touched.email && errors.email ? "email-error" : undefined
+                }
+              />
+
+              {touched.email && (
+                <FieldError id="email-error" message={errors.email} />
+              )}
+            </div>
+
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="password">
+                Пароль*
+              </label>
+
+              <input
+                className={`${styles.input} ${
+                  (touched.password && errors.password) || hasAuthError
+                    ? styles.inputError
+                    : ""
+                }`}
+                id="password"
+                name="password"
                 type="password"
-                name="password"
-                placeholder="••••••••"
+                placeholder="Ваш пароль"
+                value={values.password}
+                onChange={(event) => {
+                  if (hasAuthError) {
+                    setHasAuthError(false);
+                    setStatus(undefined);
+                  }
+
+                  handleChange(event);
+                }}
+                onBlur={handleBlur}
+                aria-invalid={
+                  Boolean(touched.password && errors.password) || hasAuthError
+                }
+                aria-describedby={
+                  touched.password && errors.password
+                    ? "password-error"
+                    : undefined
+                }
               />
-              <ErrorMessage
-                name="password"
-                component="p"
-                className={styles.error}
-              />
-            </label>
+
+              {touched.password && (
+                <FieldError id="password-error" message={errors.password} />
+              )}
+            </div>
+
+            {status && <FieldError id="login-request-error" message={status} />}
 
             <Button
-              className={styles.submitButton}
               type="submit"
-              disabled={isSubmitting}
+              className={styles.submitButton}
+              disabled={isSubmitting || !dirty || !isValid || hasAuthError}
             >
               Увійти
             </Button>
-          </Form>
+          </form>
         )}
       </Formik>
     </section>
