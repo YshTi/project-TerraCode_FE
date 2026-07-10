@@ -1,4 +1,3 @@
-import React from "react";
 import { Metadata } from "next";
 import TravellersList from "@/components/travellers-list/TravellersList";
 import { backendFetch } from "@/lib/api/backend";

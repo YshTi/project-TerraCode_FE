@@ -1,16 +1,40 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import styles from "./auth-bar.module.css";
 
-export function AuthBar() {
-  return (
-    <nav className={styles.authBar}>
-      <Link className={`${styles.link} ${styles.active}`} href="/auth/register">
-        Реєстрація
-      </Link>
+const authLinks = [
+  {
+    href: "/auth/register",
+    label: "Реєстрація",
+  },
+  {
+    href: "/auth/login",
+    label: "Вхід",
+  },
+];
 
-      <Link className={styles.link} href="/auth/login">
-        Вхід
-      </Link>
+export function AuthBar() {
+  const pathname = usePathname();
+
+  return (
+    <nav className={styles.authBar} aria-label="Навігація авторизації">
+      {authLinks.map(({ href, label }) => {
+        const isActive = pathname === href;
+
+        return (
+          <Link
+            key={href}
+            href={href}
+            className={`${styles.link} ${isActive ? styles.active : ""}`}
+            aria-current={isActive ? "page" : undefined}
+          >
+            {label}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
