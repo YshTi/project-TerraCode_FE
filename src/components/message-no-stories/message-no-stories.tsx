@@ -1,5 +1,4 @@
-import { ButtonLink } from "@/components/button/button";
-
+import { ButtonLink } from "@/components/buttons/button";
 import styles from "./message-no-stories.module.css";
 
 type MessageNoStoriesProps = {
