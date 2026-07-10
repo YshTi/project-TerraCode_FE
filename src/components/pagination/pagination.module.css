@@ -1,0 +1,30 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.button {
+  width: 133px;
+}
+
+.fullWidthOnMobile {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
+  .fullWidthOnMobile {
+    width: 133px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .button,
+  .fullWidthOnMobile {
+    width: 160px;
+  }
+
+  .button {
+    font-size: 20px;
+  }
+}
