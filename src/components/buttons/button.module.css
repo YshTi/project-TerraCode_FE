@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: center;
 
-    min-height: 38px;
+    min-height: 32px;
     padding: 3px 9px;
 
     border-radius: 6px;
@@ -45,7 +45,7 @@
 
 /* Outlined / light button */
 .secondary {
-    color: var(--color-gray-900);
+    color: var(--color-text-primary);
     background-color: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.15);
 }
@@ -65,7 +65,7 @@
 
 .button:disabled,
 .button[aria-disabled="true"] {
-    opacity: 0.5;
+    opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
 }

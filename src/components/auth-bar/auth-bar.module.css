@@ -24,3 +24,9 @@
 .active {
   border-bottom-color: var(--color-gray-700);
 }
+
+@media screen and (min-width: 1440px) {
+  .link {
+    font-size: 18px;
+  }
+}

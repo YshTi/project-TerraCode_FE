@@ -1,0 +1,84 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+
+import { ConfirmationModal } from "@/components/confirmation-modal/confirmation-modal";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
+import { DEFAULT_AVATAR_URL } from "@/constants/user";
+
+import styles from "./user-bar.module.css";
+
+type UserBarProps = {
+  name?: string;
+  avatarUrl?: string | null;
+  profileHref?: string;
+  onLogout?: () => Promise<void> | void;
+};
+
+export function UserBar({
+  name = "Імʼя",
+  avatarUrl,
+  profileHref = "/profile",
+  onLogout,
+}: UserBarProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const avatarSrc = avatarUrl || DEFAULT_AVATAR_URL;
+
+  const handleLogout = async () => {
+    try {
+      await onLogout?.();
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
+
+  return (
+    <>
+      <div className={styles.userBar}>
+        <Link
+          href={profileHref}
+          className={styles.profileLink}
+          aria-label={`Перейти до профілю користувача ${name}`}
+        >
+          <Image
+            src={avatarSrc}
+            alt={name}
+            width={32}
+            height={32}
+            className={styles.avatar}
+          />
+
+          <span
+            className={styles.name}
+            title={name}
+          >
+            {name}
+          </span>
+        </Link>
+
+        <button
+          type="button"
+          className={styles.logoutButton}
+          onClick={() => setIsModalOpen(true)}
+          aria-label="Вийти з акаунту"
+        >
+          <SpriteIcon id="icon-logout" width={24} height={24} />
+        </button>
+      </div>
+
+      {isModalOpen && (
+        <ConfirmationModal
+          title="Ви точно хочете вийти?"
+          text="Ми будемо сумувати за вами!"
+          confirmText="Вийти"
+          cancelText="Відмінити"
+          onConfirm={handleLogout}
+          onCancel={() => setIsModalOpen(false)}
+        />
+      )}
+    </>
+  );
+}
