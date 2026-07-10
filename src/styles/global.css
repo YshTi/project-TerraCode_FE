@@ -36,8 +36,45 @@ a {
         opacity 200ms ease;
 }
 
+h1 {
+    font-size: 32px;
+    line-height: 1.1;
+}
+
+h2 {
+    font-size: 28px;
+    line-height: 1.2;
+}
+
+h4 {
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+@media screen and (min-width: 768px) {
+    h1 {
+        font-size: 47px;
+    }
+
+    h2 {
+        font-size: 43px;
+    }
+}
+
 @media screen and (min-width: 1440px) {
     .section{
         padding-block: 72px;
+    }
+
+    h1 {
+        font-size: 56px;
+    }
+
+    h2 {
+        font-size: 52px;
+    }
+
+    h4 {
+        font-size: 26px;
     }
 }
