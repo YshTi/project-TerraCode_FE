@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Container } from "@/components/container/container";
 import { AuthHeader } from "@/components/auth-header/auth-header";
@@ -10,7 +11,7 @@ import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { UserBar } from "@/components/header/user-bar/user-bar";
 import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
-
+import { useAuth } from "@/providers/auth-provider";
 
 import styles from "./header.module.css";
 
@@ -23,14 +24,9 @@ const navLinks = [
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Test logged-in user
-  const user = {
-    name: "Імʼя",
-    avatarUrl: "",
-  };
+  const router = useRouter();
 
-  // Test guest user
-  // const user = null;
+  const { user, isLoading, logout } = useAuth();
 
   const isLoggedIn = Boolean(user);
 
@@ -40,6 +36,13 @@ export function Header() {
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+
+    router.replace("/");
+    router.refresh();
   };
 
   useEffect(() => {
@@ -98,13 +101,21 @@ export function Header() {
         </nav>
 
         <div className={styles.desktopActions}>
-          {isLoggedIn ? (
+          {isLoading ? null : user ? (
             <>
-              <ButtonLink href="/stories/new" className={styles.publishButton}>
+              <ButtonLink
+                href="/stories/new"
+                className={styles.publishButton}
+              >
                 Опублікувати статтю
               </ButtonLink>
 
-              <UserBar user={user} />
+              <UserBar
+                name={user.name}
+                avatarUrl={user.avatarUrl}
+                profileHref="/profile"
+                onLogout={handleLogout}
+              />
             </>
           ) : (
             <MainAuthNav />
@@ -112,8 +123,11 @@ export function Header() {
         </div>
 
         <div className={styles.tabletActions}>
-          {isLoggedIn ? (
-            <ButtonLink href="/stories/new" className={styles.publishButton}>
+          {isLoading ? null : user ? (
+            <ButtonLink
+              href="/stories/new"
+              className={styles.publishButton}
+            >
               Опублікувати статтю
             </ButtonLink>
           ) : (
@@ -141,6 +155,7 @@ export function Header() {
           isLoggedIn={isLoggedIn}
           navLinks={navLinks}
           onClose={closeMenu}
+          onLogout={handleLogout}
         />
       )}
     </header>

@@ -14,20 +14,25 @@ type UserBarProps = {
   name?: string;
   avatarUrl?: string | null;
   profileHref?: string;
+  onLogout?: () => Promise<void> | void;
 };
 
 export function UserBar({
   name = "Імʼя",
   avatarUrl,
   profileHref = "/profile",
+  onLogout,
 }: UserBarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const avatarSrc = avatarUrl || DEFAULT_AVATAR_URL;
 
-  const handleLogout = () => {
-    // TODO: connect real logout later
-    setIsModalOpen(false);
+  const handleLogout = async () => {
+    try {
+      await onLogout?.();
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
   return (
@@ -41,12 +46,17 @@ export function UserBar({
           <Image
             src={avatarSrc}
             alt={name}
-            width={40}
-            height={40}
+            width={32}
+            height={32}
             className={styles.avatar}
           />
 
-          <span className={styles.name}>{name}</span>
+          <span
+            className={styles.name}
+            title={name}
+          >
+            {name}
+          </span>
         </Link>
 
         <button

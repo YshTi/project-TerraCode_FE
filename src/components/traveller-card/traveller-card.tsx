@@ -21,7 +21,7 @@ export function TravellerCard({
     <article className={styles.card}>
       <Image
         src={avatarUrl || "/default-avatar.png"}
-        alt={`${name} avatar`}
+        alt={name}
         width={130}
         height={130}
         className={styles.photo}
@@ -35,13 +35,13 @@ export function TravellerCard({
         </p>
       </div>
 
-      <ButtonLink
-        href={`/traveller/${_id}`}
-        variant="secondary"
-        className={styles.linkButton}
-      >
-        Переглянути профіль
-      </ButtonLink>
+<ButtonLink
+  href={`/traveller/${_id}`}
+  variant="secondary"
+  className={styles.linkButton}
+>
+  Переглянути профіль
+</ButtonLink>
     </article>
   );
 }
