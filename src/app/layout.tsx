@@ -7,7 +7,9 @@ import "@/styles/reset.css";
 import "@/styles/global.css";
 
 import { AppShell } from "@/components/app-shell/app-shell";
-import { AuthProvider } from "@/contexts/auth-context";
+import { TanStackProvider } from "@/providers/tanstack-provider";
+import { AuthProvider } from "@/providers/auth-provider";
+import { AppToaster } from "@/components/toaster/toaster";
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -29,9 +31,14 @@ export default function RootLayout({
   return (
     <html lang="uk" className={montserrat.variable}>
       <body>
-        <AuthProvider>
-          <AppShell>{children}</AppShell>
-        </AuthProvider>
+        <TanStackProvider>
+          <AuthProvider>
+            <AppShell>
+              {children}
+              <AppToaster />
+            </AppShell>
+          </AuthProvider>
+        </TanStackProvider>
       </body>
     </html>
   );

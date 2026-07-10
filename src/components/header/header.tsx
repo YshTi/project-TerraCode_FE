@@ -11,7 +11,7 @@ import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { UserBar } from "@/components/header/user-bar/user-bar";
 import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/providers/auth-provider";
 
 import styles from "./header.module.css";
 
