@@ -1,0 +1,90 @@
+.toast {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 280px;
+    max-width: 420px;
+
+    padding: 16px;
+
+    background: var(--color-background);
+
+    border: 1px solid var(--color-gray-100);
+    border-radius: 12px;
+
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+
+    font-family: var(--font-main);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    color: var(--color-text-primary);
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.toast::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 8px;
+    height: 100%;
+
+    border-radius: 12px 0 0 12px;
+}
+
+.icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    color: var(--color-white);
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.message {
+    flex: 1;
+}
+
+.success .icon {
+    background: var(--color-accent);
+}
+
+.error .icon {
+    background: var(--color-error);
+}
+
+.info .icon {
+    background: var(--color-yellow-400);
+    color: var(--color-gray-900);
+}
+
+.success::before {
+    background: var(--color-accent);
+}
+
+.error::before {
+    background: var(--color-error);
+}
+
+.info::before {
+    background: var(--color-yellow-400);
+}
