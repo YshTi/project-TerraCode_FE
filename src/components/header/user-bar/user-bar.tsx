@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 import { ConfirmationModal } from "@/components/confirmation-modal/confirmation-modal";
@@ -12,30 +13,51 @@ import styles from "./user-bar.module.css";
 type UserBarProps = {
   name?: string;
   avatarUrl?: string | null;
+  profileHref?: string;
+  onLogout?: () => Promise<void> | void;
 };
 
-export function UserBar({ name = "Імʼя", avatarUrl }: UserBarProps) {
+export function UserBar({
+  name = "Імʼя",
+  avatarUrl,
+  profileHref = "/profile",
+  onLogout,
+}: UserBarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const avatarSrc = avatarUrl || DEFAULT_AVATAR_URL;
 
-  const handleLogout = () => {
-    // TODO: connect real logout later
-    setIsModalOpen(false);
+  const handleLogout = async () => {
+    try {
+      await onLogout?.();
+    } finally {
+      setIsModalOpen(false);
+    }
   };
 
   return (
     <>
       <div className={styles.userBar}>
-        <Image
-          src={avatarSrc}
-          alt={name}
-          width={40}
-          height={40}
-          className={styles.avatar}
-        />
+        <Link
+          href={profileHref}
+          className={styles.profileLink}
+          aria-label={`Перейти до профілю користувача ${name}`}
+        >
+          <Image
+            src={avatarSrc}
+            alt={name}
+            width={32}
+            height={32}
+            className={styles.avatar}
+          />
 
-        <span className={styles.name}>{name}</span>
+          <span
+            className={styles.name}
+            title={name}
+          >
+            {name}
+          </span>
+        </Link>
 
         <button
           type="button"
@@ -49,12 +71,12 @@ export function UserBar({ name = "Імʼя", avatarUrl }: UserBarProps) {
 
       {isModalOpen && (
         <ConfirmationModal
-            title="Ви точно хочете вийти?"
-            text="Ми будемо сумувати за вами!"
-            confirmText="Вийти"
-            cancelText="Відмінити"
-            onConfirm={handleLogout}
-            onCancel={() => setIsModalOpen(false)}
+          title="Ви точно хочете вийти?"
+          text="Ми будемо сумувати за вами!"
+          confirmText="Вийти"
+          cancelText="Відмінити"
+          onConfirm={handleLogout}
+          onCancel={() => setIsModalOpen(false)}
         />
       )}
     </>

@@ -1,17 +1,45 @@
 .authNav {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
 }
 
-.loginButton {
-    width: 65px;
-}
-
-.registerButton {
-    width: 137px;
+.loginButton, .registerButton {
+    width: 100%;
+    font-size: 16px;
 }
 
 .active {
     position: relative;
+}
+
+
+@media screen and (min-width: 768px) {
+    .authNav {
+        flex-direction: row;
+        gap: 16px;
+    }
+    .loginButton {
+        width: 56px;
+    }
+    
+    .registerButton {
+        width: 114px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+
+    .loginButton {
+        width: 65px;
+        height: 38px;
+        font-size: 18px;
+    }
+
+    .registerButton {
+        width: 137px;
+        height: 38px;
+        font-size: 18px;
+    }
 }

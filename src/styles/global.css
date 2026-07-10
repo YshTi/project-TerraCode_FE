@@ -1,10 +1,30 @@
+:root {
+    --header-height: 72px;
+}
+
+html {
+    scroll-padding-top: var(--header-height);
+}
+
+main {
+    padding-top: var(--header-height);
+    flex: 1 0 auto;
+}
+
 body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     min-width: 320px;
     font-family: var(--font-main);
     font-size: 16px;
     line-height: 1.5;
     color: var(--color-text-primary);
     background-color: var(--color-background);
+}
+
+.section{
+    padding-block: 64px;
 }
 
 button,
@@ -14,4 +34,10 @@ a {
         background-color 200ms ease,
         border-color 200ms ease,
         opacity 200ms ease;
+}
+
+@media screen and (min-width: 1440px) {
+    .section{
+        padding-block: 72px;
+    }
 }

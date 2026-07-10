@@ -4,6 +4,29 @@
     gap: 8px;
 }
 
+.profileLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 140px;
+
+    color: inherit;
+    text-decoration: none;
+
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.profileLink:hover .name,
+.profileLink:focus-visible .name {
+    color: var(--color-accent);
+}
+
+.profileLink:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+}
+
 .avatar {
     display: flex;
     align-items: center;
@@ -30,7 +53,14 @@
     line-height: 1.5;
     font-weight: 400;
 
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     color: var(--color-text-primary);
+
+    transition: color 200ms ease;
 }
 
 .logoutButton {
@@ -44,10 +74,25 @@
     border-left: 1px solid rgba(0, 0, 0, 0.15);
     background: transparent;
 
+    color: var(--color-text-primary);
     cursor: pointer;
+
+    transition: color 200ms ease;
 }
 
 .logoutButton:hover,
 .logoutButton:focus-visible {
     color: var(--color-accent);
+}
+
+.logoutButton:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+@media screen and (min-width: 1440px) {
+    .name {
+        font-size: 16px;
+    }
 }

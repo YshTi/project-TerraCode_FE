@@ -1,7 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+
 import { ButtonLink } from "@/components/buttons/button";
+
 import styles from "./main-auth-nav.module.css";
 
 const authLinks = [
@@ -19,12 +21,16 @@ const authLinks = [
   },
 ];
 
-export function MainAuthNav() {
+type MainAuthNavProps = {
+  onNavigate?: () => void;
+};
+
+export function MainAuthNav({ onNavigate }: MainAuthNavProps) {
   const pathname = usePathname();
 
   return (
     <nav className={styles.authNav} aria-label="Навігація авторизації">
-      {authLinks.map(({ href, label, variant, className}) => {
+      {authLinks.map(({ href, label, variant, className }) => {
         const isActive = pathname === href;
 
         return (
@@ -34,6 +40,7 @@ export function MainAuthNav() {
             variant={variant}
             className={`${className} ${isActive ? styles.active : ""}`}
             aria-current={isActive ? "page" : undefined}
+            onClick={onNavigate}
           >
             {label}
           </ButtonLink>
