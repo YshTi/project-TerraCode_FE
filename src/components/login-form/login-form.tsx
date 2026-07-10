@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
 import { useAuth } from "@/providers/auth-provider";
+import { notify } from "@/utils/notify";
 
 import styles from "./login-form.module.css";
 
@@ -62,6 +63,8 @@ export function LoginForm() {
               if (response.status === 401) {
                 setHasAuthError(true);
                 setStatus("Невірна пошта або пароль");
+
+                notify.error("Невірна пошта або пароль");
                 return;
               }
 
@@ -75,15 +78,21 @@ export function LoginForm() {
               }
 
               setStatus(data.message || "Не вдалося увійти");
+
+              notify.error(data.message || "Не вдалося увійти");
               return;
             }
 
             await refreshUser();
 
+            notify.success("Вітаємо! Ви успішно увійшли.");
+
             router.push("/");
             router.refresh();
           } catch {
             setStatus("Помилка з'єднання з сервером");
+            
+            notify.error("Помилка з'єднання з сервером");
           } finally {
             setSubmitting(false);
           }
