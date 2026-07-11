@@ -176,7 +176,6 @@ export function AddStoryForm() {
 
               <div className={styles.imagePreview}>
                 {previewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={previewUrl}
                     alt="Прев'ю обкладинки історії"
