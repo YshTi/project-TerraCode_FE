@@ -6,6 +6,7 @@ import { FieldError } from "@/components/field-error/field-error";
 import { Button } from "@/components/buttons/button";
 import styles from "./registration-form.module.css";
 import { useRouter } from "next/navigation";
+import { notify } from "@/utils/notify";
 
 const registrationSchema = Yup.object({
   name: Yup.string()
@@ -69,11 +70,8 @@ export function RegistrationForm() {
 
                 if (!response.ok) {
                 if (response.status === 409) {
-                    setErrors({
-                    email: "Користувач із такою поштою вже існує",
-                    });
-
-                    return;
+                  notify.error("Користувач із такою поштою вже існує");
+                  return;
                 }
 
                 if (data.errors) {

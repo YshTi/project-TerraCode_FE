@@ -6,6 +6,7 @@ import { TravellerCard } from "@/components/traveller-card/traveller-card.tsx";
 import css from "./TravellersList.module.css";
 import { Loader } from "../loader/loader";
 import { Button } from "../buttons/button";
+import { toast } from "react-hot-toast";
 
 
 interface Traveller {
@@ -50,9 +51,8 @@ const loadMore = async () => {
                 setHasMore(false);
             }
     } catch (err) {
-        
-        // pppppppppppush-message
-
+        toast.error("Не вдалося завантажити мандрівників. Спробуйте ще!");
+        console.error(err);
        
     } finally {
         setLoading(false);
