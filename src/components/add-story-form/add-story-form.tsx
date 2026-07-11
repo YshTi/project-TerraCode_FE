@@ -28,7 +28,7 @@ const initialValues: FormValues = {
 };
 
 const addStorySchema = Yup.object({
-  image: Yup.mixed<File>().required("Додайте зображення для обкладинки"),
+  image: Yup.mixed<File>().required("Завантажити фото"),
 
   title: Yup.string()
     .trim()
