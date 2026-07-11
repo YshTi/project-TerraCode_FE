@@ -28,8 +28,12 @@ export default function AddStoryPage() {
   return (
     <section className={styles.addStorySection}>
       <Container>
-        <PageTitle>Створити нову історію</PageTitle>
-        <AddStoryForm />
+        <div className={styles.content}>
+          <PageTitle className={styles.addStoryTitle}>
+            Створити нову історію
+          </PageTitle>
+          <AddStoryForm />
+        </div>
       </Container>
     </section>
   );
