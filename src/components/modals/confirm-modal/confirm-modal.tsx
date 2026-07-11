@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import  PageTitle  from '@/components/page-title/page-title';
+import { PageTitle } from '@/components/page-title/page-title';
 import { Button } from '@/components/buttons/button';
 import { SpriteIcon } from '@/components/sprite-icon/sprite-icon';
 
@@ -11,6 +11,7 @@ import styles from './confirm-modal.module.css';
 type Props = {
   isOpen: boolean;
   title: string;
+  description?: string;
   confirmButtonText: string;
   cancelButtonText: string;
   onConfirm: () => void;
@@ -20,6 +21,7 @@ type Props = {
 export default function ConfirmModal({
   isOpen,
   title,
+  description,
   confirmButtonText,
   cancelButtonText,
   onConfirm,
@@ -27,6 +29,10 @@ export default function ConfirmModal({
 }: Props) {
   useEffect(() => {
     if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -38,6 +44,7 @@ export default function ConfirmModal({
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen, onCancel]);
 
@@ -60,7 +67,6 @@ export default function ConfirmModal({
         className={styles.modal}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="confirm-modal-title"
       >
         <button
           type="button"
@@ -76,17 +82,15 @@ export default function ConfirmModal({
           />
         </button>
 
-              <PageTitle
-          className={styles.title}
-          tag="h2"
-          id="confirm-modal-title"
-        >
+        <PageTitle className={styles.title}>
           {title}
         </PageTitle>
 
-        <p className={styles.subtitle}>
-          Ми будемо сумувати за вами!
-        </p>
+        {description && (
+          <p className={styles.subtitle}>
+            {description}
+          </p>
+        )}
 
         <div className={styles.actions}>
           <Button
