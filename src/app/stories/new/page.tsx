@@ -9,6 +9,8 @@ import { AddStoryForm } from "@/components/add-story-form/add-story-form";
 import { Loader } from "@/components/loader/loader";
 import { useAuth } from "@/providers/auth-provider";
 
+import styles from "./page.module.css";
+
 export default function AddStoryPage() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -24,7 +26,7 @@ export default function AddStoryPage() {
   }
 
   return (
-    <section className="section">
+    <section className={styles.addStorySection}>
       <Container>
         <PageTitle>Створити нову історію</PageTitle>
         <AddStoryForm />

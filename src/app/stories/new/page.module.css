@@ -1,0 +1,15 @@
+.addStorySection {
+    padding-block: 32px;
+}
+
+@media screen and (min-width: 768px) {
+    .addStorySection {
+        padding-block: 40px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .addStorySection {
+        padding-block: 48px;
+    }
+}
