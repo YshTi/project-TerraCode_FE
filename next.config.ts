@@ -7,8 +7,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-<<<<<<< Updated upstream
-=======
       },
       {
         protocol: "https",
@@ -17,8 +15,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "ftp.goit.study",
-        pathname: "/**",
->>>>>>> Stashed changes
       },
     ],
   },
