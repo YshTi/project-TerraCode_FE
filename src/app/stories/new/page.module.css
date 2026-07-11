@@ -1,0 +1,23 @@
+.addStorySection {
+    padding-block: 32px 64px;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+@media screen and (min-width: 1440px) {
+    .addStorySection {
+        padding-block: 48px 72px;
+    }
+
+    .addStoryTitle {
+        padding-inline: 64px;
+    }
+
+    .content {
+        gap: 32px;
+    }
+}
