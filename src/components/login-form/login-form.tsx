@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
 import { useAuth } from "@/providers/auth-provider";
+import { notify } from "@/utils/notify";
 
 import styles from "./login-form.module.css";
 
@@ -32,9 +33,7 @@ export function LoginForm() {
       <div className={styles.heading}>
         <h1 className={styles.title}>Вхід</h1>
 
-        <p className={styles.description}>
-          Увійдіть, щоб продовжити подорож!
-        </p>
+        <p className={styles.description}>Увійдіть, щоб продовжити подорож!</p>
       </div>
 
       <Formik
@@ -62,6 +61,8 @@ export function LoginForm() {
               if (response.status === 401) {
                 setHasAuthError(true);
                 setStatus("Невірна пошта або пароль");
+
+                notify.error("Невірна пошта або пароль");
                 return;
               }
 
@@ -70,20 +71,25 @@ export function LoginForm() {
                   email: data.errors.email?.[0],
                   password: data.errors.password?.[0],
                 });
-
                 return;
               }
 
               setStatus(data.message || "Не вдалося увійти");
+
+              notify.error(data.message || "Не вдалося увійти");
               return;
             }
 
             await refreshUser();
 
+            notify.success("Вітаємо! Ви успішно увійшли.");
+
             router.push("/");
             router.refresh();
           } catch {
             setStatus("Помилка з'єднання з сервером");
+            
+            notify.error("Помилка з'єднання з сервером");
           } finally {
             setSubmitting(false);
           }
@@ -119,13 +125,13 @@ export function LoginForm() {
                 type="email"
                 placeholder="hello@podorozhnyky.ua"
                 value={values.email}
-                onChange={(e) => {
+                onChange={(event) => {
                   if (hasAuthError) {
                     setHasAuthError(false);
                     setStatus(undefined);
                   }
 
-                  handleChange(e);
+                  handleChange(event);
                 }}
                 onBlur={handleBlur}
                 aria-invalid={
@@ -157,18 +163,17 @@ export function LoginForm() {
                 type="password"
                 placeholder="Ваш пароль"
                 value={values.password}
-                onChange={(e) => {
+                onChange={(event) => {
                   if (hasAuthError) {
                     setHasAuthError(false);
                     setStatus(undefined);
                   }
 
-                  handleChange(e);
+                  handleChange(event);
                 }}
                 onBlur={handleBlur}
                 aria-invalid={
-                  Boolean(touched.password && errors.password) ||
-                  hasAuthError
+                  Boolean(touched.password && errors.password) || hasAuthError
                 }
                 aria-describedby={
                   touched.password && errors.password
@@ -182,12 +187,7 @@ export function LoginForm() {
               )}
             </div>
 
-            {status && (
-              <FieldError
-                id="login-request-error"
-                message={status}
-              />
-            )}
+            {status && <FieldError id="login-request-error" message={status} />}
 
             <Button
               type="submit"
