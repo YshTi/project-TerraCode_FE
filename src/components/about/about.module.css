@@ -5,13 +5,13 @@
 .aboutWrapper {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 32px;
     align-items: center;
 }
 
 .aboutTitle {
     margin-bottom: 24px;
-    max-width: 660px;
+    max-width: 644px;
 }
 
 .aboutDescription {
@@ -71,6 +71,7 @@
 
     .aboutWrapper {
         flex-direction: row;
+        gap: 24px;
     }
 
     .aboutContent {
@@ -78,8 +79,13 @@
         width: 100%;
     }
 
+    .aboutTitle {
+        margin-top: 40px;
+    }
+
     .aboutList {
         margin-top: 32px;
+        padding-block: 8px;
     }
 
     .aboutDescription {
@@ -96,5 +102,6 @@
 
     .aboutImg img{
         transform: none;
+        min-width: 644px;
     }
 }
