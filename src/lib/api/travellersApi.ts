@@ -1,25 +1,25 @@
-import { nextServer } from "./api";
+// import { nextServer } from "./api";
 
-import { Traveller } from "@/types/traveller";
+// import { Traveller } from "@/types/traveller";
 
-interface TravellersResponse {
-  travellers: Traveller[];
-}
+// interface TravellersResponse {
+//   travellers: Traveller[];
+// }
 
-export const getTravellers =
-  async (): Promise<TravellersResponse> => {
-    const response =
-      await nextServer.get<TravellersResponse>("/travellers");
+// export const getTravellers =
+//   async (): Promise<TravellersResponse> => {
+//     const response =
+//       await nextServer.get<TravellersResponse>("/travellers");
 
-    return response.data;
-  };
+//     return response.data;
+//   };
 
-export const getTravellerById = async (
-  travellerId: string,
-): Promise<Traveller> => {
-  const response = await nextServer.get<Traveller>(
-    `/travellers/${travellerId}`,
-  );
+// export const getTravellerById = async (
+//   travellerId: string,
+// ): Promise<Traveller> => {
+//   const response = await nextServer.get<Traveller>(
+//     `/travellers/${travellerId}`,
+//   );
 
-  return response.data;
-};
+//   return response.data;
+// };
