@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios"; 
-import TravellerCard from "@/components/traveller-card/traveller-card.tsx"; 
+import { TravellerCard } from "@/components/traveller-card/traveller-card.tsx"; 
 import css from "./TravellersList.module.css";
 import { Loader } from "../loader/loader";
 import { Button } from "../buttons/button";
@@ -50,6 +50,7 @@ const loadMore = async () => {
                 setHasMore(false);
             }
     } catch (err) {
+        
         // pppppppppppush-message
 
        
@@ -63,21 +64,21 @@ return (
 {travellers.length === 0 ? (
     <p>Мандрівників не знайдено...</p>
 ) : (
-    <div className={css.container}>
-
+    <> 
         <ul className={css.travellersList}>
-
             {travellers.map((traveller) => (
-                <li key={traveller._id}>
+                <li key={traveller._id} className={css.item}>
+
                     {/* Перевірити    карткуууууууууу */}
+
                      <TravellerCard traveller={traveller}/>
                 </li>
             ))}
         </ul>
 
-{loading && <Loader/>}
+        {loading && <Loader/>}
 
-{hasMore && !loading && (
+        {hasMore && !loading && (
            <Button 
               variant="primary" 
               onClick={loadMore}
@@ -85,9 +86,8 @@ return (
               Показати ще
             </Button>
          )}
-    </div>
+    </>
 )}
-
 </div>
 
 );

@@ -36,11 +36,13 @@ export default async function TravellersPage() {
   const initialTravellers = await getFirstTravellers();
 
   return (
-    <main>
-      <h1 className={css.container}>
+    <main className={css.main}>
+        <div className={css.container}>
+      <h1 className={css.title}>
         Мандрівники
       </h1>
       <TravellersList initialTravellers={initialTravellers} />
-    </main>
+   </div> 
+   </main>
   );
 }
