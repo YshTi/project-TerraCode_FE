@@ -26,7 +26,7 @@
     justify-content: center;
 
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 3 / 2;
 
     background-color: var(--color-gray-50);
     border-radius: 8px;
@@ -108,13 +108,13 @@
     gap: 16px;
 }
 
-@media screen and (min-width: 768px) {
-    .imagePreview {
-        aspect-ratio: 21 / 9;
-    }
-}
-
 @media screen and (min-width: 1440px) {
+    .imagePreview {
+        width: auto;
+        margin-left: 64px;
+        margin-right: 285px;
+    }
+
     .label {
         font-size: 18px;
     }
