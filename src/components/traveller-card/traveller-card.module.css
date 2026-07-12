@@ -5,6 +5,8 @@
   height: 100%;
   padding: 24px;
   border-radius: 12px;
+
+  background: var(--color-green-100);
 }
 
 .photo {
@@ -26,16 +28,13 @@
 .name {
   font-size: 18px;
   font-weight: 600;
-  line-height: 1.5;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .articlesCount {
-  margin-top: 4px;
   font-size: 16px;
-  line-height: 1.5;
 }
 
 .linkButton {
