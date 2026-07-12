@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+} from "@tanstack/react-query";
 
 import { CategoriesFilter } from "@/components/categories-filter/categories-filter";
 import { Container } from "@/components/container/container";
 import { Loader } from "@/components/loader/loader";
 import { PageTitle } from "@/components/page-title/page-title";
+import { Pagination } from "@/components/pagination/pagination";
 import StoryCard from "@/components/story-card/story-card";
 import {
   getCategories,
@@ -18,10 +22,38 @@ import { notify } from "@/utils/notify";
 
 import css from "./page.module.css";
 
-const LIMIT = 9;
+const MOBILE_TABLET_LIMIT = 8;
+const DESKTOP_LIMIT = 9;
+const DESKTOP_MEDIA_QUERY = "(min-width: 1440px)";
+
+function useStoriesLimit() {
+  const [limit, setLimit] = useState(MOBILE_TABLET_LIMIT);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+
+    const updateLimit = () => {
+      setLimit(
+        mediaQuery.matches
+          ? DESKTOP_LIMIT
+          : MOBILE_TABLET_LIMIT,
+      );
+    };
+
+    updateLimit();
+    mediaQuery.addEventListener("change", updateLimit);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateLimit);
+    };
+  }, []);
+
+  return limit;
+}
 
 export default function StoriesPage() {
   const { user } = useAuth();
+  const limit = useStoriesLimit();
 
   const [selectedCategory, setSelectedCategory] =
     useState<string | null>(null);
@@ -31,21 +63,31 @@ export default function StoriesPage() {
     queryFn: getCategories,
   });
 
-  const storiesQuery = useQuery({
+  const storiesQuery = useInfiniteQuery({
     queryKey: [
       "stories",
       {
-        page: 1,
-        limit: LIMIT,
+        limit,
         category: selectedCategory,
       },
     ],
-    queryFn: () =>
+
+    queryFn: ({ pageParam }) =>
       getStories({
-        page: 1,
-        limit: LIMIT,
+        page: pageParam,
+        limit,
         category: selectedCategory ?? undefined,
       }),
+
+    initialPageParam: 1,
+
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.pagination.hasNextPage) {
+        return undefined;
+      }
+
+      return lastPage.pagination.page + 1;
+    },
   });
 
   const savedStoriesQuery = useQuery({
@@ -68,38 +110,57 @@ export default function StoriesPage() {
 
   const savedIds = useMemo(() => {
     return new Set(
-      savedStoriesQuery.data?.stories.map((story) => story._id) ?? [],
+      savedStoriesQuery.data?.stories.map(
+        (story) => story._id,
+      ) ?? [],
     );
   }, [savedStoriesQuery.data]);
 
-  const handleCategoryChange = (categoryId: string | null) => {
+  const stories = useMemo(() => {
+    return (
+      storiesQuery.data?.pages.flatMap(
+        (page) => page.stories,
+      ) ?? []
+    );
+  }, [storiesQuery.data]);
+
+  const handleCategoryChange = (
+    categoryId: string | null,
+  ) => {
     setSelectedCategory(categoryId);
   };
 
-  const isLoading =
-    categoriesQuery.isLoading || storiesQuery.isFetching;
+  const handleLoadMore = () => {
+    if (
+      storiesQuery.hasNextPage &&
+      !storiesQuery.isFetchingNextPage
+    ) {
+      void storiesQuery.fetchNextPage();
+    }
+  };
 
-  const stories = storiesQuery.data?.stories ?? [];
+  const isInitialLoading =
+    categoriesQuery.isLoading || storiesQuery.isLoading;
 
   return (
     <section className={css.section}>
-      <Container>
+      <Container className={css.storyContainer}>
         <PageTitle>Статті</PageTitle>
 
         <CategoriesFilter
           categories={categoriesQuery.data ?? []}
           selectedCategory={selectedCategory}
           onCategoryChange={handleCategoryChange}
-          disabled={storiesQuery.isFetching}
+          disabled={storiesQuery.isLoading}
         />
 
-        {isLoading && (
+        {isInitialLoading && (
           <div className={css.loaderWrapper}>
             <Loader />
           </div>
         )}
 
-        {!isLoading &&
+        {!isInitialLoading &&
           storiesQuery.isSuccess &&
           stories.length === 0 && (
             <p className={css.empty}>
@@ -107,16 +168,30 @@ export default function StoriesPage() {
             </p>
           )}
 
-        {!isLoading && stories.length > 0 && (
-          <ul className={css.grid}>
-            {stories.map((story) => (
-              <StoryCard
-                key={story._id}
-                story={story}
-                isSaved={savedIds.has(story._id)}
+        {!isInitialLoading && stories.length > 0 && (
+          <>
+            <ul className={css.grid}>
+              {stories.map((story) => (
+                <StoryCard
+                  key={story._id}
+                  story={story}
+                  isSaved={savedIds.has(story._id)}
+                />
+              ))}
+            </ul>
+
+            {storiesQuery.isFetchingNextPage ? (
+              <div className={css.loadMoreLoader}>
+                <Loader />
+              </div>
+            ) : (
+              <Pagination
+                onLoadMore={handleLoadMore}
+                isLoading={false}
+                hasMore={Boolean(storiesQuery.hasNextPage)}
               />
-            ))}
-          </ul>
+            )}
+          </>
         )}
       </Container>
     </section>

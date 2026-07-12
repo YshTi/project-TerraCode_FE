@@ -1,25 +1,43 @@
 // import { nextServer } from "./api";
 
-// import { Traveller } from "@/types/traveller";
+// import { User } from "@/types/users";
 
-// interface TravellersResponse {
-//   travellers: Traveller[];
+// interface UsersResponse {
+//   status: number;
+//   data: User[];
+//   pagination: {
+//     page: number;
+//     limit: number;
+//     total: number;
+//     totalPages: number;
+//   };
 // }
 
-// export const getTravellers =
-//   async (): Promise<TravellersResponse> => {
-//     const response =
-//       await nextServer.get<TravellersResponse>("/travellers");
+// interface UserResponse {
+//   status: number;
+//   data: User;
+// }
 
-//     return response.data;
-//   };
-
-// export const getTravellerById = async (
-//   travellerId: string,
-// ): Promise<Traveller> => {
-//   const response = await nextServer.get<Traveller>(
-//     `/travellers/${travellerId}`,
-//   );
+// export const getTravellers = async (
+//   page = 1,
+//   limit = 12,
+// ): Promise<UsersResponse> => {
+//   const response = await nextServer.get<UsersResponse>("/users", {
+//     params: {
+//       page,
+//       limit,
+//     },
+//   });
 
 //   return response.data;
+// };
+
+// export const getTravellerById = async (
+//   userId: string,
+// ): Promise<User> => {
+//   const response = await nextServer.get<UserResponse>(
+//     `/users/${userId}`,
+//   );
+
+//   return response.data.data;
 // };
