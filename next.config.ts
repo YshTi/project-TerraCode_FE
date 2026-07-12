@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
         hostname: "ftp.goit.study",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "media.istockphoto.com",
+      },
+      {
+        protocol: "https",
+        hostname: "ftp.goit.study",
+      },
     ],
   },
 };

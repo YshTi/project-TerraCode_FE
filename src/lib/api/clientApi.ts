@@ -1,4 +1,5 @@
 import { nextServer } from "./api";
+
 import { Story } from "@/types/story";
 
 interface StoriesResponse {
@@ -13,29 +14,58 @@ interface StoriesResponse {
   };
 }
 
-export const getStories = async (params: {
+interface SavedStoriesResponse {
+  stories: Story[];
+}
+
+interface StoriesParams {
   page?: number;
   limit?: number;
   category?: string;
   type?: string;
-}): Promise<StoriesResponse> => {
-  const response = await nextServer.get<StoriesResponse>("/stories", {
-    params,
-  });
+}
+
+export const getStories = async (
+  params: StoriesParams,
+): Promise<StoriesResponse> => {
+  const response = await nextServer.get<StoriesResponse>(
+    "/stories",
+    {
+      params,
+    },
+  );
+
   return response.data;
 };
 
-export const getSavedStories = async (): Promise<{ stories: Story[] }> => {
-  const response = await nextServer.get("/users/me/saved");
+export const getSavedStories =
+  async (): Promise<SavedStoriesResponse> => {
+    const response =
+      await nextServer.get<SavedStoriesResponse>(
+        "/users/me/saved",
+      );
+
+    return response.data;
+  };
+
+export const saveStory = async (
+  storyId: string,
+): Promise<SavedStoriesResponse> => {
+  const response =
+    await nextServer.patch<SavedStoriesResponse>(
+      `/users/me/saved/${storyId}`,
+    );
+
   return response.data;
 };
 
-export const saveStory = async (storyId: string) => {
-  const response = await nextServer.patch(`/users/me/saved/${storyId}`);
-  return response.data;
-};
+export const removeSavedStory = async (
+  storyId: string,
+): Promise<SavedStoriesResponse> => {
+  const response =
+    await nextServer.delete<SavedStoriesResponse>(
+      `/users/me/saved/${storyId}`,
+    );
 
-export const removeSavedStory = async (storyId: string) => {
-  const response = await nextServer.delete(`/users/me/saved/${storyId}`);
   return response.data;
 };
