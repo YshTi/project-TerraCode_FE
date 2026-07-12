@@ -1,6 +1,7 @@
 import Image from "next/image";
 
 import { ButtonLink } from "@/components/buttons/button";
+import { DEFAULT_AVATAR_URL } from "@/constants/user";
 
 import styles from "./traveller-card.module.css";
 
@@ -17,11 +18,13 @@ export function TravellerCard({
   avatarUrl,
   articlesAmount,
 }: TravellerCardProps) {
+  const imageSrc = avatarUrl || DEFAULT_AVATAR_URL;
+
   return (
     <article className={styles.card}>
       <Image
-        src={avatarUrl || "/default-avatar.png"}
-        alt={name}
+        src={imageSrc}
+        alt={`${name} avatar`}
         width={130}
         height={130}
         className={styles.photo}
@@ -35,13 +38,13 @@ export function TravellerCard({
         </p>
       </div>
 
-<ButtonLink
-  href={`/traveller/${_id}`}
-  variant="secondary"
-  className={styles.linkButton}
->
-  Переглянути профіль
-</ButtonLink>
+      <ButtonLink
+        href={`/traveller/${_id}`}
+        variant="secondary"
+        className={styles.linkButton}
+      >
+        Переглянути профіль
+      </ButtonLink>
     </article>
   );
 }
