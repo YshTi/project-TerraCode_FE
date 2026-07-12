@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios"; 
-import { TravellerCard } from "@/components/traveller-card/traveller-card.tsx"; 
+import { TravellerCard } from "@/components/traveller-card/traveller-card"; 
 import css from "./TravellersList.module.css";
 import { Loader } from "../loader/loader";
 import { Button } from "../buttons/button";
