@@ -39,7 +39,7 @@
     height: 32px;
     padding: 0;
 
-    color: var(--color-text-primary);
+    color: var(--color-black);
     background: transparent;
     border: none;
 
@@ -47,8 +47,7 @@
 }
 
 .closeIcon {
-    fill: currentColor;
-    stroke: currentColor;
+    stroke: var(--color-black);
     stroke-width: 1;
 }
 
