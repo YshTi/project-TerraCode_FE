@@ -45,6 +45,8 @@
 .closeIcon {
     width: 24px;
     height: 24px;
+    stroke: var(--color-black);
+    stroke-width: 1;
 }
 
 .mobileNav {
