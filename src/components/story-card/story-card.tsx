@@ -9,7 +9,7 @@ import { SpriteIcon } from "../sprite-icon/sprite-icon";
 import SaveButton from "../save-button/save-button";
 import { ErrorWhileSavingModal } from "../modals/error-while-saving-modal/error-while-saving-modal";
 
-import css from "./story-card1.module.css";
+import css from "./story-card.module.css";
 
 interface StoryCardProps {
   story: Story;
