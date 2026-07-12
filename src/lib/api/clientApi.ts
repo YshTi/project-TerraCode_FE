@@ -1,8 +1,9 @@
 import { nextServer } from "./api";
 
+import { Category } from "@/types/category";
 import { Story } from "@/types/story";
 
-interface StoriesResponse {
+export interface StoriesResponse {
   stories: Story[];
   pagination: {
     page: number;
@@ -28,12 +29,15 @@ interface StoriesParams {
 export const getStories = async (
   params: StoriesParams,
 ): Promise<StoriesResponse> => {
-  const response = await nextServer.get<StoriesResponse>(
-    "/stories",
-    {
-      params,
-    },
-  );
+  const response = await nextServer.get<StoriesResponse>("/stories", {
+    params,
+  });
+
+  return response.data;
+};
+
+export const getCategories = async (): Promise<Category[]> => {
+  const response = await nextServer.get<Category[]>("/categories");
 
   return response.data;
 };
@@ -41,9 +45,7 @@ export const getStories = async (
 export const getSavedStories =
   async (): Promise<SavedStoriesResponse> => {
     const response =
-      await nextServer.get<SavedStoriesResponse>(
-        "/users/me/saved",
-      );
+      await nextServer.get<SavedStoriesResponse>("/users/me/saved");
 
     return response.data;
   };

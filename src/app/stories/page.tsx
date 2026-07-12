@@ -1,46 +1,142 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import StoryCard from "@/components/story-card/story-card";
+import { CategoriesFilter } from "@/components/categories-filter/categories-filter";
+import { Container } from "@/components/container/container";
+import { Loader } from "@/components/loader/loader";
 import { PageTitle } from "@/components/page-title/page-title";
-import { getStories, getSavedStories } from "@/lib/api/clientApi";
+import { Pagination } from "@/components/pagination/pagination";
+import StoryCard from "@/components/story-card/story-card";
+import {
+  getCategories,
+  getSavedStories,
+  getStories,
+} from "@/lib/api/clientApi";
 import { useAuth } from "@/providers/auth-provider";
+import { notify } from "@/utils/notify";
 
 import css from "./page.module.css";
+
+const LIMIT = 9;
 
 export default function StoriesPage() {
   const { user } = useAuth();
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["stories", { page: 1, limit: 1 }],
-    queryFn: () => getStories({ page: 1, limit: 1 }),
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] =
+    useState<string | null>(null);
+
+  const categoriesQuery = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
   });
 
-  const { data: savedData } = useQuery({
+  const storiesQuery = useQuery({
+    queryKey: [
+      "stories",
+      {
+        page: currentPage,
+        limit: LIMIT,
+        category: selectedCategory,
+      },
+    ],
+    queryFn: () =>
+      getStories({
+        page: currentPage,
+        limit: LIMIT,
+        category: selectedCategory ?? undefined,
+      }),
+  });
+
+  const savedStoriesQuery = useQuery({
     queryKey: ["saved-stories"],
     queryFn: getSavedStories,
-    enabled: !!user,
+    enabled: Boolean(user),
   });
 
-  if (isLoading) {
-    return <p className={css.status}>Завантаження...</p>;
-  }
+  useEffect(() => {
+    if (categoriesQuery.isError) {
+      notify.error("Не вдалося завантажити категорії");
+    }
+  }, [categoriesQuery.isError]);
 
-  if (isError || !data || data.stories.length === 0) {
-    return <p className={css.status}>Не вдалося завантажити статтю</p>;
-  }
+  useEffect(() => {
+    if (storiesQuery.isError) {
+      notify.error("Не вдалося завантажити статті");
+    }
+  }, [storiesQuery.isError]);
 
-  const savedIds = new Set(savedData?.stories.map((s) => s._id) ?? []);
-  const story = data.stories[0];
+  const savedIds = useMemo(() => {
+    return new Set(
+      savedStoriesQuery.data?.stories.map((story) => story._id) ?? [],
+    );
+  }, [savedStoriesQuery.data]);
+
+  const handleCategoryChange = (categoryId: string | null) => {
+    setSelectedCategory(categoryId);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const isLoading =
+    categoriesQuery.isLoading || storiesQuery.isFetching;
+
+  const stories = storiesQuery.data?.stories ?? [];
+  const pagination = storiesQuery.data?.pagination;
 
   return (
-    <section className={css.section_stories}>
-      <PageTitle>Статті</PageTitle>
+    <section className={css.section}>
+      <Container>
+        <PageTitle>Статті</PageTitle>
 
-      <ul className={css.grid}>
-        <StoryCard story={story} isSaved={savedIds.has(story._id)} />
-      </ul>
+        <CategoriesFilter
+          categories={categoriesQuery.data ?? []}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
+          disabled={storiesQuery.isFetching}
+        />
+
+        {isLoading && (
+          <div className={css.loaderWrapper}>
+            <Loader />
+          </div>
+        )}
+
+        {!isLoading &&
+          storiesQuery.isSuccess &&
+          stories.length === 0 && (
+            <p className={css.empty}>
+              У цій категорії немає статей
+            </p>
+          )}
+
+        {!isLoading && stories.length > 0 && (
+          <>
+            <ul className={css.grid}>
+              {stories.map((story) => (
+                <StoryCard
+                  key={story._id}
+                  story={story}
+                  isSaved={savedIds.has(story._id)}
+                />
+              ))}
+            </ul>
+
+            {pagination && pagination.totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
+          </>
+        )}
+      </Container>
     </section>
   );
 }
