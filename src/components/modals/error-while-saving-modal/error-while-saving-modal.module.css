@@ -27,7 +27,7 @@
   padding: 64px 16px 16px;
 
   border-radius: 24px;
-  background: #eef8ee;
+  background: var(--color-green-50);
 }
 
 .closeButton {
