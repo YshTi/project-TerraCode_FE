@@ -1,0 +1,11 @@
+.avatar {
+  width: 113px;
+  height: 113px;
+}
+
+@media only screen and (min-width: 768px) {
+  .avatar {
+    width: 145px;
+    height: 145px;
+  }
+}
