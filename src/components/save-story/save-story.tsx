@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/buttons/button";
 import { Loader } from "@/components/loader/loader";
 import { useAuth } from "@/providers/auth-provider";
+
 import {
   getSavedStories,
   saveStory,
@@ -29,23 +30,21 @@ export function SaveStory({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      return;
-    }
+    if (!user) return;
 
-    async function loadSavedStories() {
+    const loadSavedStories = async () => {
       try {
         const { stories } = await getSavedStories();
 
         setSaved(
-          stories.some(({ _id }) => _id === storyId),
+          stories.some((story) => story._id === storyId),
         );
-      } catch {
-        toast.error("Не вдалося отримати збережені історії");
+      } catch (error) {
+        console.error(error);
       }
-    }
+    };
 
-    loadSavedStories();
+    void loadSavedStories();
   }, [storyId, user]);
 
   const handleClick = async () => {
@@ -81,7 +80,6 @@ export function SaveStory({
 
       <p className={styles.description}>
         Вона буде доступна у вашому профілі у розділі
-        {" "}
         «Збережене».
       </p>
 

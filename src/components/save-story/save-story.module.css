@@ -20,7 +20,7 @@
 
   font-size: 16px;
   line-height: 1.5;
-  color: var(--color-scheme-1-text);
+  color: var(--color-text-secondary);
 }
 
 .button {
@@ -28,6 +28,8 @@
 
   width: 100%;
   min-height: 48px;
+
+  font-size: 16px;
 }
 
 @media (min-width: 768px) {
@@ -37,12 +39,16 @@
 
   .button {
     width: 103px;
+    font-size: 16px;
   }
 }
 
 @media (min-width: 1440px) {
   .wrapper {
     max-width: 866px;
+
+    border-radius: 24px;
+    background: var(--color-green-100);
   }
 
   .title {
@@ -55,5 +61,6 @@
 
   .button {
     width: 123px;
+    font-size: 20px;
   }
 }
