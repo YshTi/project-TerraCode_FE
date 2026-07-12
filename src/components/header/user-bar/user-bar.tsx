@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
-import { ConfirmationModal } from "@/components/confirmation-modal/confirmation-modal";
+import ConfirmModal from "@/components/modals/confirm-modal/confirm-modal";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { DEFAULT_AVATAR_URL } from "@/constants/user";
 
@@ -24,14 +24,17 @@ export function UserBar({
   onLogout,
 }: UserBarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const avatarSrc = avatarUrl || DEFAULT_AVATAR_URL;
 
   const handleLogout = async () => {
     try {
+      setIsLoggingOut(true);
       await onLogout?.();
-    } finally {
       setIsModalOpen(false);
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -51,10 +54,7 @@ export function UserBar({
             className={styles.avatar}
           />
 
-          <span
-            className={styles.name}
-            title={name}
-          >
+          <span className={styles.name} title={name}>
             {name}
           </span>
         </Link>
@@ -65,20 +65,29 @@ export function UserBar({
           onClick={() => setIsModalOpen(true)}
           aria-label="Вийти з акаунту"
         >
-          <SpriteIcon id="icon-logout" width={24} height={24} />
+          <SpriteIcon
+            id="icon-logout"
+            width={24}
+            height={24}
+          />
         </button>
       </div>
 
-      {isModalOpen && (
-        <ConfirmationModal
-          title="Ви точно хочете вийти?"
-          text="Ми будемо сумувати за вами!"
-          confirmText="Вийти"
-          cancelText="Відмінити"
-          onConfirm={handleLogout}
-          onCancel={() => setIsModalOpen(false)}
-        />
-      )}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="Ви точно хочете вийти?"
+        description="Ми будемо сумувати за вами!"
+        confirmButtonText={
+          isLoggingOut ? "Вихід..." : "Вийти"
+        }
+        cancelButtonText="Відмінити"
+        onConfirm={handleLogout}
+        onCancel={() => {
+          if (!isLoggingOut) {
+            setIsModalOpen(false);
+          }
+        }}
+      />
     </>
   );
 }
