@@ -5,15 +5,8 @@
 }
 
 .button {
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 6px;
-
   width: 133px;
   height: 48px;
-
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
 }
 
 .fullWidthOnMobile {
@@ -27,6 +20,7 @@
 }
 
 @media only screen and (min-width: 1440px) {
+
   .button,
   .fullWidthOnMobile {
     width: 160px;
