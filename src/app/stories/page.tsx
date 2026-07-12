@@ -7,7 +7,6 @@ import { CategoriesFilter } from "@/components/categories-filter/categories-filt
 import { Container } from "@/components/container/container";
 import { Loader } from "@/components/loader/loader";
 import { PageTitle } from "@/components/page-title/page-title";
-import { Pagination } from "@/components/pagination/pagination";
 import StoryCard from "@/components/story-card/story-card";
 import {
   getCategories,
@@ -24,7 +23,6 @@ const LIMIT = 9;
 export default function StoriesPage() {
   const { user } = useAuth();
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] =
     useState<string | null>(null);
 
@@ -37,14 +35,14 @@ export default function StoriesPage() {
     queryKey: [
       "stories",
       {
-        page: currentPage,
+        page: 1,
         limit: LIMIT,
         category: selectedCategory,
       },
     ],
     queryFn: () =>
       getStories({
-        page: currentPage,
+        page: 1,
         limit: LIMIT,
         category: selectedCategory ?? undefined,
       }),
@@ -76,18 +74,12 @@ export default function StoriesPage() {
 
   const handleCategoryChange = (categoryId: string | null) => {
     setSelectedCategory(categoryId);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
   };
 
   const isLoading =
     categoriesQuery.isLoading || storiesQuery.isFetching;
 
   const stories = storiesQuery.data?.stories ?? [];
-  const pagination = storiesQuery.data?.pagination;
 
   return (
     <section className={css.section}>
@@ -116,25 +108,15 @@ export default function StoriesPage() {
           )}
 
         {!isLoading && stories.length > 0 && (
-          <>
-            <ul className={css.grid}>
-              {stories.map((story) => (
-                <StoryCard
-                  key={story._id}
-                  story={story}
-                  isSaved={savedIds.has(story._id)}
-                />
-              ))}
-            </ul>
-
-            {pagination && pagination.totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={pagination.totalPages}
-                onPageChange={handlePageChange}
+          <ul className={css.grid}>
+            {stories.map((story) => (
+              <StoryCard
+                key={story._id}
+                story={story}
+                isSaved={savedIds.has(story._id)}
               />
-            )}
-          </>
+            ))}
+          </ul>
         )}
       </Container>
     </section>
