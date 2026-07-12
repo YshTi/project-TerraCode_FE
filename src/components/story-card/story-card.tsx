@@ -7,8 +7,9 @@ import { ButtonLink } from "../buttons/button";
 import { Story } from "@/types/story";
 import { SpriteIcon } from "../sprite-icon/sprite-icon";
 import SaveButton from "../save-button/save-button";
+import { ErrorWhileSavingModal } from "../modals/error-while-saving-modal/error-while-saving-modal";
 
-import css from "./story-card.module.css";
+import css from "./story-card1.module.css";
 
 interface StoryCardProps {
   story: Story;
@@ -28,7 +29,6 @@ export default function StoryCard({ story, isSaved }: StoryCardProps) {
           fill
           className={css.image}
           sizes="(max-width: 767px) 100vw, (max-width: 1439px) 340px, 421px"
-      
         />
       </div>
 
@@ -52,7 +52,7 @@ export default function StoryCard({ story, isSaved }: StoryCardProps) {
             variant="secondary"
             className={css.viewButton}
           >
-            Переглянути статтю
+            <span className={css.viewButtonText}>Переглянути статтю</span>
           </ButtonLink>
 
           <SaveButton
@@ -63,13 +63,10 @@ export default function StoryCard({ story, isSaved }: StoryCardProps) {
         </div>
       </div>
 
-      {/* ErrorWhileSavingModal */}
-      {isAuthModalOpen && (
-        <div className={css.tempModalStub}>
-          <p>Увійдіть, щоб зберегти статтю</p>
-          <button onClick={() => setIsAuthModalOpen(false)}>Закрити</button>
-        </div>
-      )}
+      <ErrorWhileSavingModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </li>
   );
 }
