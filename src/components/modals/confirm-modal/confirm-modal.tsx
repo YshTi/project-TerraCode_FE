@@ -59,10 +59,7 @@ export default function ConfirmModal({
   };
 
   return (
-    <div
-      className={styles.overlay}
-      onClick={handleBackdropClick}
-    >
+    <div className={styles.overlay} onClick={handleBackdropClick}>
       <div
         className={styles.modal}
         role="dialog"
