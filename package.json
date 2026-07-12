@@ -2,18 +2,15 @@
   "name": "nature-trips-fe",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "dotenv -e .env.local -- next dev",
-    "build": "next build",
-    "start": "dotenv -e .env.local -- next start",
-    "lint": "next lint"
-  },
+"scripts": {
+  "dev": "next dev -p 3001",
+  "build": "next build",
+  "start": "next start -p 3001",
+  "lint": "next lint"
+},
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",
-<<<<<<< HEAD
     "axios": "^1.18.1",
-=======
->>>>>>> c21de6e7a87851b8b646d9b4a5f223206f2eaf19
     "clsx": "^2.1.1",
     "formik": "^2.4.9",
     "modern-normalize": "^3.0.1",
