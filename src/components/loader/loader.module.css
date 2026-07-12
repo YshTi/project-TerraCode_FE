@@ -1,21 +1,78 @@
-.wrapper {
+.overlay {
+  position: fixed;
+  inset: 0;
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 160px;
+  align-items: center;
+
+  background: rgb(0 0 0 / 25%);
+
+  backdrop-filter: blur(2px);
+
+  z-index: 9999;
 }
 
 .loader {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #def2de;
-  border-top-color: #5dbe5c;
-  border-radius: 50%;
-  animation: spin 800ms linear infinite;
+  position: relative;
+
+  display: inline-block;
+  overflow: hidden;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+/* Both SVGs */
+
+.backgroundMountain,
+.fillMountain {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Background */
+
+.backgroundMountain {
+  opacity: 0.1;
+}
+
+/* Animated mountain */
+
+.fillMountain {
+  position: absolute;
+
+  inset: 0;
+
+  clip-path: inset(100% 0 0 0);
+
+  animation: fillMountain 2.5s ease-in-out infinite;
+}
+
+@keyframes fillMountain {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+
+  70% {
+    clip-path: inset(0 0 0 0);
+  }
+
+  90% {
+    clip-path: inset(0 0 0 0);
+  }
+
+  100% {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fillMountain {
+    animation: none;
+
+    clip-path: inset(0);
   }
 }
