@@ -52,7 +52,7 @@ export const saveStory = async (
   storyId: string,
 ): Promise<SavedStoriesResponse> => {
   const response =
-    await nextServer.patch<SavedStoriesResponse>(
+    await nextServer.post<SavedStoriesResponse>(
       `/users/me/saved/${storyId}`,
     );
 
