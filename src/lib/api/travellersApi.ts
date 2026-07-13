@@ -1,6 +1,6 @@
 import { nextServer } from "./api";
 
-import { User } from "@/types/users";
+import type { User } from "@/types/users";
 
 interface UsersResponse {
   status: number;
