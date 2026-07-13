@@ -1,5 +1,6 @@
 import { nextServer } from "./api";
 
+import type { Story } from "@/types/story";
 import type { User } from "@/types/user";
 
 interface UsersResponse {
@@ -16,6 +17,24 @@ interface UsersResponse {
 interface UserResponse {
   status: number;
   data: User;
+}
+
+export interface TravellerStoriesResponse {
+  stories: Story[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+interface TravellerStoriesParams {
+  userId: string;
+  page?: number;
+  limit?: number;
 }
 
 export const getTravellers = async (
@@ -40,4 +59,22 @@ export const getTravellerById = async (
   );
 
   return response.data.data;
+};
+
+export const getTravellerStories = async ({
+  userId,
+  page = 1,
+  limit = 9,
+}: TravellerStoriesParams): Promise<TravellerStoriesResponse> => {
+  const response = await nextServer.get<TravellerStoriesResponse>(
+    `/users/${userId}/stories`,
+    {
+      params: {
+        page,
+        limit,
+      },
+    },
+  );
+
+  return response.data;
 };

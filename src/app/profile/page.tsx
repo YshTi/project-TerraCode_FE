@@ -4,12 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 
+import { Button, ButtonLink } from "@/components/buttons/button";
 import { Container } from "@/components/container/container";
 import { Loader } from "@/components/loader/loader";
-import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
-import { ButtonLink } from "@/components/buttons/button";
 import { MessageNoStories } from "@/components/message-no-stories/message-no-stories";
 import { ProfileTabs } from "@/components/profile-tabs/profile-tabs";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { TravellerInfo } from "@/components/traveller-info/traveller-info";
 import { TravellersStories } from "@/components/travellers-stories/travellers-stories";
 import {
@@ -23,38 +23,10 @@ import css from "./page.module.css";
 
 type ProfileTab = "saved" | "own";
 
-const MOBILE_TABLET_LIMIT = 4;
-const DESKTOP_LIMIT = 6;
-const DESKTOP_MEDIA_QUERY = "(min-width: 1440px)";
-
-function useProfileStoriesLimit() {
-  const [limit, setLimit] = useState(MOBILE_TABLET_LIMIT);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-
-    const updateLimit = () => {
-      setLimit(
-        mediaQuery.matches
-          ? DESKTOP_LIMIT
-          : MOBILE_TABLET_LIMIT,
-      );
-    };
-
-    updateLimit();
-    mediaQuery.addEventListener("change", updateLimit);
-
-    return () => {
-      mediaQuery.removeEventListener("change", updateLimit);
-    };
-  }, []);
-
-  return limit;
-}
+const STORIES_LIMIT = 6;
 
 export default function ProfilePage() {
   const router = useRouter();
-  const limit = useProfileStoriesLimit();
   const { user, isLoading: isAuthLoading } = useAuth();
 
   const [activeTab, setActiveTab] =
@@ -67,23 +39,23 @@ export default function ProfilePage() {
   }, [isAuthLoading, router, user]);
 
   const storiesQuery = useInfiniteQuery({
-    queryKey: ["profile-stories", activeTab, limit],
+    queryKey: ["profile-stories", activeTab],
 
     queryFn: ({ pageParam }) =>
       activeTab === "saved"
         ? getSavedStories({
             page: pageParam,
-            limit,
+            limit: STORIES_LIMIT,
           })
         : getOwnStories({
             page: pageParam,
-            limit,
+            limit: STORIES_LIMIT,
           }),
 
     initialPageParam: 1,
 
     getNextPageParam: (lastPage) => {
-      const pagination = lastPage.pagination;
+      const { pagination } = lastPage;
 
       if (!pagination) {
         return undefined;
@@ -98,7 +70,7 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (!storiesQuery.isError) {
+    if (!storiesQuery.error) {
       return;
     }
 
@@ -107,7 +79,7 @@ export default function ProfilePage() {
         ? "Не вдалося завантажити збережені історії"
         : "Не вдалося завантажити ваші історії",
     );
-  }, [activeTab, storiesQuery.isError]);
+  }, [activeTab, storiesQuery.error]);
 
   const stories = useMemo(
     () =>
@@ -144,6 +116,15 @@ export default function ProfilePage() {
           linkTo: "/stories/new",
         };
 
+  const handleLoadMore = () => {
+    if (
+      storiesQuery.hasNextPage &&
+      !storiesQuery.isFetchingNextPage
+    ) {
+      void storiesQuery.fetchNextPage();
+    }
+  };
+
   return (
     <main className={css.main}>
       <Container>
@@ -172,7 +153,10 @@ export default function ProfilePage() {
               />
             </ButtonLink>
 
-            <span className={css.editProfileTooltip} role="tooltip">
+            <span
+              className={css.editProfileTooltip}
+              role="tooltip"
+            >
               Редагувати профіль
             </span>
           </div>
@@ -187,6 +171,25 @@ export default function ProfilePage() {
           {storiesQuery.isLoading ? (
             <div className={css.loaderWrapper}>
               <Loader />
+            </div>
+          ) : storiesQuery.isError ? (
+            <div className={css.errorState}>
+              <p className={css.errorText}>
+                Не вдалося завантажити історії.
+              </p>
+
+              <Button
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  void storiesQuery.refetch();
+                }}
+                disabled={storiesQuery.isFetching}
+              >
+                {storiesQuery.isFetching
+                  ? "Повторне завантаження..."
+                  : "Спробувати ще раз"}
+              </Button>
             </div>
           ) : stories.length === 0 ? (
             <MessageNoStories
@@ -204,9 +207,7 @@ export default function ProfilePage() {
               }
               hasMore={Boolean(storiesQuery.hasNextPage)}
               isLoadingMore={storiesQuery.isFetchingNextPage}
-              onLoadMore={() => {
-                void storiesQuery.fetchNextPage();
-              }}
+              onLoadMore={handleLoadMore}
             />
           )}
         </section>
