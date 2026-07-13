@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { Container } from "../container/container";
 import css from "./traveller-info.module.css";
+import { DEFAULT_AVATAR_URL } from "@/constants/user";
 
 interface TravellerInfoProps {
   user: {
@@ -12,19 +12,18 @@ interface TravellerInfoProps {
 
 export function TravellerInfo({ user }: TravellerInfoProps) {
   return (
-    <section>
-      <Container>
-        <div>
-          <Image
-            className={css.avatar}
-            src={user.avatarUrl}
-            alt={user.name}
-            width={113}
-            height={113}
-          />
-          <div></div>
-        </div>
-      </Container>
-    </section>
+    <div className={css.wrapper}>
+      <Image
+        className={css.avatar}
+        src={user.avatarUrl || DEFAULT_AVATAR_URL}
+        alt={user.name}
+        width={113}
+        height={113}
+      />
+      <div>
+        <p className={css.username}>{user.name}</p>
+        <p className={css.articles}>Статей: {user.articlesAmount}</p>
+      </div>
+    </div>
   );
 }
