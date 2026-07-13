@@ -74,9 +74,9 @@ return (
             {travellers.map((traveller) => (
                 <li key={traveller._id} className={css.item}>
 
-                    {/* Перевірити    карткуууууууууу */}
+                   
 
-                     <TravellerCard traveller={traveller}/>
+                     <TravellerCard {...traveller} />
                 </li>
             ))}
         </ul>
