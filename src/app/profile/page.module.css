@@ -39,7 +39,7 @@
 .editProfileTooltip {
     position: absolute;
     z-index: 10;
-    top: calc(100% + 8px);
+    bottom: calc(100% + 8px);
     right: 0;
 
     padding: 6px 10px;
@@ -77,6 +77,12 @@
 @media screen and (min-width:768px) {
     .editProfileWrapper {
         top: 0;
+    }
+
+    .editProfileTooltip {
+        bottom: auto;
+        top: calc(30%);
+        right: 0;
     }
 }
 
