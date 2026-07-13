@@ -1,13 +1,7 @@
-@media only screen and (min-width: 768px) {
-  .heading {
-    font-size: 44px;
-  }
+.heading {
+  color: var(--color-black);
 }
-@media only screen and (min-width: 1440px) {
-  .heading {
-    font-size: 52px;
-  }
-}
+
 .wrapper {
   display: flex;
   flex-direction: column;
@@ -25,15 +19,18 @@
 .navBtn {
   width: 48px;
   height: 48px;
+  padding: 11px;
+  background: var(--color-green-100);
 }
 .allArticlesBtnMob {
   border: 1px solid var(--color-green-600);
   border-radius: 6px;
   padding: 6px 12px;
-  width: 335px;
+  max-width: 335px;
   height: 48px;
   font-size: 16px;
 }
+
 @media only screen and (max-width: 767px) {
   .allArticlesBtnPc {
     display: none;
@@ -44,17 +41,19 @@
     display: none;
   }
 }
+
 .allArticlesBtnPc {
-  border: 1px solid var(--color-green-600);
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 11px;
   font-weight: 500;
   height: 48px;
-  font-size: 16px;
+  width: 101px;
 }
+
 @media only screen and (min-width: 1440px) {
   .allArticlesBtnPc {
-    font-size: 20px;
+    width: 120px;
+    padding: 8px 11px;
   }
 }
 .headingBtnWrap {
