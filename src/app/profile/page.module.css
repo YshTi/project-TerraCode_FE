@@ -1,0 +1,24 @@
+.main {
+    padding: 32px 0 64px 0;
+}
+
+.travellerInfo {
+    margin-bottom: 32px;
+}
+
+.storiesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+@media screen and (min-width: 1440px) {
+    .main {
+        padding: 48px 0 72px 0;
+    }
+
+    .travellerInfo {
+        margin-bottom: 48px;
+    }
+}
