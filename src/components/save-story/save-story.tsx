@@ -8,7 +8,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import type { StoriesResponse } from "@/lib/api/profileApi";
+import type { StoriesResponse } from "@/lib/api/clientApi";
 import { Button } from "@/components/buttons/button";
 import { Loader } from "@/components/loader/loader";
 import { ErrorWhileSavingModal } from "@/components/modals/error-while-saving-modal/error-while-saving-modal";
