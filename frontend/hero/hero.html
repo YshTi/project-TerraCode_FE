@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hero</title>
+    <link rel="stylesheet" href="/static/hero/hero.module.css" />
+  </head>
+  <body>
+    <section class="hero_root" id="hero">
+      <div class="hero_container">
+        <div class="hero_wrapper">
+          <div class="hero_content">
+            <h1 class="hero_title">
+              Відкрий Україну заново — еко-мандри для натхнення
+            </h1>
+            <p class="hero_text">
+              Подорожуй екологічно, відкривай заповідні місця, гори та річки
+              України. Ми зібрали маршрути, які допоможуть побачити красу
+              природи без шкоди для неї.
+            </p>
+            <a class="hero_button" href="#Join">Доєднатись до мандрів</a>
+          </div>
+
+          <div class="hero_image_box">
+            <picture>
+              <source
+                media="(min-width: 1440px)"
+                srcset="/static/hero/images/hero-desktop.jpg"
+              />
+              <source
+                media="(min-width: 768px)"
+                srcset="/static/hero/images/hero-tablet.jpg"
+              />
+              <img
+                src="/static/hero/images/hero-mobile.jpg"
+                alt="Головне зображення"
+                class="hero-image"
+              />
+            </picture>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

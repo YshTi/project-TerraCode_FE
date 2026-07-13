@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+  text-decoration: none;
+}
+
+.hero_root {
+  max-width: 375px;
+  margin: 0 auto;
+  background: #eef8ee;
+}
+
+.hero_container {
+  padding: 64px 20px;
+}
+
+/* На мобільних показуємо картинку зверху */
+.hero_wrapper {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.hero_image_box {
+  margin-bottom: 24px;
+}
+
+.hero-image {
+  width: 335px;
+  height: 469px;
+  display: block;
+}
+
+.hero_title {
+  display: flex;
+  flex-direction: column;
+  letter-spacing: -0.01em;
+  color: #1b391b;
+  font:
+    700 32px / 1.1 "Montserrat",
+    sans-serif;
+  margin-bottom: 24px;
+}
+
+.hero_text {
+  font:
+    500 16px / 1.5 "Montserrat",
+    sans-serif;
+  color: #1b391b;
+  margin-bottom: 32px;
+}
+
+.hero_button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 8px;
+  border: 1px solid #4a9849;
+  border-radius: 6px;
+  padding-block: 6px;
+  padding-inline: 12px;
+  height: 39px;
+  background: #4a9849;
+  font:
+    500 16px / 1.5 "Montserrat",
+    sans-serif;
+  color: #fff;
+  max-width: 335px;
+}
+
+.hero_button:hover,
+.hero_button:focus-visible {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  border: 1px solid rgba(255, 255, 255, 0);
+  border-radius: 6px;
+  padding-block: 6px;
+  padding-inline: 12px;
+  background: #254c24;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .hero_root {
+    max-width: 768px;
+  }
+
+  .hero_container {
+    padding: 64px 32px;
+  }
+
+  .hero-image {
+    width: 704px;
+    height: 469px;
+  }
+
+  .hero_title {
+    font: 700 48px / 1.1 "Montserrat";
+  }
+
+  .hero_button {
+    max-width: 228px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .hero_root {
+    max-width: 1440px;
+  }
+
+  .hero_container {
+    padding: 72px 64px;
+  }
+
+  /* Розділяємо екран на два рівних або пропорційних блоки зліва і справа */
+  .hero_wrapper {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  /* Ліва колонка з усім текстом та кнопкою */
+  .hero_content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 74px; /* Ваш відступ зверху, щоб вирівняти по сітці макета */
+  }
+
+  .hero_title {
+    font: 700 56px / 1.1 "Montserrat";
+    margin-bottom: 24px; /* Великий відступ від заголовка до тексту */
+  }
+
+  .hero_text {
+    max-width: 612px;
+    margin-bottom: 32px;
+  }
+
+  .hero_image_box {
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .hero-image {
+    width: 644px;
+    height: 580px;
+  }
+
+  .hero_button {
+    max-width: 278px;
+  }
+}
