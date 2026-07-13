@@ -59,10 +59,13 @@ export function LoginForm() {
 
             if (!response.ok) {
               if (response.status === 401) {
-                setHasAuthError(true);
-                setStatus("Невірна пошта або пароль");
+                const message =
+                  "Не вдалося виконати вхід. Перевірте email або пароль";
 
-                notify.error("Невірна пошта або пароль");
+                setHasAuthError(true);
+                setStatus(message);
+                notify.error(message);
+
                 return;
               }
 
@@ -88,7 +91,6 @@ export function LoginForm() {
             router.refresh();
           } catch {
             setStatus("Помилка з'єднання з сервером");
-            
             notify.error("Помилка з'єднання з сервером");
           } finally {
             setSubmitting(false);

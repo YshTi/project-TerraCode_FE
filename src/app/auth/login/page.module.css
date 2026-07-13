@@ -1,10 +1,10 @@
 .loginPage {
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-height: 100svh;
-  max-width: 335px;
-  margin: 0 auto;
   padding: 0 20px;
+  background: var(--color-background);
 }
 
 .header {
@@ -16,6 +16,9 @@
 .login {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 644px;
+  margin: 0 auto;
   gap: 32px;
   padding-top: 64px;
 }
@@ -30,21 +33,12 @@
 
 @media screen and (min-width: 768px) {
   .loginPage {
-    width: 100%;
-    max-width: 768px;
     padding: 0 32px;
-  }
-
-  .login {
-    align-items: center;
-    width: 644px;
-    margin: 0 auto;
   }
 }
 
 @media screen and (min-width: 1440px) {
   .loginPage {
-    max-width: 1440px;
     padding: 0 64px;
   }
 }
