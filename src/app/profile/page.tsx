@@ -83,9 +83,15 @@ export default function ProfilePage() {
     initialPageParam: 1,
 
     getNextPageParam: (lastPage) => {
-      const { page, totalPages } = lastPage.pagination;
+      const pagination = lastPage.pagination;
 
-      return page < totalPages ? page + 1 : undefined;
+      if (!pagination) {
+        return undefined;
+      }
+
+      return pagination.page < pagination.totalPages
+        ? pagination.page + 1
+        : undefined;
     },
 
     enabled: Boolean(user),
