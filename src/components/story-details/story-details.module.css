@@ -1,0 +1,160 @@
+.article {
+    width: 100%;
+}
+
+.storyInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    margin-bottom: 32px;
+}
+
+.imageWrapper {
+    position: relative;
+
+    width: 100%;
+    aspect-ratio: 3 / 2;
+
+    overflow: hidden;
+    border-radius: 24px;
+}
+
+.image {
+    object-fit: cover;
+}
+
+.storyInfoWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--color-text-primary);
+    text-decoration: none;
+
+    transition:
+        color 200ms ease,
+        transform 200ms ease;
+}
+
+.backIcon {
+    flex-shrink: 0;
+    color: currentColor;
+    stroke-width: 1px;
+    stroke: currentColor;
+}
+
+.backText {
+    color: var(--color-black);
+}
+
+.backLink:hover, .backLink:hover .backText {
+    color: var(--color-green-500);
+}
+
+.backLink:focus-visible,
+.backLink:focus-visible .backText {
+    outline: 2px solid var(--color-green-500);
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.backLink:active, .backLink:active .backText{
+    transform: translateX(-2px);
+}
+
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 8px;
+
+    font-size: 16px;
+    color: var(--color-text-secondary);
+}
+
+.metaName {
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.title {
+    text-align: left;
+}
+
+.metaInfo {
+    display: inline-flex;
+    gap: 8px;
+}
+
+.category {
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-black);
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+
+    border: 1px solid rgba(255, 255, 255, 0);
+    border-radius: 6px;
+    padding: 3px 9px;
+
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.content {
+    white-space: pre-line;
+    
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+}
+
+.content p {
+    margin: 0;
+    white-space: pre-line;
+}
+
+
+@media screen and (min-width: 1440px) {
+    .storyInfo {
+        flex-direction: row-reverse;
+        justify-content: space-between;
+
+        margin-bottom: 48px;
+    }
+
+    .backText {
+        font-size: 20px;
+    }
+
+    .imageWrapper {
+        flex: 0 0 755px;
+    }
+
+    .metaInfo {
+        font-size: 18px;
+    }
+
+    .category {
+        font-size: 16px;
+    }
+    
+    .content {
+        display: flex;
+        justify-content: center;
+        margin: auto;
+
+        max-width: 865px;
+        font-size: 18px;
+    }
+}
