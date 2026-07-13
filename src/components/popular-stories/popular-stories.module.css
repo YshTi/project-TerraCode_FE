@@ -13,25 +13,52 @@
   flex-direction: column;
   gap: 40px;
 }
-.swiper {
+.swiperWrapper {
   width: 100%;
-  height: 100%;
+  min-width: 0;
 }
-
-.swiper-slide {
-  text-align: center;
-  font-size: 18px;
-  background: #444;
-
-  /* Center slide text vertically */
+.navButtons {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: right;
+  gap: 10px;
 }
-
-.swiper-slide img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.navBtn {
+  width: 48px;
+  height: 48px;
+}
+.allArticlesBtnMob {
+  border: 1px solid var(--color-green-600);
+  border-radius: 6px;
+  padding: 6px 12px;
+  width: 335px;
+  height: 48px;
+  font-size: 16px;
+}
+@media only screen and (max-width: 767px) {
+  .allArticlesBtnPc {
+    display: none;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .allArticlesBtnMob {
+    display: none;
+  }
+}
+.allArticlesBtnPc {
+  border: 1px solid var(--color-green-600);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 500;
+  height: 48px;
+  font-size: 16px;
+}
+@media only screen and (min-width: 1440px) {
+  .allArticlesBtnPc {
+    font-size: 20px;
+  }
+}
+.headingBtnWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
