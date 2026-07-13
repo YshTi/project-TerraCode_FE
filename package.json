@@ -2,12 +2,12 @@
   "name": "nature-trips-fe",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "dotenv -e .env.local -- next dev",
-    "build": "next build",
-    "start": "dotenv -e .env.local -- next start",
-    "lint": "next lint"
-  },
+"scripts": {
+  "dev": "next dev -p 3001",
+  "build": "next build",
+  "start": "next start -p 3001",
+  "lint": "next lint"
+},
   "dependencies": {
     "@tanstack/react-query": "^5.101.2",
     "axios": "^1.18.1",
