@@ -8,8 +8,8 @@ import {
 } from "@tanstack/react-query";
 
 import { Button } from "@/components/buttons/button";
-import { ErrorWhileSavingModal } from "@/components/modals/error-while-saving-modal/error-while-saving-modal";
 import { Loader } from "@/components/loader/loader";
+import { ErrorWhileSavingModal } from "@/components/modals/error-while-saving-modal/error-while-saving-modal";
 import {
   getSavedStories,
   removeSavedStory,
@@ -49,13 +49,22 @@ export function SaveStory({ storyId }: SaveStoryProps) {
     }
   }, [savedStoriesQuery.isError]);
 
+  const refreshSavedStories = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["saved-stories"],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: ["profile-stories", "saved"],
+      }),
+    ]);
+  };
+
   const saveMutation = useMutation({
     mutationFn: () => saveStory(storyId),
 
     onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["saved-stories"],
-      });
+      await refreshSavedStories();
 
       notify.success("Історію збережено");
     },
@@ -69,8 +78,58 @@ export function SaveStory({ storyId }: SaveStoryProps) {
     mutationFn: () => removeSavedStory(storyId),
 
     onSuccess: async () => {
+      queryClient.setQueriesData<InfiniteData<StoriesResponse>>(
+        {
+          queryKey: ["profile-stories", "saved"],
+        },
+        (oldData) => {
+          if (!oldData) {
+            return oldData;
+          }
+
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page) => ({
+              ...page,
+              stories: page.stories.filter(
+                (story) => story._id !== storyId,
+              ),
+              pagination: {
+                ...page.pagination,
+                total: Math.max(
+                  0,
+                  page.pagination.total - 1,
+                ),
+              },
+            })),
+          };
+        },
+      );
+
+      queryClient.setQueryData(
+        ["saved-stories"],
+        (
+          oldData:
+            | {
+                stories: Array<{ _id: string }>;
+              }
+            | undefined,
+        ) => {
+          if (!oldData) {
+            return oldData;
+          }
+
+          return {
+            ...oldData,
+            stories: oldData.stories.filter(
+              (story) => story._id !== storyId,
+            ),
+          };
+        },
+      );
+
       await queryClient.invalidateQueries({
-        queryKey: ["saved-stories"],
+        queryKey: ["profile-stories", "saved"],
       });
 
       notify.success("Історію видалено зі збережених");
@@ -105,19 +164,27 @@ export function SaveStory({ storyId }: SaveStoryProps) {
 
   const isBusy = isChecking || isUpdating;
 
+  const title = isSaved
+    ? "Історію збережено"
+    : "Збережіть собі історію";
+
+  const description = isSaved
+    ? "Історію успішно додано до збережених. Вона доступна у вашому профілі у розділі «Збережені історії»."
+    : "Вона буде доступна у вашому профілі у розділі «Збережені історії».";
+
+  const buttonText = isSaved
+    ? "Видалити зі збережених"
+    : "Зберегти";
+
   return (
     <>
       <section className={styles.wrapper}>
         <h2 className={styles.title}>
-          {isSaved
-            ? "Історію збережено"
-            : "Збережіть собі історію"}
+          {title}
         </h2>
 
         <p className={styles.description}>
-          {isSaved
-            ? "Історію успішно додано до збережених. Вона доступна у вашому профілі у розділі «Збережені історії»."
-            : "Вона буде доступна у вашому профілі у розділі збережене"}
+          {description}
         </p>
 
         <Button
@@ -127,13 +194,7 @@ export function SaveStory({ storyId }: SaveStoryProps) {
           aria-pressed={isSaved}
           aria-busy={isBusy}
         >
-          {isBusy ? (
-            <Loader />
-          ) : isSaved ? (
-            "Видалити зі збережених"
-          ) : (
-            "Зберегти"
-          )}
+          {isBusy ? <Loader /> : buttonText}
         </Button>
       </section>
 

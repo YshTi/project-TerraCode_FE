@@ -1,12 +1,20 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  type InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 
-import { Button } from "../buttons/button";
+import { Button } from "@/components/buttons/button";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
+import {
+  removeSavedStory,
+  saveStory,
+} from "@/lib/api/clientApi";
 import { useAuth } from "@/providers/auth-provider";
+import type { Story } from "@/types/story";
 import { notify } from "@/utils/notify";
-import { saveStory, removeSavedStory } from "../../lib/api/clientApi";
-import { SpriteIcon } from "../sprite-icon/sprite-icon";
 
 import css from "./save-button.module.css";
 
@@ -14,6 +22,18 @@ interface SaveButtonProps {
   storyId: string;
   isSaved: boolean;
   onRequireAuth?: () => void;
+}
+
+interface StoriesPage {
+  stories: Story[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+  };
 }
 
 export default function SaveButton({
@@ -26,15 +46,70 @@ export default function SaveButton({
 
   const mutation = useMutation({
     mutationFn: () =>
-      isSaved ? removeSavedStory(storyId) : saveStory(storyId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["saved-stories"] });
+      isSaved
+        ? removeSavedStory(storyId)
+        : saveStory(storyId),
+
+    onSuccess: async () => {
+      if (isSaved) {
+        queryClient.setQueriesData<
+          InfiniteData<StoriesPage>
+        >(
+          {
+            queryKey: [
+              "profile-stories",
+              "saved",
+            ],
+          },
+          (oldData) => {
+            if (!oldData) {
+              return oldData;
+            }
+
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page) => ({
+                ...page,
+                stories: page.stories.filter(
+                  (story) => story._id !== storyId,
+                ),
+                pagination: {
+                  ...page.pagination,
+                  total: Math.max(
+                    0,
+                    page.pagination.total - 1,
+                  ),
+                },
+              })),
+            };
+          },
+        );
+      }
+
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["saved-stories"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [
+            "profile-stories",
+            "saved",
+          ],
+        }),
+      ]);
+
       notify.success(
-        isSaved ? "Статтю видалено зі збережених" : "Статтю збережено",
+        isSaved
+          ? "Статтю видалено зі збережених"
+          : "Статтю збережено",
       );
     },
+
     onError: (error: Error) => {
-      notify.error(error.message ?? "Не вдалося зберегти статтю");
+      notify.error(
+        error.message ||
+          "Не вдалося виконати операцію",
+      );
     },
   });
 
@@ -43,6 +118,7 @@ export default function SaveButton({
       onRequireAuth?.();
       return;
     }
+
     mutation.mutate();
   };
 
@@ -50,15 +126,30 @@ export default function SaveButton({
     <Button
       type="button"
       variant="secondary"
-      className={`${css.button} ${isSaved ? css.saved : ""}`}
+      className={`${css.button} ${
+        isSaved ? css.saved : ""
+      }`}
       onClick={handleClick}
       disabled={mutation.isPending}
-      aria-label={isSaved ? "Видалити зі збережених" : "Зберегти статтю"}
+      aria-label={
+        isSaved
+          ? "Видалити зі збережених"
+          : "Зберегти статтю"
+      }
+      aria-pressed={isSaved}
+      aria-busy={mutation.isPending}
     >
       {mutation.isPending ? (
-        <span className={css.spinner} />
+        <span
+          className={css.spinner}
+          aria-hidden="true"
+        />
       ) : (
-        <SpriteIcon id="icon-bookmark" width={20} height={20} />
+        <SpriteIcon
+          id="icon-bookmark"
+          width={20}
+          height={20}
+        />
       )}
     </Button>
   );

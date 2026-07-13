@@ -1,23 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button, ButtonLink } from "@/components/buttons/button";
+import { ButtonLink } from "@/components/buttons/button";
 import { Container } from "@/components/container/container";
 import { Loader } from "@/components/loader/loader";
-import { MessageNoStories } from "@/components/message-no-stories/message-no-stories";
 import { ProfileTabs } from "@/components/profile-tabs/profile-tabs";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { TravellerInfo } from "@/components/traveller-info/traveller-info";
 import { TravellersStories } from "@/components/travellers-stories/travellers-stories";
-import {
-  getOwnStories,
-  getSavedStories,
-} from "@/lib/api/profileApi";
 import { useAuth } from "@/providers/auth-provider";
-import { notify } from "@/utils/notify";
 
 import css from "./page.module.css";
 
@@ -38,57 +31,6 @@ export default function ProfilePage() {
     }
   }, [isAuthLoading, router, user]);
 
-  const storiesQuery = useInfiniteQuery({
-    queryKey: ["profile-stories", activeTab],
-
-    queryFn: ({ pageParam }) =>
-      activeTab === "saved"
-        ? getSavedStories({
-            page: pageParam,
-            limit: STORIES_LIMIT,
-          })
-        : getOwnStories({
-            page: pageParam,
-            limit: STORIES_LIMIT,
-          }),
-
-    initialPageParam: 1,
-
-    getNextPageParam: (lastPage) => {
-      const { pagination } = lastPage;
-
-      if (!pagination) {
-        return undefined;
-      }
-
-      return pagination.page < pagination.totalPages
-        ? pagination.page + 1
-        : undefined;
-    },
-
-    enabled: Boolean(user),
-  });
-
-  useEffect(() => {
-    if (!storiesQuery.error) {
-      return;
-    }
-
-    notify.error(
-      activeTab === "saved"
-        ? "Не вдалося завантажити збережені історії"
-        : "Не вдалося завантажити ваші історії",
-    );
-  }, [activeTab, storiesQuery.error]);
-
-  const stories = useMemo(
-    () =>
-      storiesQuery.data?.pages.flatMap(
-        (page) => page.stories,
-      ) ?? [],
-    [storiesQuery.data],
-  );
-
   if (isAuthLoading) {
     return (
       <main className={css.main}>
@@ -106,24 +48,15 @@ export default function ProfilePage() {
   const emptyState =
     activeTab === "saved"
       ? {
-          text: "У вас ще немає збережених історій.",
-          buttonText: "Переглянути статті",
+          text: "У вас ще немає збережених історій, мершій збережіть вашу першу історію!",
+          buttonText: "До історій",
           linkTo: "/stories",
         }
       : {
-          text: "Ви ще не створили жодної історії.",
-          buttonText: "Створити історію",
+          text: "Ви ще нічого не публікували, поділіться своєю першою історією!",
+          buttonText: "Опублікувати історію",
           linkTo: "/stories/new",
         };
-
-  const handleLoadMore = () => {
-    if (
-      storiesQuery.hasNextPage &&
-      !storiesQuery.isFetchingNextPage
-    ) {
-      void storiesQuery.fetchNextPage();
-    }
-  };
 
   return (
     <main className={css.main}>
@@ -168,48 +101,13 @@ export default function ProfilePage() {
         />
 
         <section className={css.storiesSection}>
-          {storiesQuery.isLoading ? (
-            <div className={css.loaderWrapper}>
-              <Loader />
-            </div>
-          ) : storiesQuery.isError ? (
-            <div className={css.errorState}>
-              <p className={css.errorText}>
-                Не вдалося завантажити історії.
-              </p>
-
-              <Button
-                type="button"
-                variant="primary"
-                onClick={() => {
-                  void storiesQuery.refetch();
-                }}
-                disabled={storiesQuery.isFetching}
-              >
-                {storiesQuery.isFetching
-                  ? "Повторне завантаження..."
-                  : "Спробувати ще раз"}
-              </Button>
-            </div>
-          ) : stories.length === 0 ? (
-            <MessageNoStories
-              text={emptyState.text}
-              buttonText={emptyState.buttonText}
-              linkTo={emptyState.linkTo}
-            />
-          ) : (
-            <TravellersStories
-              stories={stories}
-              savedStoryIds={
-                activeTab === "saved"
-                  ? stories.map((story) => story._id)
-                  : []
-              }
-              hasMore={Boolean(storiesQuery.hasNextPage)}
-              isLoadingMore={storiesQuery.isFetchingNextPage}
-              onLoadMore={handleLoadMore}
-            />
-          )}
+          <TravellersStories
+            source={{
+              type: activeTab,
+            }}
+            emptyState={emptyState}
+            limit={STORIES_LIMIT}
+          />
         </section>
       </Container>
     </main>
