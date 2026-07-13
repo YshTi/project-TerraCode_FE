@@ -6,11 +6,9 @@
   gap: 40px;
 
   width: 100%;
-  min-height: 753px;
-
   padding: 64px 20px;
 
-  background: #eef8ee;
+  background: var(--color-green-50);
 }
 
 .title {
@@ -39,10 +37,13 @@
   list-style: none;
 }
 
+.list > li:nth-child(n + 2) {
+  display: none;
+}
+
 /* Tablet */
 @media (min-width: 768px) {
   .section {
-    min-height: 743px;
     padding: 64px 32px;
   }
 
@@ -53,12 +54,19 @@
   .list {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .list > li:nth-child(2) {
+    display: flex;
+  }
+
+  .list > li:nth-child(n + 3) {
+    display: none;
+  }
 }
 
 /* Desktop */
 @media (min-width: 1440px) {
   .section {
-    min-height: 879px;
     padding: 72px 64px;
   }
 
@@ -68,5 +76,14 @@
 
   .list {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .list > li:nth-child(2),
+  .list > li:nth-child(3) {
+    display: flex;
+  }
+
+  .list > li:nth-child(n + 4) {
+    display: none;
   }
 }
