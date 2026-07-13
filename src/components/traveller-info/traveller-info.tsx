@@ -13,7 +13,7 @@ interface TravellerInfoProps {
 
 export function TravellerInfo({ user, className }: TravellerInfoProps) {
   return (
-    <div className={(css.wrapper, className)}>
+    <div className={`${css.wrapper} ${className}`}>
       <Image
         className={css.avatar}
         src={user.avatarUrl || DEFAULT_AVATAR_URL}
