@@ -4,7 +4,7 @@ import { DEFAULT_AVATAR_URL } from "@/constants/user";
 
 interface TravellerInfoProps {
   user: {
-    avatarUrl: string;
+    avatarUrl?: string | null;
     name: string;
     articlesAmount: number;
   };
