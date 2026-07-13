@@ -1,0 +1,25 @@
+.list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.list>li:nth-child(n + 5) {
+    display: none;
+}
+
+@media screen and (min-width: 768px) {
+    .list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .list>li:nth-child(n + 5) {
+        display: block;
+    }
+}
