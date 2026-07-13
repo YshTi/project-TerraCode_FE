@@ -41,7 +41,7 @@
   }
 
   .button {
-    width: 103px;
+    width: fit-content;
   }
 }
 
@@ -59,7 +59,6 @@
   }
 
   .button {
-    width: 123px;
     font-size: 20px;
   }
 }
