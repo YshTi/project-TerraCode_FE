@@ -48,12 +48,14 @@ export function TravellersStories({
           <Loader />
         </div>
       ) : (
-        <Pagination
-          onLoadMore={onLoadMore}
-          isLoading={isLoadingMore}
-          hasMore={hasMore}
-          fullWidthOnMobile
-        />
+        hasMore && (
+          <Pagination
+            onLoadMore={onLoadMore}
+            isLoading={isLoadingMore}
+            hasMore={hasMore}
+            fullWidthOnMobile
+          />
+        )
       )}
     </div>
   );
