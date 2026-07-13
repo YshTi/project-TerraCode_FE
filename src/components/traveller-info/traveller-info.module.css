@@ -1,6 +1,7 @@
 .avatar {
   width: 113px;
   height: 113px;
+  border-radius: 50%;
 }
 
 @media only screen and (min-width: 768px) {

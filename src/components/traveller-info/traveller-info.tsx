@@ -8,11 +8,12 @@ interface TravellerInfoProps {
     name: string;
     articlesAmount: number;
   };
+  className?: string;
 }
 
-export function TravellerInfo({ user }: TravellerInfoProps) {
+export function TravellerInfo({ user, className }: TravellerInfoProps) {
   return (
-    <div className={css.wrapper}>
+    <div className={(css.wrapper, className)}>
       <Image
         className={css.avatar}
         src={user.avatarUrl || DEFAULT_AVATAR_URL}
