@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 
 import { Container } from "@/components/container/container";
 import { Loader } from "@/components/loader/loader";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
+import { ButtonLink } from "@/components/buttons/button";
 import { MessageNoStories } from "@/components/message-no-stories/message-no-stories";
 import { ProfileTabs } from "@/components/profile-tabs/profile-tabs";
 import { TravellerInfo } from "@/components/traveller-info/traveller-info";
@@ -80,10 +82,11 @@ export default function ProfilePage() {
 
     initialPageParam: 1,
 
-    getNextPageParam: (lastPage) =>
-      lastPage.pagination?.hasNextPage
-        ? lastPage.pagination.page + 1
-        : undefined,
+    getNextPageParam: (lastPage) => {
+      const { page, totalPages } = lastPage.pagination;
+
+      return page < totalPages ? page + 1 : undefined;
+    },
 
     enabled: Boolean(user),
   });
@@ -138,14 +141,36 @@ export default function ProfilePage() {
   return (
     <main className={css.main}>
       <Container>
-        <TravellerInfo
-          user={{
-            name: user.name,
-            avatarUrl: user.avatarUrl,
-            articlesAmount: user.articlesAmount ?? 0,
-          }}
-          className={css.travellerInfo}
-        />
+        <div className={css.profileHeader}>
+          <TravellerInfo
+            user={{
+              name: user.name,
+              avatarUrl: user.avatarUrl,
+              articlesAmount: user.articlesAmount ?? 0,
+            }}
+            className={css.travellerInfo}
+          />
+
+          <div className={css.editProfileWrapper}>
+            <ButtonLink
+              href="/profile/edit"
+              variant="secondary"
+              className={css.editProfileButton}
+              aria-label="Редагувати профіль"
+            >
+              <SpriteIcon
+                id="icon-quill"
+                width={18}
+                height={18}
+                className={css.editProfileIcon}
+              />
+            </ButtonLink>
+
+            <span className={css.editProfileTooltip} role="tooltip">
+              Редагувати профіль
+            </span>
+          </div>
+        </div>
 
         <ProfileTabs
           value={activeTab}
