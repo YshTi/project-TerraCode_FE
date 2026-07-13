@@ -1,0 +1,51 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 533px;
+  padding: 40px 16px;
+
+  border-radius: 24px;
+  background-color: var(--color-green-100);
+}
+
+.text {
+  max-width: 469px;
+  margin: 0;
+
+  color: var(--color-gray-900);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.wrapper .button {
+  min-height: 48px;
+  width: 100%;
+  padding: 11px;
+}
+
+@media screen and (min-width: 768px) {
+  .wrapper {
+    padding: 40px 32px;
+  }
+
+  .wrapper .button {
+    width: fit-content;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .text {
+    font-size: 26px;
+  }
+
+  .wrapper .button {
+    padding: 8px 11px;
+  }
+}

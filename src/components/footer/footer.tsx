@@ -74,7 +74,7 @@ export const Footer = () => {
 
         <hr className={css.hr} />
 
-        <Copyright />
+        <Copyright className={css.copyRight} />
       </div>
     </footer>
   );

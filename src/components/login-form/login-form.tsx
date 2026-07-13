@@ -33,7 +33,7 @@ export function LoginForm() {
       <div className={styles.heading}>
         <h1 className={styles.title}>Вхід</h1>
 
-        <p className={styles.description}>Увійдіть, щоб продовжити подорож!</p>
+        <p className={styles.description}>Вітаємо знову у спільноту мандрівників!</p>
       </div>
 
       <Formik
@@ -77,9 +77,9 @@ export function LoginForm() {
                 return;
               }
 
-              setStatus(data.message || "Не вдалося увійти");
+              setStatus(data.message || "Не вдалося виконати вхід");
 
-              notify.error(data.message || "Не вдалося увійти");
+              notify.error(data.message || "Не вдалося виконати вхід");
               return;
             }
 
