@@ -1,7 +1,10 @@
 import { Metadata } from "next";
-import TravellersList from "@/components/travellers-list/TravellersList";
-import { backendFetch } from "@/lib/api/backend";
-import css from "@/components/travellers-list/TravellersList.module.css"
+import { Suspense } from "react";
+import TravellersList from "@/components/travellers-list/travellers-list";
+import { getTravellers } from "@/lib/api/travellersApi";
+import type { User } from "@/types/user";
+import css from "./page.module.css"
+import { Loader } from "@/components/loader/loader";
 
 export const metadata: Metadata = {
   title: "Мандрівники | Природні мандри",
@@ -9,40 +12,34 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Мандрівники | Природні мандри",
     description: "Приєднуйся до спільноти мандрівників та читай цікаві статті.",
-    url: "", //додати
+    url: "https://project-terra-code-fe.vercel.app/",                     
     siteName: "Природні мандри",
     type: "website",
   },
 };
+async function TravellersDataWrapper() {
+  let initialTravellers: User[] = [];
 
-async function getFirstTravellers() {
   try {
-  
-    const response = await backendFetch("/users?page=1&limit=12");
-    
-    if (!response.ok) {
-      throw new Error("Failed to fetch travellers from backend");
-    }
-
-    const resData = await response.json();
-    return resData?.data || []; 
+    const resData = await getTravellers(1, 12);
+    initialTravellers = resData?.data || []; 
   } catch (error) {
     console.error("Помилка при отриманні мандрівників на сервері:", error);
-    return [];
   }
+
+  return <TravellersList initialTravellers={initialTravellers} />;
 }
 
-export default async function TravellersPage() {
-  const initialTravellers = await getFirstTravellers();
-
+export default function TravellersPage() {
   return (
     <main className={css.main}>
-        <div className={css.container}>
-      <h1 className={css.title}>
-        Мандрівники
-      </h1>
-      <TravellersList initialTravellers={initialTravellers} />
-   </div> 
-   </main>
+      <div className={css.travellerContainer}>
+        <h1 className={css.title}>Мандрівники</h1>
+        <Suspense fallback={<Loader />}>
+          <TravellersDataWrapper />
+        </Suspense>
+      </div> 
+    </main>
   );
 }
+

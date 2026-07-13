@@ -1,0 +1,36 @@
+
+.travellerContainer {
+     width: 100%;
+     margin: 0 auto;
+}
+
+
+.title{
+color: var(--color-text-primary);
+font-weight: 700;
+font-size: 32px;
+line-height: 110%;
+text-align: center;
+margin-top: 0;
+margin-bottom: 24px;
+}
+
+
+/* TABLET */
+
+@media screen and (min-width: 768px) {
+   .travellerContainer {
+        max-width: 768px;
+        padding: 48px 32px;
+    }
+
+}
+/* DESKTOP */
+
+@media screen and (min-width: 1440px) {
+    .travellerContainer {
+        max-width: 1440px;
+        padding: 80px 64px;
+  }
+
+}

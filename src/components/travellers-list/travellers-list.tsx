@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios"; 
 import { TravellerCard } from "@/components/traveller-card/traveller-card"; 
-import css from "./TravellersList.module.css";
-import { Loader } from "../loader/loader";
-import { Button } from "../buttons/button";
+import css from "./travellers-list.module.css";
+import { Pagination } from "@/components/pagination/pagination";
 import { toast } from "react-hot-toast";
 
 
@@ -27,7 +26,13 @@ const [page, setPage] = useState(1);
 const [loading, setLoading] = useState(false);
 const [hasMore, setHasMore] = useState(initialTravellers.length === 12);
 
-// Pagination
+useEffect(() => {
+    if (initialTravellers.length === 0) {
+      toast.error("Не вдалося завантажити мандрівників з сервера. Спробуйте оновити сторінку!");
+    }
+  }, [initialTravellers]);
+
+
 const loadMore = async () => {
     setLoading(true);
     const nextPage = page + 1;
@@ -76,16 +81,12 @@ return (
             ))}
         </ul>
 
-        {loading && <Loader/>}
-
-        {hasMore && !loading && (
-           <Button 
-              variant="primary" 
-              onClick={loadMore}
-            >
-              Показати ще
-            </Button>
-         )}
+       <Pagination 
+            onLoadMore={loadMore} 
+            isLoading={loading} 
+            hasMore={hasMore} 
+            
+          />
     </>
 )}
 </div>
