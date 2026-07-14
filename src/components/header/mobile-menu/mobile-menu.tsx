@@ -42,7 +42,7 @@ export function MobileMenu({
     <div className={styles.mobileMenu}>
       <Container className={styles.mobileMenuContainer}>
         <div className={styles.mobileMenuTop}>
-          <AuthHeader />
+          <AuthHeader onNavigate={onClose} />
 
           <div className={styles.tabletTopActions}>
             {shouldShowUserMenu ? (
@@ -68,7 +68,10 @@ export function MobileMenu({
           </button>
         </div>
 
-        <nav className={styles.mobileNav} aria-label="Мобільна навігація">
+        <nav
+          className={styles.mobileNav}
+          aria-label="Мобільна навігація"
+        >
           {navLinks.map(({ href, label }) => (
             <NavLink
               key={href}
