@@ -14,9 +14,21 @@ interface UsersResponse {
   };
 }
 
-interface UserResponse {
-  status: number;
-  data: User;
+interface TravellerProfileResponse {
+  data: {
+    user: {
+      _id: string;
+      name: string;
+      avatarUrl?: string | null;
+    };
+    stories: Story[];
+    pagination: {
+      page: number;
+      perPage: number;
+      totalStories: number;
+      totalPages: number;
+    };
+  };
 }
 
 export interface TravellerStoriesResponse {
@@ -54,11 +66,17 @@ export const getTravellers = async (
 export const getTravellerById = async (
   userId: string,
 ): Promise<User> => {
-  const response = await nextServer.get<UserResponse>(
+  const response = await nextServer.get<TravellerProfileResponse>(
     `/users/${userId}`,
+    {
+      params: {
+        page: 1,
+        perPage: 1,
+      },
+    },
   );
 
-  return response.data.data;
+  return response.data.data.user;
 };
 
 export const getTravellerStories = async ({
@@ -66,15 +84,35 @@ export const getTravellerStories = async ({
   page = 1,
   limit = 9,
 }: TravellerStoriesParams): Promise<TravellerStoriesResponse> => {
-  const response = await nextServer.get<TravellerStoriesResponse>(
-    `/users/${userId}/stories`,
-    {
-      params: {
-        page,
-        limit,
+  const response =
+    await nextServer.get<TravellerProfileResponse>(
+      `/users/${userId}`,
+      {
+        params: {
+          page,
+          perPage: limit,
+        },
       },
-    },
-  );
+    );
 
-  return response.data;
+  const { user, stories, pagination } = response.data.data;
+
+  return {
+    stories: stories.map((story) => ({
+      ...story,
+      ownerId: {
+        _id: user._id,
+        name: user.name,
+        avatarUrl: user.avatarUrl ?? "",
+      },
+    })),
+    pagination: {
+      page: pagination.page,
+      limit: pagination.perPage,
+      total: pagination.totalStories,
+      totalPages: pagination.totalPages,
+      hasNextPage: pagination.page < pagination.totalPages,
+      hasPreviousPage: pagination.page > 1,
+    },
+  };
 };

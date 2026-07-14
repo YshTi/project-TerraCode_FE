@@ -9,6 +9,11 @@
     margin-bottom: 32px;
 }
 
+.storiesTitle {
+    text-align: left;
+    font-size: 28px;
+}
+
 .storiesBlock {
     width: 100%;
 }
@@ -32,12 +37,16 @@
     .notFound {
         font-size: 44px;
     }
+
+    .storiesTitle {
+        font-size: 44px;
+    }
 }
 
 @media screen and (min-width: 1440px) {
     .section {
         padding-top: 48px;
-        padding-bottom: 80px;
+        padding-bottom: 72px;
     }
 
     .travellerInfo {
@@ -48,8 +57,8 @@
         padding-top: 48px;
         font-size: 52px;
     }
-}
 
-.storiesTitle {
-    text-align: left;
+    .storiesTitle {
+        font-size: 52px;
+    }
 }
