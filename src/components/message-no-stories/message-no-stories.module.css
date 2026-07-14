@@ -25,23 +25,27 @@
 }
 
 .wrapper .button {
-  min-width: 205px;
   min-height: 48px;
-  padding: 6px 12px;
-
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.5;
+  width: 100%;
+  padding: 11px;
 }
 
 @media screen and (min-width: 768px) {
   .wrapper {
     padding: 40px 32px;
   }
+
+  .wrapper .button {
+    width: fit-content;
+  }
 }
 
 @media screen and (min-width: 1440px) {
   .text {
     font-size: 26px;
+  }
+
+  .wrapper .button {
+    padding: 8px 11px;
   }
 }
