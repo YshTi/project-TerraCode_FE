@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
 import { Loader } from "@/components/loader/loader";
+import ConfirmModal from "@/components/modals/confirm-modal/confirm-modal";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { notify } from "@/utils/notify";
 import type { Category } from "@/types/category";
@@ -93,10 +94,13 @@ function getCreatedStoryId(data: CreateStoryResponse) {
 export function AddStoryForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     let ignore = false;
@@ -121,6 +125,23 @@ export function AddStoryForm() {
 
     return () => {
       ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleDocumentMouseDown = (event: MouseEvent) => {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleDocumentMouseDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentMouseDown);
     };
   }, []);
 
@@ -199,6 +220,14 @@ export function AddStoryForm() {
         setFieldTouched,
         resetForm,
       }) => {
+        const selectedCategory = categories.find(
+          (category) => category._id === values.category,
+        );
+        const isCategoryError = Boolean(
+          touched.category && errors.category && !isCategoryDropdownOpen,
+        );
+        const isCategorySuccess = Boolean(values.category && !errors.category);
+        
         const imageError =
           touched.image && typeof errors.image === "string"
             ? errors.image
@@ -242,202 +271,260 @@ export function AddStoryForm() {
           }
         };
 
+        const handleConfirmCancel = () => {
+          handleCancel();
+          setIsCancelModalOpen(false);
+          router.push("/");
+        };
+
         return (
-          <form className={styles.form} onSubmit={handleSubmit}>
-            {isSubmitting && <Loader />}
+          <>
+            <form className={styles.form} onSubmit={handleSubmit}>
+              {isSubmitting && <Loader />}
 
-            <div className={styles.coverField}>
-              <label className={styles.label} htmlFor="image">
-                Обкладинка статті
-              </label>
+              <div className={styles.coverField}>
+                <label className={styles.label} htmlFor="image">
+                  Обкладинка статті
+                </label>
 
-              <div className={styles.coverPreview}>
-                <img
-                  src={
-                    previewUrl ??
-                    "/images/story-cover-placeholder.svg"
-                  }
-                  alt=""
-                  className={styles.coverImage}
+                <div className={styles.coverPreview}>
+                  <img
+                    src={
+                      previewUrl ??
+                      "/images/story-cover-placeholder.svg"
+                    }
+                    alt=""
+                    className={styles.coverImage}
+                  />
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  id="image"
+                  name="image"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className={styles.hiddenFileInput}
+                  onChange={handleFileChange}
+                  onBlur={handleBlur}
                 />
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className={styles.uploadButton}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isSubmitting}
+                >
+                  Завантажити фото
+                </Button>
+
+                <FieldError id="image-error" message={imageError} />
               </div>
 
-              <input
-                ref={fileInputRef}
-                id="image"
-                name="image"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className={styles.hiddenFileInput}
-                onChange={handleFileChange}
-                onBlur={handleBlur}
-              />
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="title">
+                  Заголовок
+                </label>
 
-              <Button
-                type="button"
-                variant="secondary"
-                className={styles.uploadButton}
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isSubmitting}
-              >
-                Завантажити фото
-              </Button>
-
-              <FieldError id="image-error" message={imageError} />
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="title">
-                Заголовок
-              </label>
-
-              <input
-                id="title"
-                name="title"
-                type="text"
-                placeholder="Введіть заголовок історії"
-                value={values.title}
-                className={`${styles.input} ${
-                  touched.title && errors.title
-                    ? styles.inputError
-                    : ""
-                }`}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                aria-invalid={Boolean(touched.title && errors.title)}
-                aria-describedby={
-                  touched.title && errors.title
-                    ? "title-error"
-                    : undefined
-                }
-              />
-
-              <FieldError
-                id="title-error"
-                message={
-                  touched.title ? errors.title : undefined
-                }
-              />
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="category">
-                Категорія
-              </label>
-
-              <div className={styles.selectWrapper}>
-                <select
-                  id="category"
-                  name="category"
-                  value={values.category}
-                  className={`${styles.input} ${styles.select} ${
-                    touched.category && errors.category
+                <input
+                  id="title"
+                  name="title"
+                  type="text"
+                  placeholder="Введіть заголовок історії"
+                  value={values.title}
+                  className={`${styles.input} ${
+                    touched.title && errors.title
                       ? styles.inputError
-                      : ""
+                      : values.title.trim()
+                        ? styles.inputSuccess
+                        : ""
                   }`}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  disabled={isCategoriesLoading || isSubmitting}
-                  aria-invalid={Boolean(
-                    touched.category && errors.category,
-                  )}
+                  aria-invalid={Boolean(touched.title && errors.title)}
                   aria-describedby={
-                    touched.category && errors.category
-                      ? "category-error"
+                    touched.title && errors.title
+                      ? "title-error"
                       : undefined
                   }
-                >
-                  <option value="" disabled>
-                    {isCategoriesLoading
-                      ? "Завантаження..."
-                      : "Категорія"}
-                  </option>
+                />
 
-                  {categories.map((category) => (
-                    <option
-                      key={category._id}
-                      value={category._id}
-                    >
-                      {category.category}
-                    </option>
-                  ))}
-                </select>
-
-                <SpriteIcon
-                  id="icon-arrow_down"
-                  width={24}
-                  height={24}
-                  className={styles.selectIcon}
-                  aria-hidden="true"
+                <FieldError
+                  id="title-error"
+                  message={
+                    touched.title ? errors.title : undefined
+                  }
                 />
               </div>
 
-              <FieldError
-                id="category-error"
-                message={
-                  touched.category
-                    ? errors.category
-                    : undefined
-                }
-              />
-            </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="category">
+                  Категорія
+                </label>
 
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="article">
-                Текст історії
-              </label>
+                <div
+                  ref={categoryDropdownRef}
+                  className={styles.selectWrapper}
+                >
+                  <button
+                    id="category"
+                    type="button"
+                    className={`${styles.selectTrigger} ${
+                      isCategoryError
+                        ? styles.inputError
+                        : isCategorySuccess
+                          ? styles.inputSuccess
+                          : ""
+                    }`}
+                    onClick={() => {
+                      if (!isCategoriesLoading && !isSubmitting) {
+                        setIsCategoryDropdownOpen((currentValue) => !currentValue);
+                      }
+                    }}
+                    onBlur={() => {
+                      setFieldTouched("category", true, true);
+                    }}
+                    disabled={isCategoriesLoading || isSubmitting}
+                    aria-haspopup="listbox"
+                    aria-expanded={isCategoryDropdownOpen}
+                    aria-invalid={isCategoryError}
+                    aria-describedby={
+                      isCategoryError ? "category-error" : undefined
+                    }
+                  >
+                    <span
+                      className={
+                        selectedCategory
+                          ? styles.selectValue
+                          : styles.selectPlaceholder
+                      }
+                    >
+                      {selectedCategory
+                        ? selectedCategory.category
+                        : isCategoriesLoading
+                          ? "Завантаження..."
+                          : "Категорія"}
+                    </span>
 
-              <textarea
-                id="article"
-                name="article"
-                placeholder="Ваша історія тут"
-                value={values.article}
-                className={`${styles.input} ${styles.textarea} ${
-                  touched.article && errors.article
-                    ? styles.inputError
-                    : ""
-                }`}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                aria-invalid={Boolean(
-                  touched.article && errors.article,
-                )}
-                aria-describedby={
-                  touched.article && errors.article
-                    ? "article-error"
-                    : undefined
-                }
-              />
+                    <SpriteIcon
+                      id="icon-arrow_down"
+                      width={24}
+                      height={24}
+                      className={`${styles.selectIcon} ${
+                        isCategoryDropdownOpen ? styles.selectIconOpen : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
 
-              <FieldError
-                id="article-error"
-                message={
-                  touched.article ? errors.article : undefined
-                }
-              />
-            </div>
+                  {isCategoryDropdownOpen && (
+                    <ul className={styles.selectMenu} role="listbox">
+                      {categories.map((category) => {
+                        const isSelected = values.category === category._id;
 
-            <div className={styles.actions}>
-              <Button
-                type="submit"
-                variant="primary"
-                className={styles.submitButton}
-                disabled={isSubmitting || !dirty || !isValid}
-              >
-                Зберегти
-              </Button>
+                        return (
+                          <li key={category._id} role="presentation">
+                            <button
+                              type="button"
+                              className={`${styles.selectOption} ${
+                                isSelected ? styles.selectOptionActive : ""
+                              }`}
+                              role="option"
+                              aria-selected={isSelected}
+                              onMouseDown={(event) => {
+                                event.preventDefault();
+                              }}
+                              onClick={() => {
+                                setFieldValue("category", category._id, true);
+                                setFieldTouched("category", true, false);
+                                setIsCategoryDropdownOpen(false);
+                              }}
+                            >
+                              {category.category}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
 
-              <Button
-                type="button"
-                variant="secondary"
-                className={styles.cancelButton}
-                onClick={handleCancel}
-                disabled={isSubmitting}
-              >
-                Відмінити
-              </Button>
-            </div>
-          </form>
+                <FieldError
+                  id="category-error"
+                  message={touched.category ? errors.category : undefined}
+                />
+              </div>
+              
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="article">
+                  Текст історії
+                </label>
+
+                <textarea
+                  id="article"
+                  name="article"
+                  placeholder="Ваша історія тут"
+                  value={values.article}
+                  className={`${styles.input} ${styles.textarea} ${
+                    touched.article && errors.article
+                      ? styles.inputError
+                      : values.article.trim()
+                        ? styles.inputSuccess
+                        : ""
+                  }`}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  aria-invalid={Boolean(
+                    touched.article && errors.article,
+                  )}
+                  aria-describedby={
+                    touched.article && errors.article
+                      ? "article-error"
+                      : undefined
+                  }
+                />
+
+                <FieldError
+                  id="article-error"
+                  message={
+                    touched.article ? errors.article : undefined
+                  }
+                />
+              </div>
+
+              <div className={styles.actions}>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className={styles.submitButton}
+                  disabled={isSubmitting || !dirty || !isValid}
+                >
+                  Зберегти
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className={styles.cancelButton}
+                  onClick={() => setIsCancelModalOpen(true)}
+                  disabled={isSubmitting}
+                >
+                  Відмінити
+                </Button>
+              </div>
+            </form>
+
+            <ConfirmModal
+              isOpen={isCancelModalOpen}
+              title="Відмінити створення історії?"
+              description="Усі внесені зміни буде втрачено."
+              confirmButtonText="Так, відмінити"
+              cancelButtonText="Повернутись"
+              onConfirm={handleConfirmCancel}
+              onCancel={() => setIsCancelModalOpen(false)}
+            />
+          </>
         );
       }}
     </Formik>

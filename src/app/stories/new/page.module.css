@@ -1,4 +1,4 @@
-.main {
+.addStorySection {
     padding-top: 32px;
     padding-bottom: 64px;
 }
@@ -12,7 +12,7 @@
     max-width: 1091px;
 }
 
-.title {
+.addStoryTitle {
     margin: 0;
     width: 100%;
     font-family: var(--font-main);
@@ -25,13 +25,13 @@
 }
 
 @media screen and (min-width: 768px) {
-    .title {
+    .addStoryTitle {
         font-size: 48px;
     }
 }
 
 @media screen and (min-width: 1440px) {
-    .main {
+    .addStorySection {
         padding-top: 48px;
         padding-bottom: 72px;
     }
@@ -40,7 +40,7 @@
         gap: 48px;
     }
 
-    .title {
+    .addStoryTitle {
         font-size: 56px;
     }
 }

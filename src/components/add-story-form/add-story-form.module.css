@@ -97,6 +97,28 @@
 .inputError:hover,
 .inputError:focus {
     border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+.inputError::placeholder {
+    color: var(--color-error);
+    opacity: 1;
+}
+
+.inputSuccess,
+.inputSuccess:hover,
+.inputSuccess:focus {
+    border-color: var(--color-accent);
+}
+
+.select.inputError {
+    color: var(--color-error);
+}
+
+.select.inputSuccess,
+.select.inputSuccess:hover,
+.select.inputSuccess:focus {
+    border-color: var(--color-accent);
 }
 
 .selectWrapper {
@@ -104,15 +126,50 @@
     width: 100%;
 }
 
-.select {
-    padding-right: 40px;
-    color: var(--color-gray-900);
-    appearance: none;
+.selectTrigger {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 40px;
+    padding: 8px 40px 8px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    background-color: transparent;
+    font-family: var(--font-main);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    text-align: left;
+    outline: none;
     cursor: pointer;
+    transition: border-color 250ms ease;
 }
 
-.select:disabled {
+.selectTrigger:hover,
+.selectTrigger:focus {
+    border-color: var(--color-accent);
+}
+
+.selectTrigger:disabled {
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.selectValue {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.selectPlaceholder {
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.selectTrigger.inputError .selectPlaceholder {
+    color: var(--color-error);
 }
 
 .selectIcon {
@@ -124,6 +181,52 @@
     transform: translateY(-50%);
     pointer-events: none;
     color: var(--color-text-primary);
+    transition: transform 250ms ease;
+}
+
+.selectIconOpen {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.selectMenu {
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 8px 0;
+    overflow: visible;
+    list-style: none;
+    border: 1px solid var(--color-accent);
+    border-radius: 6px;
+    background-color: var(--color-background, #f4fbf1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.selectOption {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 0;
+    background-color: transparent;
+    font-family: var(--font-main);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+}
+
+.selectOption:hover,
+.selectOption:focus {
+    background-color: var(--color-green-100);
+    outline: none;
+}
+
+.selectOptionActive {
+    background-color: var(--color-green-100);
 }
 
 .textarea {
@@ -205,6 +308,15 @@
 
     .input {
         height: 43px;
+        font-size: 18px;
+    }
+
+    .selectTrigger {
+        height: 43px;
+        font-size: 18px;
+    }
+
+    .selectOption {
         font-size: 18px;
     }
 
