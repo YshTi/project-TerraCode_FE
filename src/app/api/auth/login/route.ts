@@ -1,11 +1,11 @@
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 
 import { backendFetch } from "@/lib/api/backend";
 
 export async function POST(request: Request) {
   const body = await request.json();
 
-  const response = await backendFetch("/api/auth/login", {
+  const backendResponse = await backendFetch("/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,25 +13,43 @@ export async function POST(request: Request) {
     body: JSON.stringify(body),
   });
 
-  const data = await response.json();
+  const data = await backendResponse.json();
 
-  if (!response.ok) {
-    return Response.json(data, {
-      status: response.status,
+  if (!backendResponse.ok) {
+    return NextResponse.json(data, {
+      status: backendResponse.status,
     });
   }
 
-  const cookieStore = await cookies();
+  const response = NextResponse.json(data, {
+    status: backendResponse.status,
+  });
 
-  cookieStore.set("accessToken", data.accessToken, {
+  response.cookies.set("accessToken", data.accessToken, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60, // 1 hour
+    maxAge: 10,
   });
 
-  return Response.json(data, {
-    status: response.status,
-  });
+  // Forward refreshToken cookie returned by the backend
+  if (
+    "getSetCookie" in backendResponse.headers &&
+    typeof backendResponse.headers.getSetCookie === "function"
+  ) {
+    const setCookies = backendResponse.headers.getSetCookie();
+
+    for (const cookie of setCookies) {
+      response.headers.append("set-cookie", cookie);
+    }
+  } else {
+    const setCookie = backendResponse.headers.get("set-cookie");
+
+    if (setCookie) {
+      response.headers.append("set-cookie", setCookie);
+    }
+  }
+
+  return response;
 }
