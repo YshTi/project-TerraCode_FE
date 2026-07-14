@@ -25,8 +25,8 @@ export function Hero() {
               src="/images/Hero-img.webp"
               alt="Головне зображення"
               className={styles["hero-image"]}
-              width={644}
-              height={580}
+              width={704}
+              height={469}
               priority
             />
           </div>
