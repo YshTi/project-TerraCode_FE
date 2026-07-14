@@ -22,7 +22,7 @@
 
   width: 100%;
   max-width: 335px;
-  height: 382px;
+  min-height: 382px;
 
   padding: 64px 16px 16px;
 

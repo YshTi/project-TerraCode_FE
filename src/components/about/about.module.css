@@ -13,6 +13,11 @@
     margin-bottom: 24px;
     margin-top: 40px;
     max-width: 644px;
+    font-weight: 700;
+}
+
+.aboutItemTitle {
+    font-weight: 700;
 }
 
 .aboutDescription {

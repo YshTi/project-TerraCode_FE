@@ -21,7 +21,8 @@ import css from "./save-button.module.css";
 interface SaveButtonProps {
   storyId: string;
   isSaved: boolean;
-  onRequireAuth?: () => void;
+  onRequireAuth: () => void;
+  onSavedChange?: (isSaved: boolean) => void;
 }
 
 interface StoriesPage {
@@ -40,38 +41,41 @@ export default function SaveButton({
   storyId,
   isSaved,
   onRequireAuth,
+  onSavedChange,
 }: SaveButtonProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () =>
-      isSaved
+    mutationFn: () => {
+      return isSaved
         ? removeSavedStory(storyId)
-        : saveStory(storyId),
+        : saveStory(storyId);
+    },
 
     onSuccess: async () => {
-      if (isSaved) {
-        queryClient.setQueriesData<
-          InfiniteData<StoriesPage>
-        >(
+      const nextIsSaved = !isSaved;
+
+      // Notify StoryCard about the successful change.
+      // This updates the button and counter immediately.
+      onSavedChange?.(nextIsSaved);
+
+      if (!nextIsSaved) {
+        queryClient.setQueriesData<InfiniteData<StoriesPage>>(
           {
-            queryKey: [
-              "profile-stories",
-              "saved",
-            ],
+            queryKey: ["profile-stories", "saved"],
           },
-          (oldData) => {
+          oldData => {
             if (!oldData) {
               return oldData;
             }
 
             return {
               ...oldData,
-              pages: oldData.pages.map((page) => ({
+              pages: oldData.pages.map(page => ({
                 ...page,
                 stories: page.stories.filter(
-                  (story) => story._id !== storyId,
+                  story => story._id !== storyId,
                 ),
                 pagination: {
                   ...page.pagination,
@@ -90,32 +94,29 @@ export default function SaveButton({
         queryClient.invalidateQueries({
           queryKey: ["saved-stories"],
         }),
+
         queryClient.invalidateQueries({
-          queryKey: [
-            "profile-stories",
-            "saved",
-          ],
+          queryKey: ["profile-stories", "saved"],
         }),
       ]);
 
       notify.success(
-        isSaved
-          ? "Статтю видалено зі збережених"
-          : "Статтю збережено",
+        nextIsSaved
+          ? "Статтю збережено"
+          : "Статтю видалено зі збережених",
       );
     },
 
     onError: (error: Error) => {
       notify.error(
-        error.message ||
-          "Не вдалося виконати операцію",
+        error.message || "Не вдалося виконати операцію",
       );
     },
   });
 
   const handleClick = () => {
     if (!user) {
-      onRequireAuth?.();
+      onRequireAuth();
       return;
     }
 

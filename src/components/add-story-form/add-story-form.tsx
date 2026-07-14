@@ -42,13 +42,34 @@ const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_IMAGE_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+];
+
+const MAX_IMAGE_SIZE = 1024 * 1024;
 
 const initialValues: FormValues = {
   image: null,
   title: "",
   category: "",
   article: "",
+};
+
+const isAcceptedImageFile = (file: File): boolean => {
+  const fileName = file.name.toLowerCase();
+
+  const hasAcceptedMimeType =
+    ACCEPTED_IMAGE_TYPES.includes(file.type);
+
+  const hasAcceptedExtension =
+    ACCEPTED_IMAGE_EXTENSIONS.some((extension) =>
+      fileName.endsWith(extension),
+    );
+
+  return hasAcceptedMimeType && hasAcceptedExtension;
 };
 
 const addStorySchema = Yup.object({
@@ -62,12 +83,12 @@ const addStorySchema = Yup.object({
           return false;
         }
 
-        return ACCEPTED_IMAGE_TYPES.includes(file.type);
+        return isAcceptedImageFile(file);
       },
     )
     .test(
       "file-size",
-      "Розмір фото не має перевищувати 10 MB",
+      "Розмір фото не має перевищувати 1 MB",
       (file) => {
         if (!file) {
           return false;
@@ -79,14 +100,16 @@ const addStorySchema = Yup.object({
 
   title: Yup.string()
     .trim()
-    .min(3, "Заголовок має містити щонайменше 3 символи")
+    .min(2, "Заголовок має містити щонайменше 2 символи")
+    .max(40, "Заголовок має містити не більше 40 символів")
     .required("Введіть заголовок історії"),
 
   category: Yup.string().required("Оберіть категорію"),
 
   article: Yup.string()
     .trim()
-    .min(10, "Текст історії має містити щонайменше 10 символів")
+    .min(12, "Текст історії має містити щонайменше 12 символів")
+    .max(3000, "Текст історії має містити не більше 3000 символів")
     .required("Введіть текст історії"),
 });
 
@@ -121,9 +144,7 @@ export function AddStoryForm() {
       })
       .catch(() => {
         if (!ignore) {
-          notify.error(
-            "Не вдалося завантажити категорії",
-          );
+          notify.error("Не вдалося завантажити категорії");
         }
       })
       .finally(() => {
@@ -155,9 +176,14 @@ export function AddStoryForm() {
         { setSubmitting, resetForm },
       ) => {
         try {
+          if (!values.image) {
+            notify.error("Оберіть фото");
+            return;
+          }
+
           const formData = new FormData();
 
-          formData.append("img", values.image as File);
+          formData.append("img", values.image);
           formData.append("title", values.title.trim());
           formData.append("category", values.category);
           formData.append(
@@ -175,14 +201,12 @@ export function AddStoryForm() {
 
           if (!response.ok) {
             notify.error(
-              data.message ||
-                "Не вдалося створити історію",
+              data.message || "Не вдалося створити історію",
             );
             return;
           }
 
-          const createdStoryId =
-            getCreatedStoryId(data);
+          const createdStoryId = getCreatedStoryId(data);
 
           if (!createdStoryId) {
             notify.error(
@@ -191,9 +215,7 @@ export function AddStoryForm() {
             return;
           }
 
-          notify.success(
-            "Історію успішно створено!",
-          );
+          notify.success("Історію успішно створено!");
 
           resetForm();
 
@@ -208,9 +230,7 @@ export function AddStoryForm() {
 
           router.push(`/stories/${createdStoryId}`);
         } catch {
-          notify.error(
-            "Помилка з'єднання з сервером",
-          );
+          notify.error("Помилка з'єднання з сервером");
         } finally {
           setSubmitting(false);
         }
@@ -228,6 +248,7 @@ export function AddStoryForm() {
         handleSubmit,
         setFieldValue,
         setFieldTouched,
+        setFieldError,
         resetForm,
       }) => {
         const categoryOptions: DropdownOption[] = [
@@ -256,7 +277,7 @@ export function AddStoryForm() {
             ? errors.image
             : undefined;
 
-        const handleFileChange = (
+        const handleFileChange = async (
           event: React.ChangeEvent<HTMLInputElement>,
         ) => {
           const file =
@@ -264,23 +285,42 @@ export function AddStoryForm() {
 
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
           }
 
-          setFieldTouched("image", true, false);
-          setFieldValue("image", file, true);
+          await setFieldTouched("image", true, false);
 
-          if (
-            file &&
-            ACCEPTED_IMAGE_TYPES.includes(file.type) &&
-            file.size <= MAX_IMAGE_SIZE
-          ) {
-            setPreviewUrl(
-              URL.createObjectURL(file),
-            );
+          if (!file) {
+            await setFieldValue("image", null, true);
             return;
           }
 
-          setPreviewUrl(null);
+          if (!isAcceptedImageFile(file)) {
+            await setFieldValue("image", null, false);
+
+            setFieldError(
+              "image",
+              "Файл має бути у форматі JPG, PNG або WEBP",
+            );
+
+            event.currentTarget.value = "";
+            return;
+          }
+
+          if (file.size > MAX_IMAGE_SIZE) {
+            await setFieldValue("image", null, false);
+
+            setFieldError(
+              "image",
+              "Розмір фото не має перевищувати 1 MB",
+            );
+
+            event.currentTarget.value = "";
+            return;
+          }
+
+          await setFieldValue("image", file, true);
+          setPreviewUrl(URL.createObjectURL(file));
         };
 
         const handleCancel = () => {
@@ -335,7 +375,7 @@ export function AddStoryForm() {
                   id="image"
                   name="image"
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                   className={styles.hiddenFileInput}
                   onChange={handleFileChange}
                   onBlur={handleBlur}
@@ -371,6 +411,7 @@ export function AddStoryForm() {
                   id="title"
                   name="title"
                   type="text"
+                  maxLength={40}
                   placeholder="Введіть заголовок історії"
                   value={values.title}
                   className={`${styles.input} ${
@@ -416,7 +457,9 @@ export function AddStoryForm() {
                     isSubmitting
                   }
                   className={`${styles.categoryDropdown} ${
-                    isCategorySuccess ? styles.categoryDropdownSuccess : ""
+                    isCategorySuccess
+                      ? styles.categoryDropdownSuccess
+                      : ""
                   }`}
                   isError={isCategoryError}
                   isSuccess={isCategorySuccess}
@@ -462,11 +505,11 @@ export function AddStoryForm() {
                 <textarea
                   id="article"
                   name="article"
+                  maxLength={3000}
                   placeholder="Ваша історія тут"
                   value={values.article}
                   className={`${styles.input} ${styles.textarea} ${
-                    touched.article &&
-                    errors.article
+                    touched.article && errors.article
                       ? styles.inputError
                       : values.article.trim()
                         ? styles.inputSuccess
