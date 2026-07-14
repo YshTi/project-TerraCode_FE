@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
+
 import css from "./dropdown.module.css";
 
 export interface DropdownOption {
@@ -23,6 +24,10 @@ interface DropdownProps {
   ariaLabel: string;
   disabled?: boolean;
   className?: string;
+  isError?: boolean;
+  isSuccess?: boolean;
+  ariaDescribedBy?: string;
+  onTouched?: () => void;
 }
 
 export function Dropdown({
@@ -32,8 +37,13 @@ export function Dropdown({
   ariaLabel,
   disabled = false,
   className = "",
+  isError = false,
+  isSuccess = false,
+  ariaDescribedBy,
+  onTouched,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+
   const dropdownId = useId();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +56,10 @@ export function Dropdown({
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
+        if (isOpen) {
+          onTouched?.();
+        }
+
         setIsOpen(false);
       }
     };
@@ -55,24 +69,44 @@ export function Dropdown({
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, []);
+  }, [isOpen, onTouched]);
 
   const handleSelect = (nextValue: string) => {
     onChange(nextValue);
+    onTouched?.();
     setIsOpen(false);
   };
 
   const handleTriggerKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
   ) => {
-    if (event.key === "ArrowDown" || event.key === "Enter") {
+    if (
+      event.key === "ArrowDown" ||
+      event.key === "Enter" ||
+      event.key === " "
+    ) {
       event.preventDefault();
       setIsOpen(true);
+      return;
     }
 
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && isOpen) {
+      event.preventDefault();
+      onTouched?.();
       setIsOpen(false);
     }
+  };
+
+  const handleTriggerClick = () => {
+    setIsOpen((previous) => {
+      const next = !previous;
+
+      if (previous && !next) {
+        onTouched?.();
+      }
+
+      return next;
+    });
   };
 
   return (
@@ -82,12 +116,21 @@ export function Dropdown({
     >
       <button
         type="button"
-        className={`${css.trigger} ${isOpen ? css.triggerOpen : ""}`}
+        className={[
+          css.trigger,
+          isOpen ? css.triggerOpen : "",
+          isSuccess ? css.triggerSuccess : "",
+          isError ? css.triggerError : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         aria-label={ariaLabel}
+        aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-controls={dropdownId}
+        aria-describedby={ariaDescribedBy}
         disabled={disabled}
-        onClick={() => setIsOpen((previous) => !previous)}
+        onClick={handleTriggerClick}
         onKeyDown={handleTriggerKeyDown}
       >
         <span>{selectedOption?.label}</span>
@@ -112,12 +155,15 @@ export function Dropdown({
             const isSelected = option.value === value;
 
             return (
-              <li key={option.value}>
+              <li key={option.value} role="presentation">
                 <button
                   type="button"
-                  className={`${css.option} ${
-                    isSelected ? css.optionActive : ""
-                  }`}
+                  className={[
+                    css.option,
+                    isSelected ? css.optionActive : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   role="option"
                   aria-selected={isSelected}
                   onClick={() => handleSelect(option.value)}

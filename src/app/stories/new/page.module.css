@@ -1,23 +1,46 @@
 .addStorySection {
-    padding-block: 32px 64px;
+    padding-top: 32px;
+    padding-bottom: 64px;
 }
 
 .content {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 32px;
+    width: 100%;
+    max-width: 1091px;
+}
+
+.addStoryTitle {
+    margin: 0;
+    width: 100%;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-align: left;
+    color: var(--color-text-primary);
+}
+
+@media screen and (min-width: 768px) {
+    .addStoryTitle {
+        font-size: 48px;
+    }
 }
 
 @media screen and (min-width: 1440px) {
     .addStorySection {
-        padding-block: 48px 72px;
-    }
-
-    .addStoryTitle {
-        padding-inline: 64px;
+        padding-top: 48px;
+        padding-bottom: 72px;
     }
 
     .content {
         gap: 48px;
+    }
+
+    .addStoryTitle {
+        font-size: 56px;
     }
 }

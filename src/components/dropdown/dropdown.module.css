@@ -99,3 +99,17 @@
     outline: none;
     background-color: var(--color-gray-50);
 }
+
+.triggerSuccess,
+.triggerSuccess:hover,
+.triggerSuccess:focus-visible,
+.triggerSuccess.triggerOpen {
+    border-color: var(--color-accent);
+}
+
+.triggerError,
+.triggerError:hover,
+.triggerError:focus-visible,
+.triggerError.triggerOpen {
+    border-color: var(--color-error);
+}
