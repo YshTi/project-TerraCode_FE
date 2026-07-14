@@ -1,5 +1,6 @@
 .heading {
   color: var(--color-black);
+  font-weight: 700;
 }
 
 .wrapper {
