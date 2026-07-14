@@ -1,97 +1,167 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react";
-import axios from "axios"; 
-import { TravellerCard } from "@/components/traveller-card/traveller-card"; 
-import css from "./travellers-list.module.css";
-import { Pagination } from "@/components/pagination/pagination";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
+import { Loader } from "@/components/loader/loader";
+import { Pagination } from "@/components/pagination/pagination";
+import { TravellerCard } from "@/components/traveller-card/traveller-card";
+import { getTravellers } from "@/lib/api/travellersApi";
+import type { User } from "@/types/user";
 
-interface Traveller {
-    _id: string;
-    name: string;
-    avatarUrl: string;
-    articlesAmount: number;
+import css from "./travellers-list.module.css";
+
+const LIMIT = 12;
+
+function getUniqueTravellers(travellers: User[]): User[] {
+  return Array.from(
+    new Map(
+      travellers.map((traveller) => [
+        traveller._id,
+        traveller,
+      ]),
+    ).values(),
+  );
 }
 
-interface TravellersListProps {
-    initialTravellers: Traveller[];
-}
+export default function TravellersList() {
+  const [travellers, setTravellers] = useState<User[]>([]);
+  const [page, setPage] = useState(1);
+  const [isInitialLoading, setIsInitialLoading] =
+    useState(true);
+  const [isLoadingMore, setIsLoadingMore] =
+    useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
-export default function TravellersList ({ initialTravellers }: TravellersListProps) {
+  useEffect(() => {
+    const loadInitialTravellers = async () => {
+      setIsInitialLoading(true);
+      setHasError(false);
 
-const [travellers, setTravellers] = useState<Traveller[]>(initialTravellers)
-const [page, setPage] = useState(1);
-const [loading, setLoading] = useState(false);
-const [hasMore, setHasMore] = useState(initialTravellers.length === 12);
+      try {
+        const response = await getTravellers(1, LIMIT);
 
-useEffect(() => {
-    if (initialTravellers.length === 0) {
-      toast.error("Не вдалося завантажити мандрівників з сервера. Спробуйте оновити сторінку!");
+        setTravellers(
+          getUniqueTravellers(response.data ?? []),
+        );
+
+        setPage(response.pagination.page);
+
+        setHasMore(
+          response.pagination.page <
+            response.pagination.totalPages,
+        );
+      } catch (error) {
+        console.error(
+          "Не вдалося завантажити мандрівників:",
+          error,
+        );
+
+        setHasError(true);
+
+        toast.error(
+          "Не вдалося завантажити мандрівників з сервера.",
+        );
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    void loadInitialTravellers();
+  }, []);
+
+  const loadMore = async () => {
+    if (isLoadingMore || !hasMore) {
+      return;
     }
-  }, [initialTravellers]);
 
-
-const loadMore = async () => {
-    setLoading(true);
     const nextPage = page + 1;
 
+    setIsLoadingMore(true);
 
     try {
-        const res = await axios.get("/api/travellers",
-            {
-                params: {
-                    page: nextPage,
-                    limit: 12,
-                },
-            });
+      const response = await getTravellers(
+        nextPage,
+        LIMIT,
+      );
 
-            const newTravellers = res.data?.data || [];
+      setTravellers((currentTravellers) =>
+        getUniqueTravellers([
+          ...currentTravellers,
+          ...(response.data ?? []),
+        ]),
+      );
 
-            setTravellers((prev) => [...prev, ...newTravellers]);
-            setPage(nextPage);
+      setPage(response.pagination.page);
 
-            if (newTravellers.length < 12 || newTravellers.length ===0){
-                setHasMore(false);
-            }
-    } catch (err) {
-        toast.error("Не вдалося завантажити мандрівників. Спробуйте ще!");
-        console.error(err);
-       
+      setHasMore(
+        response.pagination.page <
+          response.pagination.totalPages,
+      );
+    } catch (error) {
+      console.error(
+        "Не вдалося завантажити наступну сторінку:",
+        error,
+      );
+
+      toast.error(
+        "Не вдалося завантажити мандрівників. Спробуйте ще раз!",
+      );
     } finally {
-        setLoading(false);
+      setIsLoadingMore(false);
     }
-};
+  };
 
-return (
-<div className={css.container}>
-{travellers.length === 0 ? (
-    <p>Мандрівників не знайдено...</p>
-) : (
-    <> 
-        <ul className={css.travellersList}>
-            {travellers.map((traveller) => (
-                <li key={traveller._id} className={css.item}>
+  if (isInitialLoading) {
+    return (
+      <div className={css.loaderWrapper}>
+        <Loader />
+      </div>
+    );
+  }
 
-                   
+  if (hasError) {
+    return (
+      <div className={css.errorState}>
+        <p>
+          Не вдалося завантажити мандрівників.
+          Оновіть сторінку та спробуйте ще раз.
+        </p>
+      </div>
+    );
+  }
 
-                     <TravellerCard {...traveller} />
-                </li>
-            ))}
-        </ul>
+  if (travellers.length === 0) {
+    return (
+      <p className={css.emptyText}>
+        Мандрівників не знайдено...
+      </p>
+    );
+  }
 
-       <Pagination 
-            onLoadMore={loadMore} 
-            isLoading={loading} 
-            hasMore={hasMore} 
-            
-          />
-    </>
-)}
-</div>
+  return (
+    <div className={css.container}>
+      <ul className={css.travellersList}>
+        {travellers.map((traveller) => (
+          <li
+            key={traveller._id}
+            className={css.item}
+          >
+            <TravellerCard {...traveller} />
+          </li>
+        ))}
+      </ul>
 
-);
+      {hasMore && (
+        <Pagination
+          onLoadMore={() => {
+            void loadMore();
+          }}
+          isLoading={isLoadingMore}
+          hasMore={hasMore}
+        />
+      )}
+    </div>
+  );
 }
-
-

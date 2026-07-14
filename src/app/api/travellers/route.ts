@@ -1,28 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
-import { backendFetch } from '@/lib/api/backend';
 
-export async function GET(req: NextRequest) {
+import { backendFetch } from "@/lib/api/backend";
+
+export async function GET(request: NextRequest) {
+  const page = request.nextUrl.searchParams.get("page") ?? "1";
+  const limit = request.nextUrl.searchParams.get("limit") ?? "12";
+
   try {
-    const page = Number(req.nextUrl.searchParams.get('page') ?? 1);
-    const limit = Number(req.nextUrl.searchParams.get('limit') ?? 12); 
+    const searchParams = new URLSearchParams({
+      page,
+      limit,
+    });
 
-  const res = await backendFetch(`/users?page=${page}&limit=${limit}`);
+    const response = await backendFetch(
+      `/api/users?${searchParams.toString()}`,
+    );
 
-      if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: errorData.message || "Помилка бекенду" }, 
-        { status: res.status }
-      );
-    }
+    const data = await response.json().catch(() => ({
+      message: "Backend returned an invalid response",
+    }));
 
-   const data = await res.json();
-
-    // Повертаємо дані клієнту
-    return NextResponse.json(data, { status: 200 });
+    return NextResponse.json(data, {
+      status: response.status,
+    });
   } catch (error) {
-    console.error("Помилка у проксі-роуті travellers:", error);
-    const message = error instanceof Error ? error.message : 'Internal Server Error';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error(
+      "Failed to load travellers through proxy:",
+      error,
+    );
+
+    return NextResponse.json(
+      {
+        message: "Не вдалося завантажити мандрівників",
+      },
+      {
+        status: 500,
+      },
+    );
   }
 }

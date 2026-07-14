@@ -1,3 +1,6 @@
+.main {
+    padding: 32px 0 64px;
+}
 
 .travellerContainer {
      width: 100%;
@@ -6,7 +9,7 @@
 
 
 .title{
-color: var(--color-text-primary);
+color: var(--color-black);
 font-weight: 700;
 font-size: 32px;
 line-height: 110%;
@@ -19,18 +22,24 @@ margin-bottom: 24px;
 /* TABLET */
 
 @media screen and (min-width: 768px) {
-   .travellerContainer {
-        max-width: 768px;
-        padding: 48px 32px;
+   .main {
+        padding: 32px 0 64px;
+    }
+
+    .title {
+        font-size: 48px;
     }
 
 }
 /* DESKTOP */
 
 @media screen and (min-width: 1440px) {
-    .travellerContainer {
-        max-width: 1440px;
-        padding: 80px 64px;
-  }
+    .main {
+        padding: 48px 0 72px;
+    }
+
+    .title {
+        font-size: 56px;
+    }
 
 }
