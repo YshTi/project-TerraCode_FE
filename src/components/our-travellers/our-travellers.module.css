@@ -1,7 +1,6 @@
 .section {
-  padding: 64px 20px;
+  padding: 64px 0;
   margin: 0 auto;
-  height: 1401px;
 }
 
 .topWrapper {
@@ -12,6 +11,7 @@
 
 .title {
   text-align: left;
+  color: var(--color-black);
 }
 
 .desktopBtn {
@@ -26,7 +26,9 @@
 
 .mobileBtn button, 
 .mobileBtn a {
-  width: 100%;        
+  width: 100%;
+  height: 48px;
+  margin-top: 48px;        
 }
 
 .sliderWrapper {
@@ -37,8 +39,8 @@
 
 .swiper {
   width: 100%;
-  height: 999px !important; 
-  min-width: 250px;
+  height: calc(317px * 3 + 48px);
+  min-width: 0;
 }
 
 
@@ -50,8 +52,7 @@ background-color: var(--color-accent-light);
 
 
 .swiper :global(.swiper-slide) {
- 
-  height: calc((100% - 24px) / 3) !important;
+  height: calc((100% - 48px) / 3) !important;
   box-sizing: border-box;
 }
 
@@ -61,7 +62,7 @@ background-color: var(--color-accent-light);
 .bottomWrapper {
   display: flex;
   flex-direction: column;
-  margin-top: 48px;
+  padding-top: 48px;
   }
 
 .navigationButtons {
@@ -69,7 +70,6 @@ background-color: var(--color-accent-light);
   justify-content: flex-end;
   gap: 12px;
   order: 1;
-  margin-bottom: 48px;
 }
 
 .navBtn {
@@ -83,6 +83,8 @@ background-color: var(--color-accent-light);
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
+
+  background: var(--color-green-100);
 }
 
 .navBtn:hover:not(:disabled) {
@@ -108,8 +110,7 @@ background-color: var(--color-accent-light);
 
 @media (min-width: 768px) {
   .section {
-    padding: 64px 32px;
-    height: 983px;
+    padding: 64px 0;
   }
 
   .topWrapper {
@@ -122,7 +123,7 @@ background-color: var(--color-accent-light);
     display: inline-block;
     width: 166px;
     height: 48px;   
-    font-size: 16px;
+    padding: 8px 11px;
   }
 
   .mobileBtn {
@@ -150,20 +151,19 @@ background-color: var(--color-accent-light);
 
 @media (min-width: 1440px) {
   .section {
-    padding: 72px 64px;
-    height: 685px;
+    padding: 72px 0;
     width: 100%;
   }
 
 
   .desktopBtn {
-width: 202px;
-height: 48px;    
+    width: 202px;
+    height: 48px;    
   }
 
   .swiper {
     height: 335px !important; 
-    }
+  }
 
   .swiper :global(.swiper-slide) {
     height: auto !important; 
