@@ -83,12 +83,17 @@ background-color: var(--color-accent-light);
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
+  color: var(--color-text-primary);
 
   background: var(--color-green-100);
 }
 
+.icon {
+  stroke: currentColor;
+}
+
 .navBtn:hover:not(:disabled) {
-  background: var(--color-background-soft);
+  background: var(--color-gray-50);
   border-color: var(--color-green-300);
 }
 
@@ -99,9 +104,10 @@ background-color: var(--color-accent-light);
 
 .navBtn.disabled,
 .navBtn:disabled {
-  opacity: 0.3;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  opacity: 0.4;
   background: transparent;
-  border-color: var(--color-gray-200);
+  background: var(--color-gray-50);
   cursor: not-allowed;
 }
 

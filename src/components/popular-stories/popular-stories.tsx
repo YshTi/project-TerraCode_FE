@@ -100,13 +100,13 @@ export function PopularStories() {
                 variant="secondary"
                 className={`${css.navBtn} swiper-button-prev-custom`}
               >
-                <SpriteIcon id="icon-arrow_back" />
+                <SpriteIcon id="icon-arrow_back" className={css.icon}/>
               </Button>
               <Button
                 variant="secondary"
                 className={`${css.navBtn} swiper-button-next-custom`}
               >
-                <SpriteIcon id="icon-arrow_forward" />
+                <SpriteIcon id="icon-arrow_forward" className={css.icon}/>
               </Button>
             </div>
             <ButtonLink href="/stories" className={css.allArticlesBtnMob}>
