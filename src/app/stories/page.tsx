@@ -145,7 +145,7 @@ export default function StoriesPage() {
   return (
     <section className={css.section}>
       <Container className={css.storyContainer}>
-        <PageTitle>Статті</PageTitle>
+        <PageTitle className={css.title}>Статті</PageTitle>
 
         <CategoriesFilter
           categories={categoriesQuery.data ?? []}

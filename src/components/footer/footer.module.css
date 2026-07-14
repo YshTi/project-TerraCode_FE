@@ -144,19 +144,46 @@
     }
 
     .linksContainer {
+        position: relative;
+
         display: flex;
         flex-direction: row;
-
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
+
+        min-height: 36px;
+    }
+
+    .logoLink,
+    .socialContainer,
+    .navigation {
+        grid-area: auto;
+    }
+
+    .logoLink {
+        flex-shrink: 0;
+        align-self: center;
+    }
+
+    .socialContainer {
+        position: absolute;
+        top: 0;
+        left: 50%;
+
+        display: flex;
+        gap: 12px;
+
+        transform: translateX(-50%);
     }
 
     .navigation {
         flex-direction: row;
+        align-items: flex-start;
         gap: 32px;
     }
 
     .navLink {
+        padding: 8px 0;
         font-size: 18px;
     }
 

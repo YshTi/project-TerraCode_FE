@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 import { ButtonLink } from "@/components/buttons/button";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
@@ -19,6 +20,8 @@ export function ErrorWhileSavingModal({
   useEffect(() => {
     if (!isOpen) return;
 
+    const previousOverflow = document.body.style.overflow;
+
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
@@ -30,30 +33,50 @@ export function ErrorWhileSavingModal({
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  return (
-    <div className={styles.backdrop} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+  return createPortal(
+    <div
+      className={styles.backdrop}
+      onMouseDown={event => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="saving-error-title"
+      >
         <button
           type="button"
           className={styles.closeButton}
           onClick={onClose}
           aria-label="Закрити модальне вікно"
         >
-          <SpriteIcon id="icon-close" className={styles.closeIcon} />
+          <SpriteIcon
+            id="icon-close"
+            className={styles.closeIcon}
+          />
         </button>
 
         <div className={styles.content}>
-          <h2 className={styles.title}>Помилка під час збереження</h2>
+          <h2
+            id="saving-error-title"
+            className={styles.title}
+          >
+            Помилка під час збереження
+          </h2>
 
           <p className={styles.text}>
-            Щоб зберегти статтю вам треба увійти, якщо ще немає облікового
-            запису зареєструйтесь.
+            Щоб зберегти статтю, вам треба увійти. Якщо ще немає
+            облікового запису, зареєструйтесь.
           </p>
         </div>
 
@@ -77,6 +100,7 @@ export function ErrorWhileSavingModal({
           </ButtonLink>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

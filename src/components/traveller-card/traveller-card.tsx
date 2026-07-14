@@ -39,7 +39,7 @@ export function TravellerCard({
       </div>
 
       <ButtonLink
-        href={`/traveller/${_id}`}
+        href={`/travellers/${_id}`}
         variant="secondary"
         className={styles.linkButton}
       >
