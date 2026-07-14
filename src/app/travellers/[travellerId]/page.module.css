@@ -1,0 +1,64 @@
+.section {
+    padding-top: 32px;
+    padding-bottom: 64px;
+
+    background: var(--color-background-green);
+}
+
+.travellerInfo {
+    margin-bottom: 32px;
+}
+
+.storiesTitle {
+    text-align: left;
+    font-size: 28px;
+}
+
+.storiesBlock {
+    width: 100%;
+}
+
+.storiesList {
+    margin-top: 40px;
+}
+
+.notFound {
+    padding-top: 32px;
+
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+
+    color: var(--color-text-primary);
+}
+
+@media screen and (min-width: 768px) {
+    .notFound {
+        font-size: 44px;
+    }
+
+    .storiesTitle {
+        font-size: 44px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .section {
+        padding-top: 48px;
+        padding-bottom: 72px;
+    }
+
+    .travellerInfo {
+        margin-bottom: 48px;
+    }
+
+    .notFound {
+        padding-top: 48px;
+        font-size: 52px;
+    }
+
+    .storiesTitle {
+        font-size: 52px;
+    }
+}
