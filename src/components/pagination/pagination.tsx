@@ -1,29 +1,39 @@
 "use client";
 
-import { Button } from "../buttons/button";
-import css from "./pagination.module.css";
+import { Button } from "@/components/buttons/button";
+import { Loader } from "@/components/loader/loader";
 
-interface PaginationProps {
+import styles from "./pagination.module.css";
+
+type PaginationProps = {
   onLoadMore: () => void;
   isLoading: boolean;
   hasMore: boolean;
-}
+  fullWidthOnMobile?: boolean;
+};
 
-export function Pagination({ onLoadMore, isLoading, hasMore }: PaginationProps) {
+export function Pagination({
+  onLoadMore,
+  isLoading,
+  hasMore,
+  fullWidthOnMobile = false,
+}: PaginationProps) {
   if (!hasMore) {
     return null;
   }
 
   return (
-    <div className={css.wrapper}>
+    <div className={styles.wrapper}>
       <Button
         type="button"
         variant="primary"
         onClick={onLoadMore}
-        className={css.button}
         disabled={isLoading}
+        className={`${styles.button} ${
+          fullWidthOnMobile ? styles.fullWidthOnMobile : ""
+        }`}
       >
-        {isLoading ? "Завантаження..." : "Показати ще"}
+        {isLoading ? <Loader /> : "Показати ще"}
       </Button>
     </div>
   );

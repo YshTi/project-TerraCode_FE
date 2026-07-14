@@ -21,6 +21,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 40px;
 }
 
 .tabletTopActions {
@@ -45,10 +46,13 @@
 .closeIcon {
     width: 24px;
     height: 24px;
+    stroke: var(--color-black);
+    stroke-width: 1;
 }
 
 .mobileNav {
-    margin-top: 24px;
+    margin-top: 40px;
+    margin-bottom: 266px;
 
     display: flex;
     flex-direction: column;
@@ -123,10 +127,6 @@
     .mobilePublishButton,
     .mobileOnlyAuth {
         display: none;
-    }
-
-    .mobileNav {
-        margin-top: 64px;
     }
 }
 

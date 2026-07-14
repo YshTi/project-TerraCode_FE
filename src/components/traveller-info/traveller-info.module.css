@@ -1,0 +1,35 @@
+.avatar {
+  width: 113px;
+  height: 113px;
+  border-radius: 50%;
+}
+
+@media only screen and (min-width: 768px) {
+  .avatar {
+    width: 145px;
+    height: 145px;
+  }
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 590px;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 130%;
+  letter-spacing: -0.01em;
+}
+
+@media only screen and (min-width: 1440px) {
+  .username {
+    font-size: 32px;
+  }
+  .articles {
+    font-size: 20px;
+  }
+}

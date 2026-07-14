@@ -37,6 +37,7 @@
 .publishButton {
     font-size: 16px;
     width: 196px;
+    flex: 0 0 196px;
 }
 
 .burgerButton {
@@ -95,6 +96,7 @@
 
     .publishButton {
         width: 240px;
+        flex: 0 0 240px;
         height: 38px;
         font-size: 20px;
     }
