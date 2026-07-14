@@ -6,10 +6,13 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 
 import { Button } from "@/components/buttons/button";
+import {
+  Dropdown,
+  type DropdownOption,
+} from "@/components/dropdown/dropdown";
 import { FieldError } from "@/components/field-error/field-error";
 import { Loader } from "@/components/loader/loader";
 import ConfirmModal from "@/components/modals/confirm-modal/confirm-modal";
-import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { notify } from "@/utils/notify";
 import type { Category } from "@/types/category";
 
@@ -94,18 +97,22 @@ function getCreatedStoryId(data: CreateStoryResponse) {
 export function AddStoryForm() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const categoryDropdownRef = useRef<HTMLDivElement>(null);
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isCategoriesLoading, setIsCategoriesLoading] =
+    useState(true);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    null,
+  );
+  const [isCancelModalOpen, setIsCancelModalOpen] =
+    useState(false);
 
   useEffect(() => {
     let ignore = false;
 
-    fetch("/api/categories", { cache: "no-store" })
+    fetch("/api/categories", {
+      cache: "no-store",
+    })
       .then((response) => response.json())
       .then((data) => {
         if (!ignore) {
@@ -114,7 +121,9 @@ export function AddStoryForm() {
       })
       .catch(() => {
         if (!ignore) {
-          notify.error("Не вдалося завантажити категорії");
+          notify.error(
+            "Не вдалося завантажити категорії",
+          );
         }
       })
       .finally(() => {
@@ -125,23 +134,6 @@ export function AddStoryForm() {
 
     return () => {
       ignore = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleDocumentMouseDown = (event: MouseEvent) => {
-      if (
-        categoryDropdownRef.current &&
-        !categoryDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsCategoryDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleDocumentMouseDown);
-
-    return () => {
-      document.removeEventListener("mousedown", handleDocumentMouseDown);
     };
   }, []);
 
@@ -158,35 +150,51 @@ export function AddStoryForm() {
       initialValues={initialValues}
       validationSchema={addStorySchema}
       validateOnMount
-      onSubmit={async (values, { setSubmitting, resetForm }) => {
+      onSubmit={async (
+        values,
+        { setSubmitting, resetForm },
+      ) => {
         try {
           const formData = new FormData();
 
           formData.append("img", values.image as File);
           formData.append("title", values.title.trim());
           formData.append("category", values.category);
-          formData.append("article", values.article.trim());
+          formData.append(
+            "article",
+            values.article.trim(),
+          );
 
           const response = await fetch("/api/stories", {
             method: "POST",
             body: formData,
           });
 
-          const data = (await response.json()) as CreateStoryResponse;
+          const data =
+            (await response.json()) as CreateStoryResponse;
 
           if (!response.ok) {
-            notify.error(data.message || "Не вдалося створити історію");
+            notify.error(
+              data.message ||
+                "Не вдалося створити історію",
+            );
             return;
           }
 
-          const createdStoryId = getCreatedStoryId(data);
+          const createdStoryId =
+            getCreatedStoryId(data);
 
           if (!createdStoryId) {
-            notify.error("Історію створено, але не вдалося відкрити сторінку");
+            notify.error(
+              "Історію створено, але не вдалося відкрити сторінку",
+            );
             return;
           }
 
-          notify.success("Історію успішно створено!");
+          notify.success(
+            "Історію успішно створено!",
+          );
+
           resetForm();
 
           if (previewUrl) {
@@ -200,7 +208,9 @@ export function AddStoryForm() {
 
           router.push(`/stories/${createdStoryId}`);
         } catch {
-          notify.error("Помилка з'єднання з сервером");
+          notify.error(
+            "Помилка з'єднання з сервером",
+          );
         } finally {
           setSubmitting(false);
         }
@@ -220,23 +230,37 @@ export function AddStoryForm() {
         setFieldTouched,
         resetForm,
       }) => {
-        const selectedCategory = categories.find(
-          (category) => category._id === values.category,
-        );
-        const isCategoryError = Boolean(
-          touched.category && errors.category && !isCategoryDropdownOpen,
-        );
-        const isCategorySuccess = Boolean(values.category && !errors.category);
-        
+        const categoryOptions: DropdownOption[] = [
+          {
+            value: "",
+            label: isCategoriesLoading
+              ? "Завантаження..."
+              : "Категорія",
+          },
+          ...categories.map((category) => ({
+            value: category._id,
+            label: category.category,
+          })),
+        ];
+
+        const isCategoryError =
+          Boolean(touched.category) && !values.category;
+
+        const isCategorySuccess =
+          Boolean(touched.category) &&
+          Boolean(values.category);
+
         const imageError =
-          touched.image && typeof errors.image === "string"
+          touched.image &&
+          typeof errors.image === "string"
             ? errors.image
             : undefined;
 
         const handleFileChange = (
           event: React.ChangeEvent<HTMLInputElement>,
         ) => {
-          const file = event.currentTarget.files?.[0] ?? null;
+          const file =
+            event.currentTarget.files?.[0] ?? null;
 
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
@@ -250,7 +274,9 @@ export function AddStoryForm() {
             ACCEPTED_IMAGE_TYPES.includes(file.type) &&
             file.size <= MAX_IMAGE_SIZE
           ) {
-            setPreviewUrl(URL.createObjectURL(file));
+            setPreviewUrl(
+              URL.createObjectURL(file),
+            );
             return;
           }
 
@@ -279,11 +305,17 @@ export function AddStoryForm() {
 
         return (
           <>
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form
+              className={styles.form}
+              onSubmit={handleSubmit}
+            >
               {isSubmitting && <Loader />}
 
               <div className={styles.coverField}>
-                <label className={styles.label} htmlFor="image">
+                <label
+                  className={styles.label}
+                  htmlFor="image"
+                >
                   Обкладинка статті
                 </label>
 
@@ -313,17 +345,25 @@ export function AddStoryForm() {
                   type="button"
                   variant="secondary"
                   className={styles.uploadButton}
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() =>
+                    fileInputRef.current?.click()
+                  }
                   disabled={isSubmitting}
                 >
                   Завантажити фото
                 </Button>
 
-                <FieldError id="image-error" message={imageError} />
+                <FieldError
+                  id="image-error"
+                  message={imageError}
+                />
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="title">
+                <label
+                  className={styles.label}
+                  htmlFor="title"
+                >
                   Заголовок
                 </label>
 
@@ -342,7 +382,9 @@ export function AddStoryForm() {
                   }`}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  aria-invalid={Boolean(touched.title && errors.title)}
+                  aria-invalid={Boolean(
+                    touched.title && errors.title,
+                  )}
                   aria-describedby={
                     touched.title && errors.title
                       ? "title-error"
@@ -353,111 +395,67 @@ export function AddStoryForm() {
                 <FieldError
                   id="title-error"
                   message={
-                    touched.title ? errors.title : undefined
+                    touched.title
+                      ? errors.title
+                      : undefined
                   }
                 />
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="category">
+                <span className={styles.label}>
                   Категорія
-                </label>
+                </span>
 
-                <div
-                  ref={categoryDropdownRef}
-                  className={styles.selectWrapper}
-                >
-                  <button
-                    id="category"
-                    type="button"
-                    className={`${styles.selectTrigger} ${
-                      isCategoryError
-                        ? styles.inputError
-                        : isCategorySuccess
-                          ? styles.inputSuccess
-                          : ""
-                    }`}
-                    onClick={() => {
-                      if (!isCategoriesLoading && !isSubmitting) {
-                        setIsCategoryDropdownOpen((currentValue) => !currentValue);
-                      }
-                    }}
-                    onBlur={() => {
-                      setFieldTouched("category", true, true);
-                    }}
-                    disabled={isCategoriesLoading || isSubmitting}
-                    aria-haspopup="listbox"
-                    aria-expanded={isCategoryDropdownOpen}
-                    aria-invalid={isCategoryError}
-                    aria-describedby={
-                      isCategoryError ? "category-error" : undefined
-                    }
-                  >
-                    <span
-                      className={
-                        selectedCategory
-                          ? styles.selectValue
-                          : styles.selectPlaceholder
-                      }
-                    >
-                      {selectedCategory
-                        ? selectedCategory.category
-                        : isCategoriesLoading
-                          ? "Завантаження..."
-                          : "Категорія"}
-                    </span>
-
-                    <SpriteIcon
-                      id="icon-arrow_down"
-                      width={24}
-                      height={24}
-                      className={`${styles.selectIcon} ${
-                        isCategoryDropdownOpen ? styles.selectIconOpen : ""
-                      }`}
-                      aria-hidden="true"
-                    />
-                  </button>
-
-                  {isCategoryDropdownOpen && (
-                    <ul className={styles.selectMenu} role="listbox">
-                      {categories.map((category) => {
-                        const isSelected = values.category === category._id;
-
-                        return (
-                          <li key={category._id} role="presentation">
-                            <button
-                              type="button"
-                              className={`${styles.selectOption} ${
-                                isSelected ? styles.selectOptionActive : ""
-                              }`}
-                              role="option"
-                              aria-selected={isSelected}
-                              onMouseDown={(event) => {
-                                event.preventDefault();
-                              }}
-                              onClick={() => {
-                                setFieldValue("category", category._id, true);
-                                setFieldTouched("category", true, false);
-                                setIsCategoryDropdownOpen(false);
-                              }}
-                            >
-                              {category.category}
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </div>
+                <Dropdown
+                  options={categoryOptions}
+                  value={values.category}
+                  ariaLabel="Оберіть категорію"
+                  disabled={
+                    isCategoriesLoading ||
+                    isSubmitting
+                  }
+                  className={`${styles.categoryDropdown} ${
+                    isCategorySuccess ? styles.categoryDropdownSuccess : ""
+                  }`}
+                  isError={isCategoryError}
+                  isSuccess={isCategorySuccess}
+                  ariaDescribedBy={
+                    isCategoryError
+                      ? "category-error"
+                      : undefined
+                  }
+                  onTouched={() => {
+                    setFieldTouched(
+                      "category",
+                      true,
+                      false,
+                    );
+                  }}
+                  onChange={(categoryId) => {
+                    setFieldValue(
+                      "category",
+                      categoryId,
+                      true,
+                    );
+                  }}
+                />
 
                 <FieldError
                   id="category-error"
-                  message={touched.category ? errors.category : undefined}
+                  message={
+                    isCategoryError
+                      ? "Оберіть категорію"
+                      : undefined
+                  }
                 />
               </div>
-              
+
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="article">
+                <label
+                  className={styles.label}
+                  htmlFor="article"
+                >
                   Текст історії
                 </label>
 
@@ -467,7 +465,8 @@ export function AddStoryForm() {
                   placeholder="Ваша історія тут"
                   value={values.article}
                   className={`${styles.input} ${styles.textarea} ${
-                    touched.article && errors.article
+                    touched.article &&
+                    errors.article
                       ? styles.inputError
                       : values.article.trim()
                         ? styles.inputSuccess
@@ -476,10 +475,12 @@ export function AddStoryForm() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   aria-invalid={Boolean(
-                    touched.article && errors.article,
+                    touched.article &&
+                      errors.article,
                   )}
                   aria-describedby={
-                    touched.article && errors.article
+                    touched.article &&
+                    errors.article
                       ? "article-error"
                       : undefined
                   }
@@ -488,7 +489,9 @@ export function AddStoryForm() {
                 <FieldError
                   id="article-error"
                   message={
-                    touched.article ? errors.article : undefined
+                    touched.article
+                      ? errors.article
+                      : undefined
                   }
                 />
               </div>
@@ -498,7 +501,11 @@ export function AddStoryForm() {
                   type="submit"
                   variant="primary"
                   className={styles.submitButton}
-                  disabled={isSubmitting || !dirty || !isValid}
+                  disabled={
+                    isSubmitting ||
+                    !dirty ||
+                    !isValid
+                  }
                 >
                   Зберегти
                 </Button>
@@ -507,7 +514,9 @@ export function AddStoryForm() {
                   type="button"
                   variant="secondary"
                   className={styles.cancelButton}
-                  onClick={() => setIsCancelModalOpen(true)}
+                  onClick={() =>
+                    setIsCancelModalOpen(true)
+                  }
                   disabled={isSubmitting}
                 >
                   Відмінити
@@ -522,7 +531,9 @@ export function AddStoryForm() {
               confirmButtonText="Так, відмінити"
               cancelButtonText="Повернутись"
               onConfirm={handleConfirmCancel}
-              onCancel={() => setIsCancelModalOpen(false)}
+              onCancel={() =>
+                setIsCancelModalOpen(false)
+              }
             />
           </>
         );
