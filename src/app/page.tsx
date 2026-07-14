@@ -5,6 +5,7 @@ import { OurTravellers } from "@/components/our-travellers/our-travellers";
 import { Join } from "@/components/join/join";
 
 
+
 export default function HomePage() {
   return (
     <>
@@ -13,6 +14,7 @@ export default function HomePage() {
       <About />
       <OurTravellers />
       <Join />
+      
     </>
   );
 }
