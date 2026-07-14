@@ -1,6 +1,7 @@
 .authBar {
   display: flex;
   width: 100%;
+  max-width: 644px;
 }
 
 .link {
@@ -17,7 +18,7 @@
   font-weight: 400;
   line-height: 150%;
 
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
 
