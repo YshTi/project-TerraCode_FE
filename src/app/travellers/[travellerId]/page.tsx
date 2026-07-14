@@ -3,7 +3,6 @@ import { PageTitle } from "@/components/page-title/page-title";
 import { TravellerInfo } from "@/components/traveller-info/traveller-info";
 import { TravellersStories } from "@/components/travellers-stories/travellers-stories";
 import { backendFetch } from "@/lib/api/backend";
-import type { Story } from "@/types/story";
 import type { User } from "@/types/user";
 
 import styles from "./page.module.css";
@@ -14,26 +13,15 @@ type TravellerPageProps = {
   }>;
 };
 
-type TravellerApiStory = Omit<Story, "ownerId"> & {
-  ownerId: string;
-};
-
 type TravellerApiResponse = {
   data: {
     user: User;
-    stories: TravellerApiStory[];
-    pagination: {
-      page: number;
-      perPage: number;
-      totalStories: number;
-      totalPages: number;
-    };
   };
 };
 
 async function getTravellerProfile(travellerId: string) {
   const response = await backendFetch(
-    `/api/users/${travellerId}?page=1&perPage=6`,
+    `/api/users/${travellerId}?page=1&perPage=1`,
   );
 
   if (response.status === 404) {
@@ -46,7 +34,7 @@ async function getTravellerProfile(travellerId: string) {
 
   const data = (await response.json()) as TravellerApiResponse;
 
-  return data.data;
+  return data.data.user;
 }
 
 export default async function TravellerPage({
@@ -54,9 +42,9 @@ export default async function TravellerPage({
 }: TravellerPageProps) {
   const { travellerId } = await params;
 
-  const travellerProfile = await getTravellerProfile(travellerId);
+  const traveller = await getTravellerProfile(travellerId);
 
-  if (!travellerProfile) {
+  if (!traveller) {
     return (
       <Container>
         <p className={styles.notFound}>Такий користувач відсутній</p>
@@ -64,21 +52,10 @@ export default async function TravellerPage({
     );
   }
 
-  const { user, stories } = travellerProfile;
-
-  const normalizedStories: Story[] = stories.map((story) => ({
-    ...story,
-    ownerId: {
-      _id: user._id,
-      name: user.name,
-      avatarUrl: user.avatarUrl,
-    },
-  }));
-
   return (
     <section className={styles.section}>
       <Container>
-        <TravellerInfo user={user} className={styles.travellerInfo} />
+        <TravellerInfo user={traveller} className={styles.travellerInfo} />
 
         <div className={styles.storiesBlock}>
           <PageTitle className={styles.storiesTitle}>
@@ -86,7 +63,18 @@ export default async function TravellerPage({
           </PageTitle>
 
           <div className={styles.storiesList}>
-            <TravellersStories stories={normalizedStories} />
+            <TravellersStories
+              source={{
+                type: "public",
+                userId: travellerId,
+              }}
+              emptyState={{
+                text: "Цей користувач ще не публікував історій.",
+                buttonText: "Назад до історій",
+                linkTo: "/stories",
+              }}
+              limit={6}
+            />
           </div>
         </div>
       </Container>
