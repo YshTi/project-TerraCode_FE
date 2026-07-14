@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/buttons/button";
@@ -51,15 +55,23 @@ export function TravellersStories({
   savedStoryIds = [],
   className = "",
 }: TravellersStoriesProps) {
+  const listRef = useRef<HTMLUListElement | null>(null);
+
+  const queryKey =
+    source.type === "public"
+      ? ([
+          "traveller-stories",
+          source.userId,
+          limit,
+        ] as const)
+      : ([
+          "profile-stories",
+          source.type,
+          limit,
+        ] as const);
+
   const storiesQuery = useInfiniteQuery({
-    queryKey:
-      source.type === "public"
-        ? [
-            "traveller-stories",
-            source.userId,
-            limit,
-          ]
-        : ["profile-stories", source.type, limit],
+    queryKey,
 
     queryFn: ({ pageParam }) => {
       if (source.type === "public") {
@@ -92,13 +104,12 @@ export function TravellersStories({
         return undefined;
       }
 
-      if ("hasNextPage" in pagination) {
-        return pagination.hasNextPage
-          ? pagination.page + 1
-          : undefined;
-      }
+      const hasNextPage =
+        "hasNextPage" in pagination
+          ? pagination.hasNextPage
+          : pagination.page < pagination.totalPages;
 
-      return pagination.page < pagination.totalPages
+      return hasNextPage
         ? pagination.page + 1
         : undefined;
     },
@@ -113,14 +124,14 @@ export function TravellersStories({
       return;
     }
 
-    const message =
+    const errorMessage =
       source.type === "saved"
         ? "Не вдалося завантажити збережені історії"
         : source.type === "own"
           ? "Не вдалося завантажити ваші історії"
           : "Не вдалося завантажити історії мандрівника";
 
-    notify.error(message);
+    notify.error(errorMessage);
   }, [source.type, storiesQuery.isError]);
 
   const stories = useMemo(
@@ -141,7 +152,7 @@ export function TravellersStories({
     return new Set(savedStoryIds);
   }, [savedStoryIds, source.type, stories]);
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     if (
       !storiesQuery.hasNextPage ||
       storiesQuery.isFetchingNextPage
@@ -149,11 +160,25 @@ export function TravellersStories({
       return;
     }
 
-    void storiesQuery.fetchNextPage();
-  };
+    const previousStoriesCount = stories.length;
 
-  const handleRetry = () => {
-    void storiesQuery.refetch();
+    const result = await storiesQuery.fetchNextPage();
+
+    if (result.isError) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      const firstNewStory =
+        listRef.current?.children.item(
+          previousStoriesCount,
+        );
+
+      firstNewStory?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
   };
 
   if (storiesQuery.isLoading) {
@@ -173,7 +198,9 @@ export function TravellersStories({
 
         <Button
           type="button"
-          onClick={handleRetry}
+          onClick={() => {
+            void storiesQuery.refetch();
+          }}
           disabled={storiesQuery.isFetching}
         >
           {storiesQuery.isFetching
@@ -195,8 +222,13 @@ export function TravellersStories({
   }
 
   return (
-    <div className={`${css.wrapper} ${className}`.trim()}>
-      <ul className={css.list}>
+    <div
+      className={`${css.wrapper} ${className}`.trim()}
+    >
+      <ul
+        ref={listRef}
+        className={css.list}
+      >
         {stories.map((story) => (
           <StoryCard
             key={story._id}
@@ -215,9 +247,15 @@ export function TravellersStories({
       {!storiesQuery.isFetchingNextPage &&
         storiesQuery.hasNextPage && (
           <Pagination
-            onLoadMore={handleLoadMore}
-            isLoading={storiesQuery.isFetchingNextPage}
-            hasMore={Boolean(storiesQuery.hasNextPage)}
+            onLoadMore={() => {
+              void handleLoadMore();
+            }}
+            isLoading={
+              storiesQuery.isFetchingNextPage
+            }
+            hasMore={Boolean(
+              storiesQuery.hasNextPage,
+            )}
             fullWidthOnMobile
           />
         )}
