@@ -5,12 +5,14 @@
 
   color: var(--color-white);
   background-color: var(--color-green-900);
-  background-image: url("/images/join-bg.png");
-  background-position: center;
+  background-image: url("/images/join-bg.webp");
+
+  background-position: 17% center;
   background-repeat: no-repeat;
   background-size: cover;
 
   border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
@@ -59,8 +61,11 @@
 
 @media screen and (min-width: 768px) {
   .card {
-    min-height: 320px;
+    min-height: 284px;
+    height: 284px;
     padding: 16px;
+
+    background-position: 35% center;
   }
 
   .column {
@@ -73,10 +78,6 @@
     font-size: 32px;
   }
 
-  .actions {
-    margin-top: auto;
-  }
-
   .button {
     width: 168px;
   }
@@ -85,16 +86,24 @@
 @media screen and (min-width: 1440px) {
   .card {
     min-height: 436px;
-    padding: 64px;
+    padding: 63px 64px;
+
+    background-position: center;
   }
 
   .column {
     max-width: 768px;
     gap: 32px;
+
+    justify-content: space-between;
   }
 
   .title {
     font-size: 48px;
+  }
+
+  .text {
+    font-size: 20px;
   }
 
   .button {
