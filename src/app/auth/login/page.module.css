@@ -11,12 +11,14 @@
 .header {
   display: flex;
   align-items: center;
-  height: 72px;
+  min-height: 72px;
 }
 
 .login {
   display: flex;
   flex-direction: column;
+  align-self: center;
+  max-width: 335px;
   width: 100%;
   max-width: 644px;
   margin: 0 auto;
@@ -28,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 72px;
+  min-height: 72px;
   margin-top: auto;
 }
 

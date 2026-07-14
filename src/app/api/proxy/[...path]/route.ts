@@ -8,6 +8,103 @@ interface RouteContext {
   }>;
 }
 
+const ACCESS_TOKEN_MAX_AGE = 60 * 60;
+
+function createRequestHeaders(
+  request: NextRequest,
+  accessToken?: string,
+): Headers {
+  const headers = new Headers();
+
+  const contentType = request.headers.get("content-type");
+  const authorization = request.headers.get("authorization");
+  const cookie = request.headers.get("cookie");
+  const accept = request.headers.get("accept");
+
+  if (contentType) {
+    headers.set("content-type", contentType);
+  }
+
+  if (accept) {
+    headers.set("accept", accept);
+  }
+
+  /*
+   * Preserve cookies because they contain refreshToken
+   * and possibly the current accessToken.
+   */
+  if (cookie) {
+    headers.set("cookie", cookie);
+  }
+
+  /*
+   * A newly refreshed access token must override the old
+   * Authorization header or accessToken cookie.
+   */
+  if (accessToken) {
+    headers.set("authorization", `Bearer ${accessToken}`);
+  } else if (authorization) {
+    headers.set("authorization", authorization);
+  }
+
+  return headers;
+}
+
+async function sendBackendRequest({
+  request,
+  targetPath,
+  body,
+  accessToken,
+}: {
+  request: NextRequest;
+  targetPath: string;
+  body?: ArrayBuffer;
+  accessToken?: string;
+}): Promise<Response> {
+  return backendFetch(targetPath, {
+    method: request.method,
+    headers: createRequestHeaders(request, accessToken),
+    body,
+  });
+}
+
+function forwardBackendHeaders(
+  backendResponse: Response,
+  response: NextResponse,
+) {
+  const contentType = backendResponse.headers.get("content-type");
+
+  if (contentType) {
+    response.headers.set("content-type", contentType);
+  }
+
+  const location = backendResponse.headers.get("location");
+
+  if (location) {
+    response.headers.set("location", location);
+  }
+
+  /*
+   * Forward cookies returned by the backend.
+   */
+  if (
+    "getSetCookie" in backendResponse.headers &&
+    typeof backendResponse.headers.getSetCookie === "function"
+  ) {
+    const cookies = backendResponse.headers.getSetCookie();
+
+    for (const cookieValue of cookies) {
+      response.headers.append("set-cookie", cookieValue);
+    }
+  } else {
+    const setCookie = backendResponse.headers.get("set-cookie");
+
+    if (setCookie) {
+      response.headers.append("set-cookie", setCookie);
+    }
+  }
+}
+
 async function proxyRequest(
   request: NextRequest,
   context: RouteContext,
@@ -22,29 +119,10 @@ async function proxyRequest(
       ? `${backendPath}?${queryString}`
       : backendPath;
 
-    const requestHeaders = new Headers();
-
-    const contentType = request.headers.get("content-type");
-    const authorization = request.headers.get("authorization");
-    const cookie = request.headers.get("cookie");
-    const accept = request.headers.get("accept");
-
-    if (contentType) {
-      requestHeaders.set("content-type", contentType);
-    }
-
-    if (authorization) {
-      requestHeaders.set("authorization", authorization);
-    }
-
-    if (cookie) {
-      requestHeaders.set("cookie", cookie);
-    }
-
-    if (accept) {
-      requestHeaders.set("accept", accept);
-    }
-
+    /*
+     * Read the request body once.
+     * The same ArrayBuffer can then be reused for the retry.
+     */
     const hasBody =
       request.method !== "GET" && request.method !== "HEAD";
 
@@ -52,49 +130,112 @@ async function proxyRequest(
       ? await request.arrayBuffer()
       : undefined;
 
-    const backendResponse = await backendFetch(targetPath, {
-      method: request.method,
-      headers: requestHeaders,
+    /*
+     * First attempt with the currently available credentials.
+     */
+    let backendResponse = await sendBackendRequest({
+      request,
+      targetPath,
       body,
     });
 
-    const responseBody = await backendResponse.arrayBuffer();
+    let newAccessToken: string | undefined;
+    let refreshFailed = false;
+
+    const refreshToken =
+      request.cookies.get("refreshToken")?.value;
+
+    /*
+     * If access authorization failed, use the refresh token
+     * and retry the original request exactly once.
+     */
+    if (
+      backendResponse.status === 401 &&
+      refreshToken &&
+      targetPath !== "/api/auth/refresh"
+    ) {
+      const refreshResponse = await backendFetch(
+        "/api/auth/refresh",
+        {
+          method: "POST",
+          headers: {
+            Cookie: `refreshToken=${refreshToken}`,
+          },
+        },
+      );
+
+      if (refreshResponse.ok) {
+        const refreshData: unknown =
+          await refreshResponse.json();
+
+        if (
+          typeof refreshData === "object" &&
+          refreshData !== null &&
+          "accessToken" in refreshData &&
+          typeof refreshData.accessToken === "string"
+        ) {
+          newAccessToken = refreshData.accessToken;
+
+          /*
+           * Retry the original protected request with
+           * the newly issued access token.
+           */
+          backendResponse = await sendBackendRequest({
+            request,
+            targetPath,
+            body,
+            accessToken: newAccessToken,
+          });
+        } else {
+          refreshFailed = true;
+        }
+      } else {
+        refreshFailed = true;
+      }
+    }
+
+    const responseBody =
+      await backendResponse.arrayBuffer();
 
     const response = new NextResponse(responseBody, {
       status: backendResponse.status,
     });
 
-    const responseContentType =
-      backendResponse.headers.get("content-type");
+    forwardBackendHeaders(backendResponse, response);
 
-    if (responseContentType) {
-      response.headers.set("content-type", responseContentType);
-    }
-
-    const location = backendResponse.headers.get("location");
-
-    if (location) {
-      response.headers.set("location", location);
+    /*
+     * Save the new access token in the browser.
+     */
+    if (newAccessToken) {
+      response.cookies.set("accessToken", newAccessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: ACCESS_TOKEN_MAX_AGE,
+      });
     }
 
     /*
-     * Forward authentication cookies returned by the backend.
+     * The refresh token is invalid or expired.
+     * Remove both local authentication cookies.
      */
-    if (
-      "getSetCookie" in backendResponse.headers &&
-      typeof backendResponse.headers.getSetCookie === "function"
-    ) {
-      const cookies = backendResponse.headers.getSetCookie();
+    if (refreshFailed) {
+      response.cookies.set("accessToken", "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 0,
+      });
 
-      for (const cookieValue of cookies) {
-        response.headers.append("set-cookie", cookieValue);
-      }
-    } else {
-      const setCookie = backendResponse.headers.get("set-cookie");
-
-      if (setCookie) {
-        response.headers.set("set-cookie", setCookie);
-      }
+      response.cookies.set("refreshToken", "", {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 0,
+      });
     }
 
     return response;
