@@ -12,6 +12,7 @@
 .title {
   text-align: left;
   color: var(--color-black);
+  font-weight: 700;
 }
 
 .desktopBtn {
