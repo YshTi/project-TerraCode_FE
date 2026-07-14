@@ -16,11 +16,7 @@ interface UsersResponse {
 
 interface TravellerProfileResponse {
   data: {
-    user: {
-      _id: string;
-      name: string;
-      avatarUrl?: string | null;
-    };
+    user: User;
     stories: Story[];
     pagination: {
       page: number;
@@ -111,7 +107,8 @@ export const getTravellerStories = async ({
       limit: pagination.perPage,
       total: pagination.totalStories,
       totalPages: pagination.totalPages,
-      hasNextPage: pagination.page < pagination.totalPages,
+      hasNextPage:
+        pagination.page < pagination.totalPages,
       hasPreviousPage: pagination.page > 1,
     },
   };
