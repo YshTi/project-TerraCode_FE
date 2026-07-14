@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useRouter } from "next/navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
@@ -16,6 +22,7 @@ import {
 } from "@/lib/api/profileEditApi";
 import { useAuth } from "@/providers/auth-provider";
 import { notify } from "@/utils/notify";
+import Image from "next/image";
 
 import styles from "./page.module.css";
 
@@ -28,6 +35,14 @@ type ProfileEditValues = {
 };
 
 const MAX_AVATAR_SIZE = 1024 * 1024;
+
+const ACCEPTED_AVATAR_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
 
 const profileEditSchema = Yup.object({
   name: Yup.string()
@@ -50,120 +65,116 @@ const profileEditSchema = Yup.object({
     .test(
       "file-type",
       "Фото має бути у форматі JPG, PNG, GIF або WEBP",
-      (value) =>
-        !value ||
-        [
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-        ].includes(value.type),
+      (value) => !value || ACCEPTED_AVATAR_TYPES.includes(value.type),
     ),
 
-  currentPassword: Yup.string(),
-  newPassword: Yup.string(),
-  confirmNewPassword: Yup.string(),
-})
-  .test("current-password-required", function (values) {
-    if (!values) {
-      return true;
-    }
+  currentPassword: Yup.string().test(
+    "current-password-required",
+    "Введіть поточний пароль",
+    function (value) {
+      const {
+        newPassword,
+        confirmNewPassword,
+      } = this.parent as ProfileEditValues;
 
-    const hasPasswordValues = Boolean(
-      values.currentPassword ||
-        values.newPassword ||
-        values.confirmNewPassword,
-    );
+      const isPasswordChangeStarted = Boolean(
+        value || newPassword || confirmNewPassword,
+      );
 
-    if (hasPasswordValues && !values.currentPassword) {
-      return this.createError({
-        path: "currentPassword",
-        message: "Введіть поточний пароль",
-      });
-    }
+      return !isPasswordChangeStarted || Boolean(value);
+    },
+  ),
 
-    return true;
-  })
-  .test("new-password-required", function (values) {
-    if (!values) {
-      return true;
-    }
+  newPassword: Yup.string()
+    .test(
+      "new-password-required",
+      "Введіть новий пароль",
+      function (value) {
+        const {
+          currentPassword,
+          confirmNewPassword,
+        } = this.parent as ProfileEditValues;
 
-    const hasPasswordValues = Boolean(
-      values.currentPassword ||
-        values.newPassword ||
-        values.confirmNewPassword,
-    );
+        const isPasswordChangeStarted = Boolean(
+          currentPassword || value || confirmNewPassword,
+        );
 
-    if (hasPasswordValues && !values.newPassword) {
-      return this.createError({
-        path: "newPassword",
-        message: "Введіть новий пароль",
-      });
-    }
+        return !isPasswordChangeStarted || Boolean(value);
+      },
+    )
+    .test(
+      "new-password-min",
+      "Новий пароль має містити щонайменше 8 символів",
+      (value) => !value || value.length >= 8,
+    )
+    .test(
+      "new-password-max",
+      "Новий пароль має містити не більше 128 символів",
+      (value) => !value || value.length <= 128,
+    )
+    .test(
+      "new-password-spaces",
+      "Пароль не повинен містити пробілів",
+      (value) => !value || !/\s/.test(value),
+    )
+    .test(
+      "new-password-special",
+      "Пароль має містити хоча б один спеціальний символ",
+      (value) => !value || /[\p{P}\p{S}]/u.test(value),
+    ),
 
-    if (values.newPassword && values.newPassword.length < 8) {
-      return this.createError({
-        path: "newPassword",
-        message: "Новий пароль має містити щонайменше 8 символів",
-      });
-    }
+  confirmNewPassword: Yup.string()
+    .test(
+      "confirm-password-required",
+      "Повторіть новий пароль",
+      function (value) {
+        const {
+          currentPassword,
+          newPassword,
+        } = this.parent as ProfileEditValues;
 
-    if (values.newPassword && values.newPassword.length > 128) {
-      return this.createError({
-        path: "newPassword",
-        message: "Новий пароль має містити не більше 128 символів",
-      });
-    }
+        const isPasswordChangeStarted = Boolean(
+          currentPassword || newPassword || value,
+        );
 
-    if (values.newPassword && /\s/.test(values.newPassword)) {
-      return this.createError({
-        path: "newPassword",
-        message: "Пароль не повинен містити пробілів",
-      });
-    }
+        return !isPasswordChangeStarted || Boolean(value);
+      },
+    )
+    .test(
+      "passwords-match",
+      "Паролі не збігаються",
+      function (value) {
+        const { newPassword } = this.parent as ProfileEditValues;
 
-    if (values.newPassword && !/[\p{P}\p{S}]/u.test(values.newPassword)) {
-      return this.createError({
-        path: "newPassword",
-        message: "Пароль має містити хоча б один спеціальний символ",
-      });
-    }
+        if (!newPassword || !value) {
+          return true;
+        }
 
-    return true;
-  })
-  .test("confirm-password-required", function (values) {
-    if (!values) {
-      return true;
-    }
+        return value === newPassword;
+      },
+    ),
+});
 
-    const hasPasswordValues = Boolean(
-      values.currentPassword ||
-        values.newPassword ||
-        values.confirmNewPassword,
-    );
+function getProfileErrorMessage(error: unknown) {
+  const fallbackMessage = "Не вдалося оновити профіль";
 
-    if (hasPasswordValues && !values.confirmNewPassword) {
-      return this.createError({
-        path: "confirmNewPassword",
-        message: "Повторіть новий пароль",
-      });
-    }
+  if (!(error instanceof Error)) {
+    return fallbackMessage;
+  }
 
-    if (
-      values.newPassword &&
-      values.confirmNewPassword &&
-      values.newPassword !== values.confirmNewPassword
-    ) {
-      return this.createError({
-        path: "confirmNewPassword",
-        message: "Паролі не збігаються",
-      });
-    }
+  const messages: Record<string, string> = {
+    "Current password is incorrect":
+      "Введено неправильний поточний пароль",
+    "Invalid current password":
+      "Введено неправильний поточний пароль",
+    "User not found":
+      "Користувача не знайдено",
+    "Not authorized":
+      "Ви не авторизовані",
+  };
 
-    return true;
-  });
+  return messages[error.message] ?? error.message ?? fallbackMessage;
+}
 
 export default function ProfileEditPage() {
   const router = useRouter();
@@ -193,12 +204,16 @@ export default function ProfileEditPage() {
     confirmNewPassword: "",
   };
 
-  const currentAvatar = avatarPreview || user.avatarUrl || DEFAULT_AVATAR_URL;
+  const currentAvatar =
+    avatarPreview || user.avatarUrl || DEFAULT_AVATAR_URL;
 
   return (
     <section className={styles.section}>
       <div className={styles.heading}>
-        <h1 className={styles.title}>Редагувати профіль</h1>
+        <h1 className={styles.title}>
+          Редагувати профіль
+        </h1>
+
         <p className={styles.description}>
           Оновіть фото, ім&apos;я або пароль.
         </p>
@@ -208,7 +223,16 @@ export default function ProfileEditPage() {
         initialValues={initialValues}
         validationSchema={profileEditSchema}
         enableReinitialize
-        onSubmit={async (values, { setSubmitting, setStatus }) => {
+        validateOnChange
+        validateOnBlur
+        onSubmit={async (
+          values,
+          {
+            setSubmitting,
+            setStatus,
+            resetForm,
+          },
+        ) => {
           setStatus(undefined);
 
           const trimmedName = values.name.trim();
@@ -220,8 +244,15 @@ export default function ProfileEditPage() {
               values.confirmNewPassword,
           );
 
-          if (!isNameChanged && !isAvatarChanged && !isPasswordChanged) {
-            setStatus("Немає змін для збереження");
+          if (
+            !isNameChanged &&
+            !isAvatarChanged &&
+            !isPasswordChanged
+          ) {
+            const message = "Немає змін для збереження";
+
+            setStatus(message);
+            notify.error(message);
             setSubmitting(false);
             return;
           }
@@ -247,13 +278,29 @@ export default function ProfileEditPage() {
 
             notify.success("Профіль успішно оновлено");
 
+            resetForm({
+              values: {
+                name: trimmedName,
+                avatar: null,
+                currentPassword: "",
+                newPassword: "",
+                confirmNewPassword: "",
+              },
+            });
+
+            if (avatarPreview) {
+              URL.revokeObjectURL(avatarPreview);
+              setAvatarPreview(null);
+            }
+
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+
             router.push("/profile/saved");
             router.refresh();
           } catch (error) {
-            const message =
-              error instanceof Error
-                ? error.message
-                : "Не вдалося оновити профіль";
+            const message = getProfileErrorMessage(error);
 
             setStatus(message);
             notify.error(message);
@@ -267,11 +314,14 @@ export default function ProfileEditPage() {
           handleChange,
           handleBlur,
           setFieldValue,
+          setFieldTouched,
+          setTouched,
+          validateForm,
+          setStatus,
           values,
           errors,
           touched,
           isSubmitting,
-          isValid,
           dirty,
           status,
         }) => {
@@ -283,13 +333,117 @@ export default function ProfileEditPage() {
 
           const hasChanges = dirty || Boolean(values.avatar);
 
+          const clearRequestError = () => {
+            if (status) {
+              setStatus(undefined);
+            }
+          };
+
+          const handleTextFieldChange = (
+            event: ChangeEvent<HTMLInputElement>,
+          ) => {
+            clearRequestError();
+            handleChange(event);
+          };
+
+          const handleValidatedSubmit = async (
+            event: FormEvent<HTMLFormElement>,
+          ) => {
+            event.preventDefault();
+
+            if (!hasChanges) {
+              notify.error("Немає змін для збереження");
+              return;
+            }
+
+            const validationErrors = await validateForm();
+
+            if (Object.keys(validationErrors).length > 0) {
+              await setTouched(
+                {
+                  name: true,
+                  avatar: true,
+                  currentPassword: true,
+                  newPassword: true,
+                  confirmNewPassword: true,
+                },
+                false,
+              );
+
+              const firstError =
+                validationErrors.name ||
+                validationErrors.avatar ||
+                validationErrors.currentPassword ||
+                validationErrors.newPassword ||
+                validationErrors.confirmNewPassword ||
+                "Перевірте правильність заповнення форми";
+
+              notify.error(String(firstError));
+              return;
+            }
+
+            handleSubmit();
+          };
+
+          const nameHasError = Boolean(
+            touched.name && errors.name,
+          );
+
+          const nameHasSuccess = Boolean(
+            touched.name &&
+              values.name.trim() &&
+              !errors.name,
+          );
+
+          const currentPasswordHasError = Boolean(
+            touched.currentPassword &&
+              errors.currentPassword,
+          );
+
+          const currentPasswordHasSuccess = Boolean(
+            touched.currentPassword &&
+              values.currentPassword &&
+              !errors.currentPassword,
+          );
+
+          const newPasswordHasError = Boolean(
+            touched.newPassword &&
+              errors.newPassword,
+          );
+
+          const newPasswordHasSuccess = Boolean(
+            touched.newPassword &&
+              values.newPassword &&
+              !errors.newPassword,
+          );
+
+          const confirmPasswordHasError = Boolean(
+            touched.confirmNewPassword &&
+              errors.confirmNewPassword,
+          );
+
+          const confirmPasswordHasSuccess = Boolean(
+            touched.confirmNewPassword &&
+              values.confirmNewPassword &&
+              !errors.confirmNewPassword,
+          );
+
           return (
-            <form className={styles.form} onSubmit={handleSubmit}>
+            <form
+              className={styles.form}
+              onSubmit={handleValidatedSubmit}
+              noValidate
+            >
+              {isSubmitting && <Loader />}
+
               <div className={styles.avatarBlock}>
-                <img
+                <Image
                   className={styles.avatar}
                   src={currentAvatar}
                   alt={user.name}
+                  width={110}
+                  height={110}
+                  unoptimized
                 />
 
                 <div className={styles.avatarActions}>
@@ -300,20 +454,52 @@ export default function ProfileEditPage() {
                     name="avatar"
                     type="file"
                     accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                    onChange={(event) => {
-                      const file = event.currentTarget.files?.[0] ?? null;
+                    onChange={async (event) => {
+                      clearRequestError();
+
+                      const file =
+                        event.currentTarget.files?.[0] ?? null;
 
                       if (avatarPreview) {
                         URL.revokeObjectURL(avatarPreview);
                       }
 
-                      setFieldValue("avatar", file);
+                      await setFieldValue(
+                        "avatar",
+                        file,
+                        true,
+                      );
 
-                      if (file) {
-                        setAvatarPreview(URL.createObjectURL(file));
-                      } else {
+                      await setFieldTouched(
+                        "avatar",
+                        true,
+                        true,
+                      );
+
+                      if (!file) {
                         setAvatarPreview(null);
+                        return;
                       }
+
+                      if (file.size > MAX_AVATAR_SIZE) {
+                        setAvatarPreview(null);
+                        notify.error("Фото має бути менше 1 MB");
+                        return;
+                      }
+
+                      if (
+                        !ACCEPTED_AVATAR_TYPES.includes(file.type)
+                      ) {
+                        setAvatarPreview(null);
+                        notify.error(
+                          "Фото має бути у форматі JPG, PNG, GIF або WEBP",
+                        );
+                        return;
+                      }
+
+                      setAvatarPreview(
+                        URL.createObjectURL(file),
+                      );
                     }}
                   />
 
@@ -321,7 +507,9 @@ export default function ProfileEditPage() {
                     type="button"
                     variant="secondary"
                     className={styles.uploadButton}
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() =>
+                      fileInputRef.current?.click()
+                    }
                     disabled={isSubmitting}
                   >
                     Змінити фото
@@ -331,133 +519,188 @@ export default function ProfileEditPage() {
                     JPG, PNG, GIF або WEBP. До 1 MB.
                   </p>
 
-                  {touched.avatar && (
-                    <FieldError id="avatar-error" message={errors.avatar} />
-                  )}
+                  <FieldError
+                    id="avatar-error"
+                    message={
+                      touched.avatar
+                        ? errors.avatar
+                        : undefined
+                    }
+                  />
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label className={styles.label} htmlFor="name">
+                <label
+                  className={styles.label}
+                  htmlFor="name"
+                >
                   Ім&apos;я та прізвище
                 </label>
 
                 <input
                   className={`${styles.input} ${
-                    touched.name && errors.name ? styles.inputError : ""
+                    nameHasError
+                      ? styles.inputError
+                      : nameHasSuccess
+                        ? styles.inputSuccess
+                        : ""
                   }`}
                   id="name"
                   name="name"
                   type="text"
                   placeholder="Ваше ім'я та прізвище"
                   value={values.name}
-                  onChange={handleChange}
+                  onChange={handleTextFieldChange}
                   onBlur={handleBlur}
-                  aria-invalid={Boolean(touched.name && errors.name)}
+                  onFocus={clearRequestError}
+                  aria-invalid={nameHasError}
                   aria-describedby={
-                    touched.name && errors.name ? "name-error" : undefined
+                    nameHasError
+                      ? "name-error"
+                      : undefined
                   }
                 />
 
-                {touched.name && (
-                  <FieldError id="name-error" message={errors.name} />
-                )}
+                <FieldError
+                  id="name-error"
+                  message={
+                    touched.name
+                      ? errors.name
+                      : undefined
+                  }
+                />
               </div>
 
               <div className={styles.passwordBlock}>
-                <h2 className={styles.subtitle}>Змінити пароль</h2>
+                <h2 className={styles.subtitle}>
+                  Змінити пароль
+                </h2>
 
                 <div className={styles.field}>
-                  <label className={styles.label} htmlFor="currentPassword">
+                  <label
+                    className={styles.label}
+                    htmlFor="currentPassword"
+                  >
                     Поточний пароль
                   </label>
 
                   <input
                     className={`${styles.input} ${
-                      touched.currentPassword && errors.currentPassword
+                      currentPasswordHasError
                         ? styles.inputError
-                        : ""
+                        : currentPasswordHasSuccess
+                          ? styles.inputSuccess
+                          : ""
                     }`}
                     id="currentPassword"
                     name="currentPassword"
                     type="password"
                     placeholder="Ваш поточний пароль"
                     value={values.currentPassword}
-                    onChange={handleChange}
+                    onChange={handleTextFieldChange}
                     onBlur={handleBlur}
-                    aria-invalid={Boolean(
-                      touched.currentPassword && errors.currentPassword,
-                    )}
+                    onFocus={clearRequestError}
+                    aria-invalid={currentPasswordHasError}
+                    aria-describedby={
+                      currentPasswordHasError
+                        ? "current-password-error"
+                        : undefined
+                    }
                   />
 
-                  {touched.currentPassword && (
-                    <FieldError
-                      id="current-password-error"
-                      message={errors.currentPassword}
-                    />
-                  )}
+                  <FieldError
+                    id="current-password-error"
+                    message={
+                      touched.currentPassword
+                        ? errors.currentPassword
+                        : undefined
+                    }
+                  />
                 </div>
 
                 <div className={styles.field}>
-                  <label className={styles.label} htmlFor="newPassword">
+                  <label
+                    className={styles.label}
+                    htmlFor="newPassword"
+                  >
                     Новий пароль
                   </label>
 
                   <input
                     className={`${styles.input} ${
-                      touched.newPassword && errors.newPassword
+                      newPasswordHasError
                         ? styles.inputError
-                        : ""
+                        : newPasswordHasSuccess
+                          ? styles.inputSuccess
+                          : ""
                     }`}
                     id="newPassword"
                     name="newPassword"
                     type="password"
                     placeholder="Новий пароль"
                     value={values.newPassword}
-                    onChange={handleChange}
+                    onChange={handleTextFieldChange}
                     onBlur={handleBlur}
-                    aria-invalid={Boolean(
-                      touched.newPassword && errors.newPassword,
-                    )}
+                    onFocus={clearRequestError}
+                    aria-invalid={newPasswordHasError}
+                    aria-describedby={
+                      newPasswordHasError
+                        ? "new-password-error"
+                        : undefined
+                    }
                   />
 
-                  {touched.newPassword && (
-                    <FieldError
-                      id="new-password-error"
-                      message={errors.newPassword}
-                    />
-                  )}
+                  <FieldError
+                    id="new-password-error"
+                    message={
+                      touched.newPassword
+                        ? errors.newPassword
+                        : undefined
+                    }
+                  />
                 </div>
 
                 <div className={styles.field}>
-                  <label className={styles.label} htmlFor="confirmNewPassword">
+                  <label
+                    className={styles.label}
+                    htmlFor="confirmNewPassword"
+                  >
                     Повторіть новий пароль
                   </label>
 
                   <input
                     className={`${styles.input} ${
-                      touched.confirmNewPassword && errors.confirmNewPassword
+                      confirmPasswordHasError
                         ? styles.inputError
-                        : ""
+                        : confirmPasswordHasSuccess
+                          ? styles.inputSuccess
+                          : ""
                     }`}
                     id="confirmNewPassword"
                     name="confirmNewPassword"
                     type="password"
                     placeholder="Повторіть новий пароль"
                     value={values.confirmNewPassword}
-                    onChange={handleChange}
+                    onChange={handleTextFieldChange}
                     onBlur={handleBlur}
-                    aria-invalid={Boolean(
-                      touched.confirmNewPassword && errors.confirmNewPassword,
-                    )}
+                    onFocus={clearRequestError}
+                    aria-invalid={confirmPasswordHasError}
+                    aria-describedby={
+                      confirmPasswordHasError
+                        ? "confirm-password-error"
+                        : undefined
+                    }
                   />
 
-                  {touched.confirmNewPassword && (
-                    <FieldError
-                      id="confirm-password-error"
-                      message={errors.confirmNewPassword}
-                    />
-                  )}
+                  <FieldError
+                    id="confirm-password-error"
+                    message={
+                      touched.confirmNewPassword
+                        ? errors.confirmNewPassword
+                        : undefined
+                    }
+                  />
                 </div>
 
                 {!hasPasswordValues && (
@@ -468,14 +711,17 @@ export default function ProfileEditPage() {
               </div>
 
               {status && (
-                <FieldError id="profile-edit-request-error" message={status} />
+                <FieldError
+                  id="profile-edit-request-error"
+                  message={status}
+                />
               )}
 
               <div className={styles.actions}>
                 <Button
                   type="submit"
                   className={styles.submitButton}
-                  disabled={isSubmitting || !hasChanges || !isValid}
+                  disabled={isSubmitting || !hasChanges}
                 >
                   Зберегти
                 </Button>
@@ -484,7 +730,9 @@ export default function ProfileEditPage() {
                   type="button"
                   variant="secondary"
                   className={styles.cancelButton}
-                  onClick={() => router.push("/profile/saved")}
+                  onClick={() =>
+                    router.push("/profile/saved")
+                  }
                   disabled={isSubmitting}
                 >
                   Відмінити
