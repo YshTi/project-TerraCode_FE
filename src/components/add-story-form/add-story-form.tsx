@@ -7,9 +7,10 @@ import * as Yup from "yup";
 
 import { Button } from "@/components/buttons/button";
 import { FieldError } from "@/components/field-error/field-error";
+import { Loader } from "@/components/loader/loader";
+import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { notify } from "@/utils/notify";
 import type { Category } from "@/types/category";
-import type { Story } from "@/types/story";
 
 import styles from "./add-story-form.module.css";
 
@@ -20,6 +21,25 @@ type FormValues = {
   article: string;
 };
 
+type CreateStoryResponse = {
+  _id?: string;
+  data?: {
+    _id?: string;
+  };
+  story?: {
+    _id?: string;
+  };
+  message?: string;
+};
+
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
+
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
 const initialValues: FormValues = {
   image: null,
   title: "",
@@ -28,7 +48,30 @@ const initialValues: FormValues = {
 };
 
 const addStorySchema = Yup.object({
-  image: Yup.mixed<File>().required("Завантажити фото"),
+  image: Yup.mixed<File>()
+    .required("Фото обовʼязкове")
+    .test(
+      "file-type",
+      "Файл має бути у форматі JPG, PNG або WEBP",
+      (file) => {
+        if (!file) {
+          return false;
+        }
+
+        return ACCEPTED_IMAGE_TYPES.includes(file.type);
+      },
+    )
+    .test(
+      "file-size",
+      "Розмір фото не має перевищувати 10 MB",
+      (file) => {
+        if (!file) {
+          return false;
+        }
+
+        return file.size <= MAX_IMAGE_SIZE;
+      },
+    ),
 
   title: Yup.string()
     .trim()
@@ -42,6 +85,10 @@ const addStorySchema = Yup.object({
     .min(10, "Текст історії має містити щонайменше 10 символів")
     .required("Введіть текст історії"),
 });
+
+function getCreatedStoryId(data: CreateStoryResponse) {
+  return data._id ?? data.data?._id ?? data.story?._id ?? null;
+}
 
 export function AddStoryForm() {
   const router = useRouter();
@@ -89,6 +136,7 @@ export function AddStoryForm() {
     <Formik
       initialValues={initialValues}
       validationSchema={addStorySchema}
+      validateOnMount
       onSubmit={async (values, { setSubmitting, resetForm }) => {
         try {
           const formData = new FormData();
@@ -103,14 +151,19 @@ export function AddStoryForm() {
             body: formData,
           });
 
-          const data = await response.json();
+          const data = (await response.json()) as CreateStoryResponse;
 
           if (!response.ok) {
             notify.error(data.message || "Не вдалося створити історію");
             return;
           }
 
-          const createdStory = data as Story;
+          const createdStoryId = getCreatedStoryId(data);
+
+          if (!createdStoryId) {
+            notify.error("Історію створено, але не вдалося відкрити сторінку");
+            return;
+          }
 
           notify.success("Історію успішно створено!");
           resetForm();
@@ -120,7 +173,11 @@ export function AddStoryForm() {
             setPreviewUrl(null);
           }
 
-          router.push(`/stories/${createdStory._id}`);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+
+          router.push(`/stories/${createdStoryId}`);
         } catch {
           notify.error("Помилка з'єднання з сервером");
         } finally {
@@ -139,20 +196,36 @@ export function AddStoryForm() {
         handleBlur,
         handleSubmit,
         setFieldValue,
+        setFieldTouched,
         resetForm,
       }) => {
+        const imageError =
+          touched.image && typeof errors.image === "string"
+            ? errors.image
+            : undefined;
+
         const handleFileChange = (
           event: React.ChangeEvent<HTMLInputElement>,
         ) => {
-          const file = event.target.files?.[0] ?? null;
-
-          setFieldValue("image", file);
+          const file = event.currentTarget.files?.[0] ?? null;
 
           if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
           }
 
-          setPreviewUrl(file ? URL.createObjectURL(file) : null);
+          setFieldTouched("image", true, false);
+          setFieldValue("image", file, true);
+
+          if (
+            file &&
+            ACCEPTED_IMAGE_TYPES.includes(file.type) &&
+            file.size <= MAX_IMAGE_SIZE
+          ) {
+            setPreviewUrl(URL.createObjectURL(file));
+            return;
+          }
+
+          setPreviewUrl(null);
         };
 
         const handleCancel = () => {
@@ -171,57 +244,46 @@ export function AddStoryForm() {
 
         return (
           <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.field}>
-              <label className={styles.label}>Обкладинка статті</label>
+            {isSubmitting && <Loader />}
 
-              <div className={styles.imagePreview}>
-                {previewUrl ? (
-                  <img
-                    src={previewUrl}
-                    alt="Прев'ю обкладинки історії"
-                    className={styles.previewImg}
-                  />
-                ) : (
-                  <svg
-                    className={styles.placeholderIcon}
-                    width="64"
-                    height="64"
-                    viewBox="0 0 64 64"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <rect width="64" height="64" rx="8" fill="none" />
-                    <circle cx="22" cy="22" r="6" fill="currentColor" />
-                    <path
-                      d="M6 50L24 32L36 44L46 34L58 46V54C58 55.1046 57.1046 56 56 56H8C6.89543 56 6 55.1046 6 54V50Z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                )}
+            <div className={styles.coverField}>
+              <label className={styles.label} htmlFor="image">
+                Обкладинка статті
+              </label>
+
+              <div className={styles.coverPreview}>
+                <img
+                  src={
+                    previewUrl ??
+                    "/images/story-cover-placeholder.svg"
+                  }
+                  alt=""
+                  className={styles.coverImage}
+                />
               </div>
 
               <input
                 ref={fileInputRef}
+                id="image"
+                name="image"
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 className={styles.hiddenFileInput}
                 onChange={handleFileChange}
                 onBlur={handleBlur}
-                name="image"
-                id="image"
               />
 
               <Button
                 type="button"
                 variant="secondary"
+                className={styles.uploadButton}
                 onClick={() => fileInputRef.current?.click()}
+                disabled={isSubmitting}
               >
                 Завантажити фото
               </Button>
 
-              {touched.image && (
-                <FieldError id="image-error" message={errors.image} />
-              )}
+              <FieldError id="image-error" message={imageError} />
             </div>
 
             <div className={styles.field}>
@@ -230,25 +292,32 @@ export function AddStoryForm() {
               </label>
 
               <input
-                className={`${styles.input} ${
-                  touched.title && errors.title ? styles.inputError : ""
-                }`}
                 id="title"
                 name="title"
                 type="text"
                 placeholder="Введіть заголовок історії"
                 value={values.title}
+                className={`${styles.input} ${
+                  touched.title && errors.title
+                    ? styles.inputError
+                    : ""
+                }`}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 aria-invalid={Boolean(touched.title && errors.title)}
                 aria-describedby={
-                  touched.title && errors.title ? "title-error" : undefined
+                  touched.title && errors.title
+                    ? "title-error"
+                    : undefined
                 }
               />
 
-              {touched.title && (
-                <FieldError id="title-error" message={errors.title} />
-              )}
+              <FieldError
+                id="title-error"
+                message={
+                  touched.title ? errors.title : undefined
+                }
+              />
             </div>
 
             <div className={styles.field}>
@@ -256,34 +325,61 @@ export function AddStoryForm() {
                 Категорія
               </label>
 
-              <select
-                className={`${styles.input} ${styles.select} ${
-                  touched.category && errors.category
-                    ? styles.inputError
-                    : ""
-                }`}
-                id="category"
-                name="category"
-                value={values.category}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                disabled={isCategoriesLoading}
-                aria-invalid={Boolean(touched.category && errors.category)}
-              >
-                <option value="" disabled>
-                  {isCategoriesLoading ? "Завантаження..." : "Категорія"}
-                </option>
-
-                {categories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.category}
+              <div className={styles.selectWrapper}>
+                <select
+                  id="category"
+                  name="category"
+                  value={values.category}
+                  className={`${styles.input} ${styles.select} ${
+                    touched.category && errors.category
+                      ? styles.inputError
+                      : ""
+                  }`}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={isCategoriesLoading || isSubmitting}
+                  aria-invalid={Boolean(
+                    touched.category && errors.category,
+                  )}
+                  aria-describedby={
+                    touched.category && errors.category
+                      ? "category-error"
+                      : undefined
+                  }
+                >
+                  <option value="" disabled>
+                    {isCategoriesLoading
+                      ? "Завантаження..."
+                      : "Категорія"}
                   </option>
-                ))}
-              </select>
 
-              {touched.category && (
-                <FieldError id="category-error" message={errors.category} />
-              )}
+                  {categories.map((category) => (
+                    <option
+                      key={category._id}
+                      value={category._id}
+                    >
+                      {category.category}
+                    </option>
+                  ))}
+                </select>
+
+                <SpriteIcon
+                  id="icon-arrow_down"
+                  width={24}
+                  height={24}
+                  className={styles.selectIcon}
+                  aria-hidden="true"
+                />
+              </div>
+
+              <FieldError
+                id="category-error"
+                message={
+                  touched.category
+                    ? errors.category
+                    : undefined
+                }
+              />
             </div>
 
             <div className={styles.field}>
@@ -292,16 +388,20 @@ export function AddStoryForm() {
               </label>
 
               <textarea
-                className={`${styles.input} ${styles.textarea} ${
-                  touched.article && errors.article ? styles.inputError : ""
-                }`}
                 id="article"
                 name="article"
                 placeholder="Ваша історія тут"
                 value={values.article}
+                className={`${styles.input} ${styles.textarea} ${
+                  touched.article && errors.article
+                    ? styles.inputError
+                    : ""
+                }`}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                aria-invalid={Boolean(touched.article && errors.article)}
+                aria-invalid={Boolean(
+                  touched.article && errors.article,
+                )}
                 aria-describedby={
                   touched.article && errors.article
                     ? "article-error"
@@ -309,15 +409,19 @@ export function AddStoryForm() {
                 }
               />
 
-              {touched.article && (
-                <FieldError id="article-error" message={errors.article} />
-              )}
+              <FieldError
+                id="article-error"
+                message={
+                  touched.article ? errors.article : undefined
+                }
+              />
             </div>
 
             <div className={styles.actions}>
               <Button
                 type="submit"
                 variant="primary"
+                className={styles.submitButton}
                 disabled={isSubmitting || !dirty || !isValid}
               >
                 Зберегти
@@ -326,6 +430,7 @@ export function AddStoryForm() {
               <Button
                 type="button"
                 variant="secondary"
+                className={styles.cancelButton}
                 onClick={handleCancel}
                 disabled={isSubmitting}
               >
