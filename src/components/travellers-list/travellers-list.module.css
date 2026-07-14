@@ -1,0 +1,59 @@
+
+
+.travellersList {
+display: flex;
+flex-direction: column;
+gap: 24px;
+padding: 0;
+margin: 0;
+margin-bottom: 24px;
+list-style: none;
+}
+
+.item {
+background: var(--color-accent-light);
+border-radius: 12px;
+width: 100%;
+max-width: 335px; 
+min-height: 317px; 
+margin: 0 auto; 
+display: flex;
+flex-direction: column;;
+}
+
+
+/* TABLET */
+
+@media screen and (min-width: 768px) {
+   
+.travellersList {
+    display: grid;
+    grid-template-columns: repeat(3, 218px); 
+    justify-content: center;
+    gap: 24px; 
+}
+
+.item {
+width: 218px;
+min-height: 317px;
+
+}
+
+}
+/* DESKTOP */
+
+@media screen and (min-width: 1440px) {
+ 
+.travellersList {
+    grid-template-columns: repeat(4, 310px); 
+    gap: 24px;
+  }
+
+
+
+.item {
+width: 310px;    
+height: 335px;
+
+}
+}
