@@ -2,7 +2,10 @@ import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container/container";
 import { DeleteStoryButton } from "@/components/delete-story-button/delete-story-button";
-import { EditStoryForm } from "@/components/edit-story-form/edit-story-form";
+import {
+  EditStoryForm,
+  type EditableStory,
+} from "@/components/edit-story-form/edit-story-form";
 import { getResolvedStoryDetails } from "@/lib/api/storyDetailsApi";
 
 import css from "./page.module.css";
@@ -11,6 +14,29 @@ interface EditStoryPageProps {
   params: Promise<{
     storyId: string;
   }>;
+}
+
+function isEditableStory(
+  value: unknown,
+): value is EditableStory {
+  if (
+    typeof value !== "object" ||
+    value === null
+  ) {
+    return false;
+  }
+
+  return (
+    "_id" in value &&
+    typeof value._id === "string" &&
+    "title" in value &&
+    typeof value.title === "string" &&
+    "article" in value &&
+    typeof value.article === "string" &&
+    "img" in value &&
+    typeof value.img === "string" &&
+    "category" in value
+  );
 }
 
 export default async function EditStoryPage({
@@ -25,14 +51,18 @@ export default async function EditStoryPage({
     notFound();
   }
 
-  const story =
+  const candidate =
+    typeof result === "object" &&
+    result !== null &&
     "story" in result
       ? result.story
       : result;
 
-  if (!story) {
+  if (!isEditableStory(candidate)) {
     notFound();
   }
+
+  const story = candidate;
 
   return (
     <main className={css.main}>
@@ -41,15 +71,16 @@ export default async function EditStoryPage({
           <h1 className={css.title}>
             Редагувати історію
           </h1>
+
           <div className={css.delete}>
             <DeleteStoryButton
-            storyId={story._id}
-            /> 
+              storyId={storyId}
+            />
           </div>
         </div>
 
         <EditStoryForm
-          key={story._id}
+          key={storyId}
           story={story}
         />
       </Container>

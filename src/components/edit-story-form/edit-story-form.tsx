@@ -36,8 +36,21 @@ type UpdateStoryResponse = {
   data?: Story;
 };
 
+export type EditableStory = {
+  _id: string;
+  title: string;
+  article: string;
+  img: string;
+  category:
+    | string
+    | {
+        _id: string;
+        category?: string;
+      };
+};
+
 type EditStoryFormProps = {
-  story: Story;
+  story: EditableStory;
 };
 
 const editStorySchema = Yup.object({
@@ -71,7 +84,7 @@ const editStorySchema = Yup.object({
 });
 
 function getCategoryId(
-  category: Story["category"],
+  category: EditableStory["category"],
 ): string {
   if (typeof category === "string") {
     return category;

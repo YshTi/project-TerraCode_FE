@@ -89,12 +89,11 @@ export default function ConfirmModal({
           />
         </button>
 
-        <PageTitle
-          id="confirm-modal-title"
-          className={styles.title}
-        >
-          {title}
-        </PageTitle>
+        <div id="confirm-modal-title">
+          <PageTitle className={styles.title}>
+            {title}
+          </PageTitle>
+        </div>
 
         {description && (
           <p
