@@ -7,6 +7,7 @@ import { Button } from "@/components/buttons/button";
 import styles from "./registration-form.module.css";
 import { useRouter } from "next/navigation";
 import { notify } from "@/utils/notify";
+import { useAuth } from "@/providers/auth-provider";
 
 const registrationSchema = Yup.object({
   name: Yup.string()
@@ -38,6 +39,7 @@ const registrationSchema = Yup.object({
 
 export function RegistrationForm() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   
   return (
     <section className={styles.registration}>
@@ -57,39 +59,69 @@ export function RegistrationForm() {
         }}
         validationSchema={registrationSchema}
         onSubmit={async (values, { setErrors, setSubmitting }) => {
-            try {
-                const response = await fetch("/api/auth/register", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-                });
+          try {
+            const registerResponse = await fetch("/api/auth/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(values),
+            });
 
-                const data = await response.json();
+            const registerData = await registerResponse.json();
 
-                if (!response.ok) {
-                if (response.status === 409) {
-                  notify.error("Користувач із такою поштою вже існує");
-                  return;
-                }
-
-                if (data.errors) {
-                    setErrors({
-                    name: data.errors.name?.[0],
-                    email: data.errors.email?.[0],
-                    password: data.errors.password?.[0],
-                    });
-                }
-
+            if (!registerResponse.ok) {
+              if (registerResponse.status === 409) {
+                notify.error("Користувач із такою поштою вже існує");
                 return;
-                }
+              }
 
-                router.push("/");
-            } finally {
-                setSubmitting(false);
+              if (registerData.errors) {
+                setErrors({
+                  name: registerData.errors.name?.[0],
+                  email: registerData.errors.email?.[0],
+                  password: registerData.errors.password?.[0],
+                });
+              }
+
+              notify.error(registerData.message || "Не вдалося зареєструватися");
+              return;
             }
-            }}
+
+            const loginResponse = await fetch("/api/auth/login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: values.email,
+                password: values.password,
+              }),
+            });
+
+            const loginData = await loginResponse.json();
+
+            if (!loginResponse.ok) {
+              notify.error(
+                loginData.message ||
+                  "Реєстрація успішна, але не вдалося виконати автоматичний вхід",
+              );
+              router.push("/auth/login");
+              return;
+            }
+
+            await refreshUser();
+
+            notify.success("Вітаємо! Ви успішно зареєструвалися.");
+
+            router.push("/");
+            router.refresh();
+          } catch {
+            notify.error("Помилка з'єднання з сервером");
+          } finally {
+            setSubmitting(false);
+          }
+        }}
       >
         {({
           handleSubmit,
@@ -140,7 +172,7 @@ export function RegistrationForm() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Ваша пошта"
+                placeholder="hello@podorozhnyky.ua"
                 value={values.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -167,7 +199,7 @@ export function RegistrationForm() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Ваш пароль"
+                placeholder="********"
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
