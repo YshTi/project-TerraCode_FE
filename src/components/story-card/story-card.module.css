@@ -12,12 +12,42 @@
 
 .imageWrapper {
   position: relative;
+
   width: 100%;
   aspect-ratio: 1 / 1;
+
+  overflow: hidden;
 }
 
 .image {
   object-fit: cover;
+}
+
+.editButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+
+  color: var(--color-accent);
+  background-color: var(--color-green-100);
+  border: 1px solid var(--color-green-600);
+  border-radius: 50%;
+}
+
+.editButton:hover,
+.editButton:focus-visible {
+  color: var(--color-white);
+  background-color: var(--color-green-600);
 }
 
 .content {

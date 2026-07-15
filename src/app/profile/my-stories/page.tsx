@@ -1,3 +1,5 @@
+"use client";
+
 import { TravellersStories } from "@/components/travellers-stories/travellers-stories";
 
 const STORIES_LIMIT = 6;

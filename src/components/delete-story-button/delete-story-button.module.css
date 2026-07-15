@@ -1,0 +1,89 @@
+.deleteIconButton {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    color: var(--color-error);
+}
+
+.deleteIconButton svg {
+    width: 16px;
+    height: 16px;
+}
+
+.deleteButtonWrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.deleteTooltip {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 8px);
+    right: 0;
+
+    padding: 6px 10px;
+
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: var(--color-white);
+
+    background-color: var(--color-accent);
+    border-radius: 6px;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateY(-4px);
+
+    transition:
+        opacity 150ms ease,
+        visibility 150ms ease,
+        transform 150ms ease;
+}
+
+.deleteButtonWrapper:hover .deleteTooltip,
+.deleteButtonWrapper:focus-within .deleteTooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media screen and (min-width: 768px) {
+    .deleteIconButton {
+        width: 36px;
+        height: 36px;
+    }
+
+    .deleteIconButton svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .deleteTooltip {
+        font-size: 16px;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .deleteIconButton {
+        width: 46px;
+        height: 46px;
+    }
+
+    .deleteIconButton svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .deleteTooltip {
+        font-size: 20px;
+    }
+}

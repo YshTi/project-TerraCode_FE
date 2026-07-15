@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { Formik } from "formik";
@@ -14,92 +18,42 @@ import {
 import { FieldError } from "@/components/field-error/field-error";
 import { Loader } from "@/components/loader/loader";
 import ConfirmModal from "@/components/modals/confirm-modal/confirm-modal";
-import { useAuth } from "@/providers/auth-provider";
 import type { Category } from "@/types/category";
+import type { Story } from "@/types/story";
 import { notify } from "@/utils/notify";
 
-import styles from "./add-story-form.module.css";
+import styles from "./edit-story-form.module.css";
 
 type FormValues = {
-  image: File | null;
   title: string;
   category: string;
   article: string;
 };
 
-type CreateStoryResponse = {
-  _id?: string;
-  data?: {
-    _id?: string;
-  };
-  story?: {
-    _id?: string;
-  };
+type UpdateStoryResponse = {
+  status?: number;
   message?: string;
+  data?: Story;
 };
 
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
-
-const ACCEPTED_IMAGE_EXTENSIONS = [
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".webp",
-];
-
-const MAX_IMAGE_SIZE = 1024 * 1024;
-
-const initialValues: FormValues = {
-  image: null,
-  title: "",
-  category: "",
-  article: "",
+export type EditableStory = {
+  _id: string;
+  title: string;
+  article: string;
+  img: string;
+  category:
+    | string
+    | {
+        _id: string;
+        category?: string;
+      };
 };
 
-const isAcceptedImageFile = (file: File): boolean => {
-  const fileName = file.name.toLowerCase();
-
-  const hasAcceptedMimeType =
-    ACCEPTED_IMAGE_TYPES.includes(file.type);
-
-  const hasAcceptedExtension =
-    ACCEPTED_IMAGE_EXTENSIONS.some((extension) =>
-      fileName.endsWith(extension),
-    );
-
-  return hasAcceptedMimeType && hasAcceptedExtension;
+type EditStoryFormProps = {
+  story: EditableStory;
 };
 
-const addStorySchema = Yup.object({
-  image: Yup.mixed<File>()
-    .required("Фото обовʼязкове")
-    .test(
-      "file-type",
-      "Файл має бути у форматі JPG, PNG або WEBP",
-      (file) => {
-        if (!file) {
-          return false;
-        }
-
-        return isAcceptedImageFile(file);
-      },
-    )
-    .test(
-      "file-size",
-      "Розмір фото не має перевищувати 1 MB",
-      (file) => {
-        if (!file) {
-          return false;
-        }
-
-        return file.size <= MAX_IMAGE_SIZE;
-      },
-    ),
-
+const editStorySchema = Yup.object({
   title: Yup.string()
     .trim()
     .min(
@@ -129,24 +83,21 @@ const addStorySchema = Yup.object({
     .required("Введіть текст історії"),
 });
 
-function getCreatedStoryId(
-  data: CreateStoryResponse,
-): string | null {
-  return (
-    data._id ??
-    data.data?._id ??
-    data.story?._id ??
-    null
-  );
+function getCategoryId(
+  category: EditableStory["category"],
+): string {
+  if (typeof category === "string") {
+    return category;
+  }
+
+  return category?._id ?? "";
 }
 
-export function AddStoryForm() {
+export function EditStoryForm({
+  story,
+}: EditStoryFormProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { refreshUser } = useAuth();
-
-  const fileInputRef =
-    useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<
     Category[]
@@ -157,14 +108,21 @@ export function AddStoryForm() {
     setIsCategoriesLoading,
   ] = useState(true);
 
-  const [previewUrl, setPreviewUrl] = useState<
-    string | null
-  >(null);
-
   const [
     isCancelModalOpen,
     setIsCancelModalOpen,
   ] = useState(false);
+
+  const initialValues = useMemo<FormValues>(
+    () => ({
+      title: story.title,
+      category: getCategoryId(
+        story.category,
+      ),
+      article: story.article,
+    }),
+    [story],
+  );
 
   useEffect(() => {
     let ignore = false;
@@ -172,7 +130,15 @@ export function AddStoryForm() {
     fetch("/api/categories", {
       cache: "no-store",
     })
-      .then((response) => response.json())
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(
+            "Failed to load categories",
+          );
+        }
+
+        return response.json();
+      })
       .then((data) => {
         if (!ignore) {
           setCategories(
@@ -198,19 +164,47 @@ export function AddStoryForm() {
     };
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  }, [previewUrl]);
+  const clearRelevantCaches = async () => {
+    queryClient.removeQueries({
+      queryKey: [
+        "profile-stories",
+        "own",
+      ],
+    });
+
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: ["stories"],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "story",
+          story._id,
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "profile-stories",
+          "own",
+        ],
+      }),
+
+      queryClient.invalidateQueries({
+        queryKey: [
+          "traveller-stories",
+        ],
+      }),
+    ]);
+  };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={addStorySchema}
+      validationSchema={editStorySchema}
       validateOnMount
+      enableReinitialize
       onSubmit={async (
         values,
         {
@@ -219,99 +213,85 @@ export function AddStoryForm() {
         },
       ) => {
         try {
-          if (!values.image) {
-            notify.error("Оберіть фото");
-            return;
-          }
-
-          const formData = new FormData();
-
-          formData.append(
-            "img",
-            values.image,
-          );
-
-          formData.append(
-            "title",
-            values.title.trim(),
-          );
-
-          formData.append(
-            "category",
-            values.category,
-          );
-
-          formData.append(
-            "article",
-            values.article.trim(),
-          );
-
           const response = await fetch(
-            "/api/stories",
+            `/api/stories/${story._id}`,
             {
-              method: "POST",
-              body: formData,
+              method: "PATCH",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              body: JSON.stringify({
+                title:
+                  values.title.trim(),
+                category:
+                  values.category,
+                article:
+                  values.article.trim(),
+              }),
             },
           );
 
-          const data =
-            (await response.json()) as CreateStoryResponse;
+          const contentType =
+            response.headers.get(
+              "content-type",
+            );
+
+          const data: UpdateStoryResponse =
+            contentType?.includes(
+              "application/json",
+            )
+              ? await response.json()
+              : {
+                  message:
+                    await response.text(),
+                };
 
           if (!response.ok) {
             notify.error(
               data.message ||
-                "Не вдалося створити історію",
+                "Не вдалося оновити історію",
             );
+
             return;
           }
 
-          const createdStoryId =
-            getCreatedStoryId(data);
-
-          if (!createdStoryId) {
-            notify.error(
-              "Історію створено, але не вдалося відкрити сторінку",
-            );
-            return;
-          }
-
-          try {
-            await refreshUser();
-
-            queryClient.removeQueries({
-              queryKey: ["profile-stories", "own"],
-            });
-
-            await queryClient.invalidateQueries({
-              queryKey: ["stories"],
-            });
-          } catch (error) {
-            console.error(
-              "Не вдалося оновити дані після створення історії",
-              error,
-            );
-          }
+          await clearRelevantCaches();
 
           notify.success(
-            "Історію успішно створено!",
+            "Історію успішно оновлено!",
           );
 
-          resetForm();
+          resetForm({
+            values: {
+              title:
+                data.data?.title ??
+                values.title.trim(),
 
-          if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            setPreviewUrl(null);
-          }
+              category:
+                data.data?.category
+                  ? getCategoryId(
+                      data.data.category,
+                    )
+                  : values.category,
 
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
+              article:
+                data.data?.article ??
+                values.article.trim(),
+            },
+          });
 
           router.push(
-            `/stories/${createdStoryId}`,
+            `/stories/${story._id}`,
           );
+
           router.refresh();
-        } catch {
+        } catch (error) {
+          console.error(
+            "Story update failed:",
+            error,
+          );
+
           notify.error(
             "Помилка з'єднання з сервером",
           );
@@ -332,153 +312,42 @@ export function AddStoryForm() {
         handleSubmit,
         setFieldValue,
         setFieldTouched,
-        setFieldError,
-        resetForm,
       }) => {
-        const categoryOptions: DropdownOption[] =
-          [
-            {
-              value: "",
-              label: isCategoriesLoading
-                ? "Завантаження..."
-                : "Категорія",
-            },
-            ...categories.map((category) => ({
+        const categoryOptions:
+          DropdownOption[] = [
+          {
+            value: "",
+            label: isCategoriesLoading
+              ? "Завантаження..."
+              : "Категорія",
+          },
+
+          ...categories.map(
+            (category) => ({
               value: category._id,
-              label: category.category,
-            })),
-          ];
+              label:
+                category.category,
+            }),
+          ),
+        ];
 
         const isCategoryError =
           Boolean(touched.category) &&
-          !values.category;
+          Boolean(errors.category);
 
         const isCategorySuccess =
           Boolean(touched.category) &&
-          Boolean(values.category);
+          Boolean(values.category) &&
+          !errors.category;
 
-        const imageError =
-          touched.image &&
-          typeof errors.image === "string"
-            ? errors.image
-            : undefined;
+        const handleConfirmCancel =
+          () => {
+            setIsCancelModalOpen(false);
 
-        const handleUploadClick = () => {
-          const handlePickerClose = () => {
-            window.setTimeout(() => {
-              const selectedFile =
-                fileInputRef.current?.files?.[0];
-
-              if (!selectedFile) {
-                void setFieldTouched(
-                  "image",
-                  true,
-                  true,
-                );
-              }
-            }, 100);
+            router.push(
+              `/stories/${story._id}`,
+            );
           };
-
-          window.addEventListener(
-            "focus",
-            handlePickerClose,
-            {
-              once: true,
-            },
-          );
-
-          fileInputRef.current?.click();
-        };
-
-        const handleFileChange = async (
-          event: React.ChangeEvent<HTMLInputElement>,
-        ) => {
-          const file =
-            event.currentTarget.files?.[0] ??
-            null;
-
-          if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            setPreviewUrl(null);
-          }
-
-          await setFieldTouched(
-            "image",
-            true,
-            false,
-          );
-
-          if (!file) {
-            await setFieldValue(
-              "image",
-              null,
-              true,
-            );
-            return;
-          }
-
-          if (!isAcceptedImageFile(file)) {
-            await setFieldValue(
-              "image",
-              null,
-              false,
-            );
-
-            setFieldError(
-              "image",
-              "Файл має бути у форматі JPG, PNG або WEBP",
-            );
-
-            event.currentTarget.value = "";
-            return;
-          }
-
-          if (file.size > MAX_IMAGE_SIZE) {
-            await setFieldValue(
-              "image",
-              null,
-              false,
-            );
-
-            setFieldError(
-              "image",
-              "Розмір фото не має перевищувати 1 MB",
-            );
-
-            event.currentTarget.value = "";
-            return;
-          }
-
-          await setFieldValue(
-            "image",
-            file,
-            true,
-          );
-
-          setPreviewUrl(
-            URL.createObjectURL(file),
-          );
-        };
-
-        const handleCancel = () => {
-          resetForm();
-
-          if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-          }
-
-          setPreviewUrl(null);
-
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
-        };
-
-        const handleConfirmCancel = () => {
-          handleCancel();
-          setIsCancelModalOpen(false);
-          router.push("/");
-        };
 
         return (
           <>
@@ -489,14 +358,15 @@ export function AddStoryForm() {
               {isSubmitting && <Loader />}
 
               <div
-                className={styles.coverField}
+                className={
+                  styles.coverField
+                }
               >
-                <label
+                <span
                   className={styles.label}
-                  htmlFor="image"
                 >
                   Обкладинка статті
-                </label>
+                </span>
 
                 <div
                   className={
@@ -504,45 +374,13 @@ export function AddStoryForm() {
                   }
                 >
                   <img
-                    src={
-                      previewUrl ??
-                      "/images/story-cover-placeholder.svg"
-                    }
-                    alt=""
+                    src={story.img}
+                    alt={`Обкладинка історії «${story.title}»`}
                     className={
                       styles.coverImage
                     }
                   />
                 </div>
-
-                <input
-                  ref={fileInputRef}
-                  id="image"
-                  name="image"
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                  className={
-                    styles.hiddenFileInput
-                  }
-                  onChange={handleFileChange}
-                />
-
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className={
-                    styles.uploadButton
-                  }
-                  onClick={handleUploadClick}
-                  disabled={isSubmitting}
-                >
-                  Завантажити фото
-                </Button>
-
-                <FieldError
-                  id="image-error"
-                  message={imageError}
-                />
               </div>
 
               <div className={styles.field}>
@@ -563,7 +401,9 @@ export function AddStoryForm() {
                     touched.title &&
                     errors.title
                       ? styles.inputError
-                      : values.title.trim()
+                      : touched.title &&
+                          values.title.trim() &&
+                          !errors.title
                         ? styles.inputSuccess
                         : ""
                   }`}
@@ -592,7 +432,9 @@ export function AddStoryForm() {
               </div>
 
               <div className={styles.field}>
-                <span className={styles.label}>
+                <span
+                  className={styles.label}
+                >
                   Категорія
                 </span>
 
@@ -611,7 +453,9 @@ export function AddStoryForm() {
                       ? styles.categoryDropdownSuccess
                       : ""
                   }`}
-                  isError={isCategoryError}
+                  isError={
+                    isCategoryError
+                  }
                   isSuccess={
                     isCategorySuccess
                   }
@@ -641,8 +485,8 @@ export function AddStoryForm() {
                 <FieldError
                   id="category-error"
                   message={
-                    isCategoryError
-                      ? "Оберіть категорію"
+                    touched.category
+                      ? errors.category
                       : undefined
                   }
                 />
@@ -667,7 +511,9 @@ export function AddStoryForm() {
                     touched.article &&
                     errors.article
                       ? styles.inputError
-                      : values.article.trim()
+                      : touched.article &&
+                          values.article.trim() &&
+                          !errors.article
                         ? styles.inputSuccess
                         : ""
                   }`}
@@ -710,7 +556,7 @@ export function AddStoryForm() {
                     !isValid
                   }
                 >
-                  Зберегти
+                  Зберегти зміни
                 </Button>
 
                 <Button
@@ -720,7 +566,9 @@ export function AddStoryForm() {
                     styles.cancelButton
                   }
                   onClick={() => {
-                    setIsCancelModalOpen(true);
+                    setIsCancelModalOpen(
+                      true,
+                    );
                   }}
                   disabled={isSubmitting}
                 >
@@ -731,11 +579,13 @@ export function AddStoryForm() {
 
             <ConfirmModal
               isOpen={isCancelModalOpen}
-              title="Відмінити створення історії?"
+              title="Відмінити редагування історії?"
               description="Усі внесені зміни буде втрачено."
               confirmButtonText="Так, відмінити"
               cancelButtonText="Повернутись"
-              onConfirm={handleConfirmCancel}
+              onConfirm={
+                handleConfirmCancel
+              }
               onCancel={() => {
                 setIsCancelModalOpen(false);
               }}

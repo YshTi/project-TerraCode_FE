@@ -20,6 +20,9 @@ export function TravellerInfo({ user, className }: TravellerInfoProps) {
         alt={user.name}
         width={113}
         height={113}
+        sizes="113px"
+        loading="eager"
+        fetchPriority="high"
       />
       <div>
         <p className={css.username}>{user.name}</p>
