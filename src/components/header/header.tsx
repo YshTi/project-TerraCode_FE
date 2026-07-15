@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Container } from "@/components/container/container";
 import { AuthHeader } from "@/components/auth-header/auth-header";
@@ -10,7 +11,7 @@ import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { UserBar } from "@/components/header/user-bar/user-bar";
 import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/providers/auth-provider";
 import { ThemeSwitch } from "@/components/theme-switch/theme-switch";
 
 import styles from "./header.module.css";
@@ -23,7 +24,10 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, isLoading } = useAuth();
+
+  const router = useRouter();
+
+  const { user, isLoading, logout } = useAuth();
 
   const isLoggedIn = Boolean(user);
 
@@ -33,6 +37,13 @@ export function Header() {
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+
+    router.replace("/");
+    router.refresh();
   };
 
   useEffect(() => {
@@ -95,7 +106,10 @@ export function Header() {
         <div className={styles.desktopActions}>
           {isLoading ? null : user ? (
             <>
-              <ButtonLink href="/stories/new" className={styles.publishButton}>
+              <ButtonLink
+                href="/stories/new"
+                className={styles.publishButton}
+              >
                 Опублікувати статтю
               </ButtonLink>
 
@@ -103,6 +117,7 @@ export function Header() {
                 name={user.name}
                 avatarUrl={user.avatarUrl}
                 profileHref="/profile"
+                onLogout={handleLogout}
               />
             </>
           ) : (
@@ -112,7 +127,10 @@ export function Header() {
 
         <div className={styles.tabletActions}>
           {isLoading ? null : user ? (
-            <ButtonLink href="/stories/new" className={styles.publishButton}>
+            <ButtonLink
+              href="/stories/new"
+              className={styles.publishButton}
+            >
               Опублікувати статтю
             </ButtonLink>
           ) : (
@@ -140,6 +158,7 @@ export function Header() {
           isLoggedIn={isLoggedIn}
           navLinks={navLinks}
           onClose={closeMenu}
+          onLogout={handleLogout}
         />
       )}
     </header>

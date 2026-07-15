@@ -4,6 +4,7 @@
 
 html {
     scroll-padding-top: var(--header-height);
+    scrollbar-gutter: stable;
 }
 
 html, body {
@@ -18,13 +19,17 @@ main {
 body {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     min-width: 320px;
     font-family: var(--font-main);
     font-size: 16px;
     line-height: 1.5;
     color: var(--color-text-primary);
-    background-color: var(--color-background-primary);
+    background-color: var(--color-background-green);
+}
+
+.section{
+    padding-block: 64px;
 }
 
 button,
@@ -34,4 +39,53 @@ a {
         background-color 200ms ease,
         border-color 200ms ease,
         opacity 200ms ease;
+}
+
+h1 {
+    font-size: 32px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+}
+
+h4 {
+    font-size: 18px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    font-weight: 700;
+}
+
+@media screen and (min-width: 768px) {
+    h1 {
+        font-size: 48px;
+    }
+
+    h2 {
+        font-size: 44px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .section{
+        padding-block: 72px;
+    }
+
+    h1 {
+        font-size: 56px;
+    }
+
+    h2 {
+        font-size: 52px;
+    }
+
+    h4 {
+        font-size: 26px;
+    }
 }

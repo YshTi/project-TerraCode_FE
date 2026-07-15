@@ -1,0 +1,94 @@
+.card {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  padding: 24px;
+
+  background: var(--color-green-100);
+  border-radius: 12px;
+}
+
+.photoWrapper {
+  position: relative;
+
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 24px;
+
+  flex-shrink: 0;
+  overflow: hidden;
+
+  border-radius: 50%;
+}
+
+.photo {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.infoWrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  min-width: 0;
+  margin-bottom: 16px;
+}
+
+.name {
+  overflow: hidden;
+
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.articlesCount {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.linkButton {
+  width: 100%;
+  min-height: 48px;
+
+  font-size: 16px;
+  text-align: center;
+}
+
+@media screen and (min-width: 768px) {
+  .card {
+    width: auto;
+  }
+
+  .linkButton {
+    padding: 0;
+
+    line-height: 1.4;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .name {
+    font-size: 26px;
+  }
+
+  .articlesCount {
+    font-size: 20px;
+  }
+
+  .linkButton {
+    padding: 8px 15px;
+
+    font-size: 20px;
+  }
+}

@@ -21,6 +21,7 @@ type MobileMenuProps = {
     label: string;
   }[];
   onClose: () => void;
+  onLogout: () => Promise<void> | void;
 };
 
 export function MobileMenu({
@@ -28,14 +29,20 @@ export function MobileMenu({
   isLoggedIn,
   navLinks,
   onClose,
+  onLogout,
 }: MobileMenuProps) {
   const shouldShowUserMenu = isLoggedIn && user;
+
+  const handleLogout = async () => {
+    await onLogout();
+    onClose();
+  };
 
   return (
     <div className={styles.mobileMenu}>
       <Container className={styles.mobileMenuContainer}>
         <div className={styles.mobileMenuTop}>
-          <AuthHeader />
+          <AuthHeader onNavigate={onClose} />
 
           <div className={styles.tabletTopActions}>
             {shouldShowUserMenu ? (
@@ -61,7 +68,10 @@ export function MobileMenu({
           </button>
         </div>
 
-        <nav className={styles.mobileNav} aria-label="Мобільна навігація">
+        <nav
+          className={styles.mobileNav}
+          aria-label="Мобільна навігація"
+        >
           {navLinks.map(({ href, label }) => (
             <NavLink
               key={href}
@@ -100,6 +110,7 @@ export function MobileMenu({
                   name={user.name}
                   avatarUrl={user.avatarUrl}
                   profileHref="/profile"
+                  onLogout={handleLogout}
                 />
               </div>
             </>

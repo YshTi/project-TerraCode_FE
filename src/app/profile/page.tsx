@@ -1,3 +1,5 @@
-export default function Page() {
-  return <div>Page is under construction</div>;
+import { redirect } from "next/navigation";
+
+export default function ProfilePage() {
+  redirect("/profile/saved");
 }

@@ -1,7 +1,7 @@
-import { AuthFooter } from "@/components/auth-footer/auth-footer";
 import { AuthHeader } from "@/components/auth-header/auth-header";
 import { AuthBar } from "@/components/auth-bar/auth-bar";
 import { RegistrationForm } from "@/components/registration-form/registration-form";
+import { AuthFooter } from "@/components/auth-footer/auth-footer";
 
 import styles from "./page.module.css";
 

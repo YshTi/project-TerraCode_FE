@@ -1,0 +1,145 @@
+.card {
+  position: relative;
+
+  display: flex;
+
+  width: 100%;
+  min-height: 397px;
+  padding: 16px;
+
+  overflow: hidden;
+
+  color: var(--color-white);
+  background-color: var(--color-green-900);
+  border: 1px solid rgb(0 0 0 / 15%);
+  border-radius: 12px;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: 17% center;
+}
+
+.column {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+
+  width: 100%;
+  min-height: 363px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title {
+  margin: 0;
+
+  color: var(--color-white);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.text {
+  margin: 0;
+
+  color: var(--color-white);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.actions {
+  width: 100%;
+  min-height: 48px;
+  margin-top: auto;
+}
+
+.button,
+.buttonPlaceholder {
+  width: 100%;
+  min-height: 48px;
+}
+
+.button {
+  padding: 6px 12px;
+}
+
+.buttonPlaceholder {
+  border-radius: 6px;
+  background-color: rgb(255 255 255 / 18%);
+}
+
+/* TABLET */
+
+@media screen and (min-width: 768px) {
+  .card {
+    min-height: 284px;
+    padding: 16px;
+  }
+
+  .backgroundImage {
+    object-position: center;
+  }
+
+  .column {
+    width: 100%;
+    max-width: 672px;
+    min-height: 250px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .button,
+  .buttonPlaceholder {
+    width: 168px;
+  }
+}
+
+/* DESKTOP */
+
+@media screen and (min-width: 1440px) {
+  .card {
+    min-height: 436px;
+    padding: 63px 64px;
+  }
+
+  .column {
+    max-width: 768px;
+    min-height: auto;
+
+    justify-content: space-between;
+    gap: 32px;
+  }
+
+  .title {
+    font-size: 48px;
+  }
+
+  .text {
+    font-size: 20px;
+  }
+
+  .button,
+  .buttonPlaceholder {
+    width: 204px;
+  }
+}

@@ -1,11 +1,21 @@
 import styles from "./copyright.module.css";
 
-export function Copyright() {
+type CopyrightProps = {
+  variant?: "full" | "short";
+  className?: string;
+};
+
+export function Copyright({
+  variant = "full",
+  className = "",
+}: CopyrightProps) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <p className={styles.copyright}>
-      © {currentYear} Природні Мандри. Усі права захищені.
+    <p className={`${styles.copyright} ${className}`}>
+      {variant === "full"
+        ? `© ${currentYear} Природні Мандри. Усі права захищені.`
+        : `© ${currentYear} Природні Мандри`}
     </p>
   );
 }
