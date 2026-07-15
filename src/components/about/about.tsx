@@ -55,7 +55,7 @@ export function About() {
               className={styles.image}
               sizes="
                 (max-width: 767px) calc(100vw - 40px),
-                (max-width: 1439px) calc(100vw - 64px),
+                (max-width: 1439px) 704px,
                 644px
               "
               quality={70}

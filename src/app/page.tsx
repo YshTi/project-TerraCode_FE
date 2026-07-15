@@ -2,6 +2,21 @@ import dynamic from "next/dynamic";
 
 import { Hero } from "@/components/hero/hero";
 
+import styles from "./page.module.css";
+
+function SectionFallback({
+  className,
+}: {
+  className: string;
+}) {
+  return (
+    <div
+      className={`${styles.dynamicSectionFallback} ${className}`}
+      aria-hidden="true"
+    />
+  );
+}
+
 const PopularStories = dynamic(
   () =>
     import(
@@ -9,9 +24,8 @@ const PopularStories = dynamic(
     ).then(module => module.PopularStories),
   {
     loading: () => (
-      <div
-        aria-hidden="true"
-        style={{ minHeight: "700px" }}
+      <SectionFallback
+        className={styles.popularStoriesFallback}
       />
     ),
   },
@@ -22,6 +36,11 @@ const About = dynamic(
     import("@/components/about/about").then(
       module => module.About,
     ),
+  {
+    loading: () => (
+      <SectionFallback className={styles.aboutFallback} />
+    ),
+  },
 );
 
 const OurTravellers = dynamic(
@@ -29,6 +48,13 @@ const OurTravellers = dynamic(
     import(
       "@/components/our-travellers/our-travellers"
     ).then(module => module.OurTravellers),
+  {
+    loading: () => (
+      <SectionFallback
+        className={styles.travellersFallback}
+      />
+    ),
+  },
 );
 
 const Join = dynamic(
@@ -36,6 +62,11 @@ const Join = dynamic(
     import("@/components/join/join").then(
       module => module.Join,
     ),
+  {
+    loading: () => (
+      <SectionFallback className={styles.joinFallback} />
+    ),
+  },
 );
 
 export default function HomePage() {

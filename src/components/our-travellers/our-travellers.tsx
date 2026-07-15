@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Grid, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-import { Button } from "@/components/buttons/button";
+import { ButtonLink, Button } from "@/components/buttons/button";
 import { Container } from "@/components/container/container";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import { TravellerCard } from "@/components/traveller-card/traveller-card";
@@ -94,14 +93,13 @@ export function OurTravellers() {
             Наші Мандрівники
           </h2>
 
-          <Link href="/travellers">
-            <Button
-              variant="primary"
-              className={css.desktopBtn}
-            >
-              Всі мандрівники
-            </Button>
-          </Link>
+          <ButtonLink
+            href="/travellers"
+            variant="primary"
+            className={css.desktopBtn}
+          >
+            Всі мандрівники
+          </ButtonLink>
         </div>
 
         {travellersQuery.isLoading && (
@@ -214,14 +212,13 @@ export function OurTravellers() {
                   </button>
                 </div>
 
-                <Link
+                <ButtonLink
                   href="/travellers"
+                  variant="primary"
                   className={css.mobileBtn}
                 >
-                  <Button variant="primary">
-                    Всі мандрівники
-                  </Button>
-                </Link>
+                  Всі мандрівники
+                </ButtonLink>
               </div>
             </div>
           )}

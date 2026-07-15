@@ -1,0 +1,59 @@
+.dynamicSectionFallback {
+    width: 100%;
+    pointer-events: none;
+}
+
+/* Mobile */
+.popularStoriesFallback {
+    min-height: 928px;
+}
+
+.aboutFallback {
+    min-height: 1161px;
+}
+
+.travellersFallback {
+    min-height: 1425px;
+}
+
+.joinFallback {
+    min-height: 528px;
+}
+
+/* Tablet */
+@media screen and (min-width: 768px) {
+    .popularStoriesFallback {
+        min-height: 831px;
+    }
+
+    .aboutFallback {
+        min-height: 965px;
+    }
+
+    .travellersFallback {
+        min-height: 983px;
+    }
+
+    .joinFallback {
+        min-height: 415px;
+    }
+}
+
+/* Desktop */
+@media screen and (min-width: 1440px) {
+    .popularStoriesFallback {
+        min-height: 967px;
+    }
+
+    .aboutFallback {
+        min-height: 910px;
+    }
+
+    .travellersFallback {
+        min-height: 685px;
+    }
+
+    .joinFallback {
+        min-height: 581px;
+    }
+}
