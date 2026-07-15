@@ -24,13 +24,22 @@
 }
 
 .hero_image_box {
+  position: relative;
+
+  width: 100%;
+  max-width: 335px;
+  aspect-ratio: 335 / 469;
   margin-bottom: 24px;
+
+  overflow: hidden;
 }
 
-.hero-image {
-  width: 335px;
-  height: 469px;
+.heroImage {
   display: block;
+
+  width: 100%;
+  height: 100%;
+
   object-fit: cover;
 }
 
@@ -95,9 +104,11 @@
     padding: 64px 32px;
   }
 
-  .hero-image {
-    width: 704px;
-    height: 469px;
+  .hero_image_box {
+      width: 704px;
+      max-width: none;
+      height: 469px;
+      aspect-ratio: auto;
   }
 
   .hero_title {
@@ -143,13 +154,10 @@
   }
 
   .hero_image_box {
-    margin-bottom: 0;
-    flex-shrink: 0;
-  }
-
-  .hero-image {
-    width: 644px;
-    height: 580px;
+      width: 644px;
+      height: 580px;
+      margin-bottom: 0;
+      flex-shrink: 0;
   }
 
   .hero_button {

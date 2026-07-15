@@ -7,7 +7,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import { Button, ButtonLink } from "@/components/buttons/button";
 import { Container } from "@/components/container/container";
-import { Loader } from "@/components/loader/loader";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 import StoryCard from "@/components/story-card/story-card";
 import {
@@ -26,6 +25,7 @@ interface PopularStoriesProps {
 }
 
 const MAX_VISIBLE_STORIES = 10;
+const QUERY_STALE_TIME = 5 * 60 * 1000;
 
 export function PopularStories({
   excludeStoryId,
@@ -40,6 +40,8 @@ export function PopularStories({
     queryKey: ["saved-stories"],
     queryFn: getSavedStories,
     enabled: Boolean(user),
+    staleTime: QUERY_STALE_TIME,
+    refetchOnWindowFocus: false,
   });
 
   const savedIds = useMemo(() => {
@@ -53,6 +55,7 @@ export function PopularStories({
   const {
     data,
     isLoading,
+    isError,
     isSuccess,
   } = useQuery({
     queryKey: [
@@ -69,6 +72,8 @@ export function PopularStories({
         limit: storiesLimit,
         type: "popular",
       }),
+    staleTime: QUERY_STALE_TIME,
+    refetchOnWindowFocus: false,
   });
 
   const visibleStories = useMemo(() => {
@@ -100,9 +105,46 @@ export function PopularStories({
         </div>
 
         {isLoading && (
-          <div className={css.loaderWrapper}>
-            <Loader />
+          <div
+            className={css.skeletonGrid}
+            aria-hidden="true"
+          >
+            {Array.from({ length: 3 }).map(
+              (_, index) => (
+                <div
+                  key={index}
+                  className={css.skeletonCard}
+                >
+                  <div
+                    className={css.skeletonImage}
+                  />
+
+                  <div
+                    className={css.skeletonContent}
+                  >
+                    <div
+                      className={css.skeletonMeta}
+                    />
+                    <div
+                      className={css.skeletonTitle}
+                    />
+                    <div
+                      className={css.skeletonTitleShort}
+                    />
+                    <div
+                      className={css.skeletonActions}
+                    />
+                  </div>
+                </div>
+              ),
+            )}
           </div>
+        )}
+
+        {isError && (
+          <p className={css.errorMessage}>
+            Не вдалося завантажити популярні статті.
+          </p>
         )}
 
         {!isLoading &&

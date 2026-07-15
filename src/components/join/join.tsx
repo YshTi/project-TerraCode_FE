@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
+
 import { ButtonLink } from "@/components/buttons/button";
 import { Container } from "@/components/container/container";
 import { useAuth } from "@/providers/auth-provider";
+
+import joinBackground from "../../../public/images/join-bg.webp";
 
 import styles from "./join.module.css";
 
@@ -31,6 +35,20 @@ export function Join() {
     <section id="Join" className="section">
       <Container>
         <div className={styles.card}>
+          <Image
+            src={joinBackground}
+            alt=""
+            fill
+            className={styles.backgroundImage}
+            sizes="
+              (max-width: 767px) calc(100vw - 40px),
+              (max-width: 1439px) calc(100vw - 64px),
+              1312px
+            "
+            quality={70}
+            placeholder="blur"
+          />
+
           <div className={styles.column}>
             <div className={styles.content}>
               <h2 className={styles.title}>
@@ -43,7 +61,12 @@ export function Join() {
             </div>
 
             <div className={styles.actions}>
-              {!isLoading && (
+              {isLoading ? (
+                <div
+                  className={styles.buttonPlaceholder}
+                  aria-hidden="true"
+                />
+              ) : (
                 <ButtonLink
                   href={href}
                   className={styles.button}

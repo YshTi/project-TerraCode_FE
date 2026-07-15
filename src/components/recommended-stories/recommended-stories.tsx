@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import StoryCard from "@/components/story-card/story-card";
@@ -13,20 +14,28 @@ interface RecommendedStoriesProps {
   stories: Story[];
 }
 
-export function RecommendedStories({ stories }: RecommendedStoriesProps) {
+export function RecommendedStories({
+  stories,
+}: RecommendedStoriesProps) {
   const { user } = useAuth();
 
   const { data: savedData } = useQuery({
     queryKey: ["saved-stories"],
     queryFn: getSavedStories,
-    enabled: !!user,
+    enabled: Boolean(user),
   });
 
-  const savedIds = new Set(savedData?.stories.map((story) => story._id) ?? []);
+  const savedIds = useMemo(() => {
+    return new Set(
+      savedData?.stories.map((story) => story._id) ?? [],
+    );
+  }, [savedData]);
 
   return (
     <section className={styles.section}>
-      <h2 className={styles.title}>Вам також сподобається</h2>
+      <h2 className={styles.title}>
+        Вам також сподобається
+      </h2>
 
       <ul className={styles.list}>
         {stories.map((story) => (
