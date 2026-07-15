@@ -49,6 +49,7 @@
   border-radius: 6px;
   background: var(--color-surface-subtle);
   cursor: pointer;
+  color: var(--color-text-primary);
 }
 
 /* tablet */
