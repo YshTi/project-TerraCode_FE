@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import styles from "./theme-switch.module.css";
+
 export function ThemeSwitch() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -25,7 +27,7 @@ export function ThemeSwitch() {
   }, [theme]);
 
   return (
-    <button className="theme-switch"
+    <button className={styles.themeSwitch}
       onClick={() =>
         setTheme(theme === "light" ? "dark" : "light")
       }

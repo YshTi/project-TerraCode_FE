@@ -48,6 +48,7 @@
 }
 
 [data-theme="dark"] {
+    --color-black: #fff;
     --color-background: var(--color-gray-900);
     --color-background-primary: var(--color-gray-900);
     --color-background-secondary: #222;
