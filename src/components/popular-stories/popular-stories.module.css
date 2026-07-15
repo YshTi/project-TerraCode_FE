@@ -1,8 +1,3 @@
-.heading {
-  color: var(--color-black);
-  font-weight: 700;
-}
-
 .wrapper {
   display: flex;
   flex-direction: column;

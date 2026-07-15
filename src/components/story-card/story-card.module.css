@@ -6,8 +6,9 @@
   margin-inline: auto;
   border-radius: 12px;
   overflow: hidden;
+  color: var(--color-green-900);
   background-color: var(--color-green-100);
-  border: 0px solid rgba(0, 0, 0, 0.15);
+  border: 0px solid var(--color-border-subtle);
 }
 
 .imageWrapper {
@@ -62,6 +63,7 @@
   align-items: center;
   gap: 8px;
   flex-wrap: nowrap;
+  color: var(--color-green-900);
 }
 
 .author {
@@ -72,7 +74,7 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.5;
-  color: var(--color-text-secondary);
+  color: var(--color-green-900);
 }
 
 .dot {
@@ -80,7 +82,7 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.5;
-  color: var(--color-text-secondary);
+  color: var(--color-green-900);
 }
 
 .rate {
@@ -91,7 +93,7 @@
   white-space: nowrap;
   font-weight: 400;
   font-size: 12px;
-  color: var(--color-text-secondary);
+  color: var(--color-green-900);
 }
 
 .title {
@@ -107,18 +109,20 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-top: auto;
 }
 
 .viewButton {
   flex: 1;
   min-width: 0;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border-subtle);
   border-radius: 6px;
   padding: 6px 12px;
   height: 48px;
   font-weight: 500;
   font-size: 16px;
   line-height: 1.5;
+  background: var(--color-surface-subtle);
 }
 
 .viewButtonText {

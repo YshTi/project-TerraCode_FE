@@ -62,9 +62,9 @@
 
     .categoryButton.active {
         font-weight: 500;
-        color: var(--color-text-primary);
+        color: var(--color-green-900);
         background-color: var(--color-green-100);
-        border-color: rgba(0, 0, 0, 0.15);
+        border-color: var(--color-border-subtle);
     }
 
     .categoryButton:disabled {

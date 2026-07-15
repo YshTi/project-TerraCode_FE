@@ -51,7 +51,7 @@
 }
 
 .backText {
-    color: var(--color-black);
+    color: var(--color-text-black);
 }
 
 .backLink:hover, .backLink:hover .backText {
@@ -99,7 +99,7 @@
     display: inline-flex;
     font-size: 12px;
     font-weight: 600;
-    color: var(--color-black);
+    color: var(--color-text-black);
     align-items: center;
     justify-content: center;
     width: fit-content;
@@ -108,7 +108,7 @@
     border-radius: 6px;
     padding: 3px 9px;
 
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--color-surface-subtle);
 }
 
 .content {

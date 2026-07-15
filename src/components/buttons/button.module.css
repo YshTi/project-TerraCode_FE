@@ -46,8 +46,8 @@
 /* Outlined / light button */
 .secondary {
     color: var(--color-text-primary);
-    background-color: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.15);
+    background-color: var(--color-surface-subtle);
+    border-color: var(--color-border-subtle);
 }
 
 .secondary:hover,
@@ -59,7 +59,7 @@
 
 .secondary:active {
     color: var(--color-text-inverse);
-    background-color: var(--color-green-800);
+    background-color: var(--color-active);
     border-color: rgba(255, 255, 255, 0);
 }
 

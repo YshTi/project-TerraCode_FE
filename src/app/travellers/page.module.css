@@ -1,45 +1,30 @@
 .main {
-    padding: 32px 0 64px;
+  padding: 32px 0 64px;
 }
 
 .travellerContainer {
-     width: 100%;
-     margin: 0 auto;
+  width: 100%;
+  margin: 0 auto;
 }
 
-
-.title{
-color: var(--color-black);
-font-weight: 700;
-font-size: 32px;
-line-height: 110%;
-text-align: center;
-margin-top: 0;
-margin-bottom: 24px;
+.title {
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 24px;
 }
-
 
 /* TABLET */
 
 @media screen and (min-width: 768px) {
-   .main {
-        padding: 32px 0 64px;
-    }
-
-    .title {
-        font-size: 48px;
-    }
-
+  .main {
+    padding: 32px 0 64px;
+  }
 }
+
 /* DESKTOP */
 
 @media screen and (min-width: 1440px) {
-    .main {
-        padding: 48px 0 72px;
-    }
-
-    .title {
-        font-size: 56px;
-    }
-
+  .main {
+    padding: 48px 0 72px;
+  }
 }

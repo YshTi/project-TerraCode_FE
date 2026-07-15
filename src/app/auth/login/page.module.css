@@ -5,13 +5,14 @@
   min-height: 100svh;
   padding: 0 20px;
   overflow-y: auto;
-  background: var(--color-white);
+  /*background: var(--color-white);*/
 }
 
 .header {
   display: flex;
   align-items: center;
   min-height: 72px;
+  justify-content: space-between;
 }
 
 .login {

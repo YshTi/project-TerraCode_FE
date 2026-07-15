@@ -23,14 +23,15 @@
 
 .navLink[aria-current="page"] {
     font-weight: 500;
+    color: var(--color-green-900);
     background-color: var(--color-green-100);
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: var(--color-border-subtle);
 }
 
 .navLink:not([aria-current="page"]):hover {
     color: var(--color-accent);
     background-color: var(--color-green-100);
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: var(--color-border-subtle);
 }
 
 .navLink:focus:not(:focus-visible) {
@@ -40,11 +41,11 @@
 .navLink:focus-visible {
     outline: none;
     background-color: var(--color-green-100);
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: var(--color-border-subtle);
 }
 
 .navLink:active {
-    color: var(--color-text-inverse);
+    color: var(--color-gray-900);
     background-color: var(--color-accent);
     border-color: var(--color-accent);
 }
