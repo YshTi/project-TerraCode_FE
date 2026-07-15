@@ -15,7 +15,13 @@
 
   font-size: 18px;
   font-weight: 700;
+<<<<<<< Updated upstream
   line-height: 1.5;
+=======
+  line-height: 1.4;
+
+  color: var(--color-black);
+>>>>>>> Stashed changes
 }
 
 .description {
@@ -23,7 +29,7 @@
 
   font-size: 16px;
   line-height: 1.5;
-  color: var(--color-text-secondary);
+  color: var(--color-black);
 }
 
 .button {

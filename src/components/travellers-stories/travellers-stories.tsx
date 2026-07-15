@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useSyncExternalStore,
 } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
@@ -12,11 +13,21 @@ import { Loader } from "@/components/loader/loader";
 import { MessageNoStories } from "@/components/message-no-stories/message-no-stories";
 import { Pagination } from "@/components/pagination/pagination";
 import StoryCard from "@/components/story-card/story-card";
+import { getSavedStories as getSavedStoriesForStatus } from "@/lib/api/clientApi";
 import {
   getOwnStories,
   getSavedStories,
 } from "@/lib/api/profileApi";
+<<<<<<< Updated upstream
 import { getTravellerStories } from "@/lib/api/travellersApi";
+=======
+import {
+  getTravellerById,
+  getTravellerStories,
+} from "@/lib/api/travellersApi";
+import { useAuth } from "@/providers/auth-provider";
+import type { Story } from "@/types/story";
+>>>>>>> Stashed changes
 import { notify } from "@/utils/notify";
 
 import css from "./travellers-stories.module.css";
@@ -48,26 +59,126 @@ interface TravellersStoriesProps {
   className?: string;
 }
 
+<<<<<<< Updated upstream
+=======
+const STALE_TIME = 5 * 60 * 1000;
+const OWNER_STALE_TIME = 10 * 60 * 1000;
+
+const MOBILE_TABLET_LIMIT = 4;
+const DESKTOP_LIMIT = 6;
+const DESKTOP_MEDIA_QUERY =
+  "(min-width: 1440px)";
+
+function subscribeToDesktop(
+  callback: () => void,
+) {
+  const mediaQuery = window.matchMedia(
+    DESKTOP_MEDIA_QUERY,
+  );
+
+  mediaQuery.addEventListener(
+    "change",
+    callback,
+  );
+
+  return () => {
+    mediaQuery.removeEventListener(
+      "change",
+      callback,
+    );
+  };
+}
+
+function getDesktopSnapshot() {
+  return window.matchMedia(
+    DESKTOP_MEDIA_QUERY,
+  ).matches;
+}
+
+function getDesktopServerSnapshot() {
+  return false;
+}
+
+function useIsDesktop() {
+  return useSyncExternalStore(
+    subscribeToDesktop,
+    getDesktopSnapshot,
+    getDesktopServerSnapshot,
+  );
+}
+
+function hasPopulatedOwner(
+  ownerId:
+    | Story["ownerId"]
+    | string
+    | null
+    | undefined,
+): ownerId is Exclude<
+  Story["ownerId"],
+  string | null | undefined
+> {
+  return (
+    typeof ownerId === "object" &&
+    ownerId !== null &&
+    "name" in ownerId &&
+    typeof ownerId.name === "string" &&
+    ownerId.name.trim().length > 0
+  );
+}
+
+>>>>>>> Stashed changes
 export function TravellersStories({
   source,
   emptyState,
-  limit = 6,
+  limit,
   savedStoryIds = [],
   className = "",
 }: TravellersStoriesProps) {
+<<<<<<< Updated upstream
   const listRef = useRef<HTMLUListElement | null>(null);
+=======
+  const { user } = useAuth();
+  const isDesktop = useIsDesktop();
+
+  const listRef =
+    useRef<HTMLUListElement | null>(null);
+
+  /*
+   * When no explicit limit is passed:
+   * - mobile/tablet: 4
+   * - desktop >= 1440px: 6
+   *
+   * An explicitly passed limit still overrides
+   * the responsive value.
+   */
+  const effectiveLimit =
+    limit ??
+    (isDesktop
+      ? DESKTOP_LIMIT
+      : MOBILE_TABLET_LIMIT);
+
+  const savedStatusQuery = useQuery({
+    queryKey: ["saved-stories"],
+    queryFn: getSavedStoriesForStatus,
+    enabled:
+      Boolean(user) &&
+      source.type !== "saved",
+    staleTime: STALE_TIME,
+    refetchOnWindowFocus: false,
+  });
+>>>>>>> Stashed changes
 
   const queryKey =
     source.type === "public"
       ? ([
           "traveller-stories",
           source.userId,
-          limit,
+          effectiveLimit,
         ] as const)
       : ([
           "profile-stories",
           source.type,
-          limit,
+          effectiveLimit,
         ] as const);
 
   const storiesQuery = useInfiniteQuery({
@@ -78,20 +189,20 @@ export function TravellersStories({
         return getTravellerStories({
           userId: source.userId,
           page: pageParam,
-          limit,
+          limit: effectiveLimit,
         });
       }
 
       if (source.type === "saved") {
         return getSavedStories({
           page: pageParam,
-          limit,
+          limit: effectiveLimit,
         });
       }
 
       return getOwnStories({
         page: pageParam,
-        limit,
+        limit: effectiveLimit,
       });
     },
 
@@ -104,12 +215,16 @@ export function TravellersStories({
         return undefined;
       }
 
+<<<<<<< Updated upstream
       const hasNextPage =
         "hasNextPage" in pagination
           ? pagination.hasNextPage
           : pagination.page < pagination.totalPages;
 
       return hasNextPage
+=======
+      return pagination.page < pagination.totalPages
+>>>>>>> Stashed changes
         ? pagination.page + 1
         : undefined;
     },
@@ -137,20 +252,178 @@ export function TravellersStories({
   const stories = useMemo(
     () =>
       storiesQuery.data?.pages.flatMap(
+<<<<<<< Updated upstream
         (page) => page.stories,
       ) ?? [],
     [storiesQuery.data],
   );
+=======
+        page => page.stories,
+      ) ?? []
+    );
+  }, [storiesQuery.data]);
+
+  const savedOwnerIds = useMemo(() => {
+    if (source.type !== "saved") {
+      return [];
+    }
+
+    const ownerIds = stories
+      .map(story => {
+        const owner =
+          story.ownerId as unknown;
+
+        return typeof owner === "string"
+          ? owner
+          : null;
+      })
+      .filter(
+        (ownerId): ownerId is string =>
+          Boolean(ownerId),
+      );
+
+    return Array.from(new Set(ownerIds));
+  }, [source.type, stories]);
+
+  const ownerQueries = useQueries({
+    queries: savedOwnerIds.map(ownerId => ({
+      queryKey: ["traveller", ownerId],
+      queryFn: () =>
+        getTravellerById(ownerId),
+      staleTime: OWNER_STALE_TIME,
+      refetchOnWindowFocus: false,
+    })),
+  });
+
+  const ownerNamesById = useMemo(() => {
+    const map = new Map<
+      string,
+      {
+        _id: string;
+        name: string;
+        avatarUrl?: string;
+      }
+    >();
+
+    ownerQueries.forEach(
+      (query, index) => {
+        const ownerId =
+          savedOwnerIds[index];
+
+        const owner = query.data;
+
+        if (!ownerId || !owner?.name) {
+          return;
+        }
+
+        map.set(ownerId, {
+          _id: owner._id,
+          name: owner.name,
+          avatarUrl:
+            owner.avatarUrl ?? "",
+        });
+      },
+    );
+
+    return map;
+  }, [ownerQueries, savedOwnerIds]);
+
+  const resolvedStories = useMemo(() => {
+    return stories.map(story => {
+      const currentOwner =
+        story.ownerId as unknown;
+
+      if (
+        hasPopulatedOwner(
+          currentOwner as Story["ownerId"],
+        )
+      ) {
+        return story;
+      }
+
+      if (
+        source.type === "own" &&
+        user
+      ) {
+        return {
+          ...story,
+          ownerId: {
+            _id:
+              typeof currentOwner ===
+              "string"
+                ? currentOwner
+                : user.id,
+            name: user.name,
+            avatarUrl:
+              user.avatarUrl ?? "",
+          },
+        } as Story;
+      }
+
+      if (
+        source.type === "saved" &&
+        typeof currentOwner === "string"
+      ) {
+        const savedOwner =
+          ownerNamesById.get(
+            currentOwner,
+          );
+
+        if (savedOwner) {
+          return {
+            ...story,
+            ownerId: savedOwner,
+          } as Story;
+        }
+      }
+
+      return story;
+    });
+  }, [
+    ownerNamesById,
+    source.type,
+    stories,
+    user,
+  ]);
+>>>>>>> Stashed changes
 
   const savedIds = useMemo(() => {
     if (source.type === "saved") {
       return new Set(
+<<<<<<< Updated upstream
         stories.map((story) => story._id),
       );
     }
 
     return new Set(savedStoryIds);
   }, [savedStoryIds, source.type, stories]);
+=======
+        stories.map(story => story._id),
+      );
+    }
+
+    const idsFromQuery =
+      savedStatusQuery.data?.stories.map(
+        story => story._id,
+      ) ?? [];
+
+    return new Set([
+      ...savedStoryIds,
+      ...idsFromQuery,
+    ]);
+  }, [
+    savedStatusQuery.data,
+    savedStoryIds,
+    source.type,
+    stories,
+  ]);
+
+  const areSavedOwnersLoading =
+    source.type === "saved" &&
+    ownerQueries.some(
+      query => query.isLoading,
+    );
+>>>>>>> Stashed changes
 
   const handleLoadMore = async () => {
     if (
@@ -229,6 +502,7 @@ export function TravellersStories({
         ref={listRef}
         className={css.list}
       >
+<<<<<<< Updated upstream
         {stories.map((story) => (
           <StoryCard
             key={story._id}
@@ -236,29 +510,40 @@ export function TravellersStories({
             isSaved={savedIds.has(story._id)}
           />
         ))}
+=======
+        {resolvedStories.map(
+          (story, index) => (
+            <StoryCard
+              key={story._id}
+              story={story}
+              isSaved={savedIds.has(
+                story._id,
+              )}
+              imagePriority={index === 0}
+              canEdit={
+                source.type === "own"
+              }
+            />
+          ),
+        )}
+>>>>>>> Stashed changes
       </ul>
 
-      {storiesQuery.isFetchingNextPage && (
-        <div className={css.loaderWrapper}>
-          <Loader />
-        </div>
+      {(storiesQuery.hasNextPage ||
+        storiesQuery.isFetchingNextPage) && (
+        <Pagination
+          onLoadMore={() => {
+            void handleLoadMore();
+          }}
+          isLoading={
+            storiesQuery.isFetchingNextPage
+          }
+          hasMore={Boolean(
+            storiesQuery.hasNextPage,
+          )}
+          fullWidthOnMobile
+        />
       )}
-
-      {!storiesQuery.isFetchingNextPage &&
-        storiesQuery.hasNextPage && (
-          <Pagination
-            onLoadMore={() => {
-              void handleLoadMore();
-            }}
-            isLoading={
-              storiesQuery.isFetchingNextPage
-            }
-            hasMore={Boolean(
-              storiesQuery.hasNextPage,
-            )}
-            fullWidthOnMobile
-          />
-        )}
     </div>
   );
 }

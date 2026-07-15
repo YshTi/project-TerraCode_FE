@@ -41,6 +41,7 @@
 }
 
 .burgerButton {
+<<<<<<< Updated upstream
     width: 32px;
     height: 32px;
 
@@ -53,6 +54,18 @@
     background: rgba(0, 0, 0, 0.05);
 
     cursor: pointer;
+=======
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
+  background: var(--color-surface-subtle);
+  cursor: pointer;
+  color: var(--color-text-primary);
+>>>>>>> Stashed changes
 }
 
 /* tablet */

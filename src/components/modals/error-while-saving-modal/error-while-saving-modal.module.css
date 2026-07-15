@@ -27,7 +27,7 @@
   padding: 64px 16px 16px;
 
   border-radius: 24px;
-  background: var(--color-green-50);
+  background: var(--color-background-green);
 }
 
 .closeButton {
@@ -44,6 +44,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
+  color: var(--color-text-primary);
 }
 
 .closeButton:hover {
@@ -53,6 +54,7 @@
 .closeIcon {
   width: 32px;
   height: 32px;
+  stroke: var(--color-text-primary);
 }
 
 .content {
@@ -73,7 +75,7 @@
   letter-spacing: -0.01em;
   text-align: center;
 
-  color: #000;
+  color: var(--color-text-black);
 }
 
 .text {
@@ -85,7 +87,7 @@
   line-height: 1.5;
   text-align: center;
 
-  color: #000;
+  color: var(--color-text-black);
 }
 
 .actions {

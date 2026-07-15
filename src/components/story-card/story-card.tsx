@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import { Story } from "@/types/story";
+import type { Story } from "@/types/story";
 
 import { ButtonLink } from "../buttons/button";
 import { ErrorWhileSavingModal } from "../modals/error-while-saving-modal/error-while-saving-modal";
@@ -17,12 +17,19 @@ interface StoryCardProps {
   isSaved: boolean;
 }
 
+type PendingSaveChange = {
+  isSaved: boolean;
+  rate: number;
+};
+
 export default function StoryCard({
   story,
   isSaved,
 }: StoryCardProps) {
-  const { _id, img, title, rate, ownerId } = story;
+  const { _id, img, title, rate, ownerId } =
+    story;
 
+<<<<<<< Updated upstream
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [savedState, setSavedState] = useState(isSaved);
   const [displayRate, setDisplayRate] = useState(rate);
@@ -38,7 +45,53 @@ export default function StoryCard({
       nextIsSaved
         ? currentRate + 1
         : Math.max(0, currentRate - 1),
+=======
+  const [
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+  ] = useState(false);
+
+  const [
+    pendingSaveChange,
+    setPendingSaveChange,
+  ] = useState<PendingSaveChange | null>(
+    null,
+  );
+
+  const hasServerCaughtUp =
+    pendingSaveChange !== null &&
+    rate === pendingSaveChange.rate;
+
+  const effectiveIsSaved =
+    pendingSaveChange &&
+    !hasServerCaughtUp
+      ? pendingSaveChange.isSaved
+      : isSaved;
+
+  const displayRate =
+    pendingSaveChange &&
+    !hasServerCaughtUp
+      ? pendingSaveChange.rate
+      : rate;
+
+  const handleSavedChange = (
+    nextIsSaved: boolean,
+  ) => {
+    if (nextIsSaved === effectiveIsSaved) {
+      return;
+    }
+
+    const nextRate = Math.max(
+      0,
+      displayRate +
+        (nextIsSaved ? 1 : -1),
+>>>>>>> Stashed changes
     );
+
+    setPendingSaveChange({
+      isSaved: nextIsSaved,
+      rate: nextRate,
+    });
   };
 
   return (
@@ -49,7 +102,26 @@ export default function StoryCard({
           alt={title}
           fill
           className={css.image}
+<<<<<<< Updated upstream
           sizes="(max-width: 767px) 100vw, (max-width: 1439px) 340px, 421px"
+=======
+          sizes="
+            (max-width: 767px) calc(100vw - 40px),
+            (max-width: 1439px) 340px,
+            421px
+          "
+          quality={70}
+          loading={
+            imagePriority
+              ? "eager"
+              : "lazy"
+          }
+          fetchPriority={
+            imagePriority
+              ? "high"
+              : "auto"
+          }
+>>>>>>> Stashed changes
         />
       </div>
 
@@ -59,7 +131,9 @@ export default function StoryCard({
             {ownerId?.name ?? "Невідомий автор"}
           </span>
 
-          <span className={css.dot}>·</span>
+          <span className={css.dot}>
+            ·
+          </span>
 
           <span className={css.rate}>
             {displayRate}
@@ -79,16 +153,30 @@ export default function StoryCard({
             variant="secondary"
             className={css.viewButton}
           >
-            <span className={css.viewButtonText}>
+            <span
+              className={
+                css.viewButtonText
+              }
+            >
               Переглянути статтю
             </span>
           </ButtonLink>
 
           <SaveButton
             storyId={_id}
+<<<<<<< Updated upstream
             isSaved={savedState}
             onRequireAuth={() => setIsAuthModalOpen(true)}
             onSavedChange={handleSavedChange}
+=======
+            isSaved={effectiveIsSaved}
+            onRequireAuth={() => {
+              setIsAuthModalOpen(true);
+            }}
+            onSavedChange={
+              handleSavedChange
+            }
+>>>>>>> Stashed changes
           />
         </div>
       </div>

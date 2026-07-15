@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 
 import { Notification } from "@/components/toaster/notification";
 
-const TOAST_DURATION = 4000;
+const TOAST_DURATION = 3000;
 
 function showNotification(
   type: "success" | "error" | "info",

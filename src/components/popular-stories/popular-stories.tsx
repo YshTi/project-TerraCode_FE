@@ -49,8 +49,19 @@ export function PopularStories() {
     <section className="section">
       <Container className={css.wrapper}>
         <div className={css.headingBtnWrap}>
+<<<<<<< Updated upstream
           <h2 className={css.heading}>Популярні статті</h2>
           <ButtonLink href="/stories" className={css.allArticlesBtnPc}>
+=======
+          <h2 className={css.heading}>
+            Вам також сподобається
+          </h2>
+
+          <ButtonLink
+            href="/stories"
+            className={css.allArticlesBtnPc}
+          >
+>>>>>>> Stashed changes
             Всі статті
           </ButtonLink>
         </div>
