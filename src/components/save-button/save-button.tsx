@@ -47,23 +47,27 @@ export default function SaveButton({
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return isSaved
+    mutationFn: () =>
+      isSaved
         ? removeSavedStory(storyId)
-        : saveStory(storyId);
-    },
+        : saveStory(storyId),
 
     onSuccess: async () => {
       const nextIsSaved = !isSaved;
 
-      // Notify StoryCard about the successful change.
-      // This updates the button and counter immediately.
+      // Update the current card immediately.
       onSavedChange?.(nextIsSaved);
 
+      // If removed, immediately delete the card from the saved page cache.
       if (!nextIsSaved) {
-        queryClient.setQueriesData<InfiniteData<StoriesPage>>(
+        queryClient.setQueriesData<
+          InfiniteData<StoriesPage>
+        >(
           {
-            queryKey: ["profile-stories", "saved"],
+            queryKey: [
+              "profile-stories",
+              "saved",
+            ],
           },
           oldData => {
             if (!oldData) {
@@ -96,7 +100,21 @@ export default function SaveButton({
         }),
 
         queryClient.invalidateQueries({
-          queryKey: ["profile-stories", "saved"],
+          queryKey: [
+            "profile-stories",
+            "saved",
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: [
+            "profile-stories",
+            "own",
+          ],
+        }),
+
+        queryClient.invalidateQueries({
+          queryKey: ["stories"],
         }),
       ]);
 
@@ -109,7 +127,8 @@ export default function SaveButton({
 
     onError: (error: Error) => {
       notify.error(
-        error.message || "Не вдалося виконати операцію",
+        error.message ||
+          "Не вдалося виконати операцію",
       );
     },
   });
@@ -117,6 +136,10 @@ export default function SaveButton({
   const handleClick = () => {
     if (!user) {
       onRequireAuth();
+      return;
+    }
+
+    if (mutation.isPending) {
       return;
     }
 

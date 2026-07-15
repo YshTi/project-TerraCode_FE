@@ -16,30 +16,51 @@ interface StoryCardProps {
   story: Story;
   isSaved: boolean;
   imagePriority?: boolean;
+  canEdit?: boolean;
 }
 
 export default function StoryCard({
   story,
   isSaved,
   imagePriority = false,
+  canEdit = false,
 }: StoryCardProps) {
   const { _id, img, title, rate, ownerId } = story;
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [savedState, setSavedState] = useState(isSaved);
-  const [displayRate, setDisplayRate] = useState(rate);
+  const [isAuthModalOpen, setIsAuthModalOpen] =
+    useState(false);
 
-  const handleSavedChange = (nextIsSaved: boolean) => {
-    if (nextIsSaved === savedState) {
+  /*
+   * null means: use the current isSaved prop.
+   * After a successful user action, temporarily use the
+   * locally selected state.
+   */
+  const [savedOverride, setSavedOverride] =
+    useState<boolean | null>(null);
+
+  const [rateChange, setRateChange] = useState(0);
+
+  const effectiveIsSaved =
+    savedOverride ?? isSaved;
+
+  const displayRate = Math.max(
+    0,
+    rate + rateChange,
+  );
+
+  const handleSavedChange = (
+    nextIsSaved: boolean,
+  ) => {
+    if (nextIsSaved === effectiveIsSaved) {
       return;
     }
 
-    setSavedState(nextIsSaved);
+    setSavedOverride(nextIsSaved);
 
-    setDisplayRate(currentRate =>
+    setRateChange(currentChange =>
       nextIsSaved
-        ? currentRate + 1
-        : Math.max(0, currentRate - 1),
+        ? currentChange + 1
+        : currentChange - 1,
     );
   };
 
@@ -57,14 +78,33 @@ export default function StoryCard({
             421px
           "
           quality={70}
-          priority={imagePriority}
+          loading={imagePriority ? "eager" : "lazy"}
+          fetchPriority={imagePriority ? "high" : "auto"}
         />
+
+        {canEdit && (
+          <ButtonLink
+            href={`/stories/${_id}/edit`}
+            variant="secondary"
+            className={css.editButton}
+            aria-label={`Редагувати історію «${title}»`}
+          >
+            <SpriteIcon
+              id="icon-quill"
+              width={20}
+              height={20}
+            />
+          </ButtonLink>
+        )}
       </div>
 
       <div className={css.content}>
         <p className={css.meta}>
           <span className={css.author}>
-            {ownerId?.name ?? "Невідомий автор"}
+            {typeof ownerId === "object"
+              ? ownerId?.name ??
+                "Невідомий автор"
+              : "Невідомий автор"}
           </span>
 
           <span className={css.dot}>·</span>
@@ -97,8 +137,10 @@ export default function StoryCard({
 
           <SaveButton
             storyId={_id}
-            isSaved={savedState}
-            onRequireAuth={() => setIsAuthModalOpen(true)}
+            isSaved={effectiveIsSaved}
+            onRequireAuth={() => {
+              setIsAuthModalOpen(true);
+            }}
             onSavedChange={handleSavedChange}
           />
         </div>
@@ -106,7 +148,9 @@ export default function StoryCard({
 
       <ErrorWhileSavingModal
         isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+        }}
       />
     </li>
   );

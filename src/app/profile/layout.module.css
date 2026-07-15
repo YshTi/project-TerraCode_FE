@@ -1,5 +1,8 @@
 .main {
-    padding: 32px 0 64px 0;
+    position: relative;
+
+    min-height: 100vh;
+    padding: 32px 0 64px;
 }
 
 .travellerInfo {
@@ -12,8 +15,8 @@
 
 .editProfileWrapper {
     position: absolute;
-    bottom: 0;
     right: 0;
+    bottom: 0;
 
     display: inline-flex;
 }
@@ -27,87 +30,33 @@
     height: 32px;
     padding: 0;
 
-    border-radius: 50%;
-    background: transparent;
     color: var(--color-accent);
+    background: transparent;
+    border-radius: 50%;
 }
 
 .editProfileIcon {
     flex-shrink: 0;
 }
 
-.editProfileTooltip {
-    position: absolute;
-    z-index: 10;
-    bottom: calc(100% + 8px);
-    right: 0;
-
-    padding: 6px 10px;
-
-    font-size: 14px;
-    white-space: nowrap;
-    color: var(--color-white);
-
-    background-color: var(--color-accent);
-    border-radius: 6px;
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    transition:
-        opacity 150ms ease,
-        visibility 150ms ease;
-}
-
-.editProfileWrapper:hover .editProfileTooltip,
-.editProfileWrapper:focus-within .editProfileTooltip {
-    opacity: 1;
-    visibility: visible;
-}
-
-
 .storiesSection {
     display: flex;
     flex-direction: column;
     gap: 40px;
+
     margin-top: 40px;
 }
 
-.errorState {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    padding-block: 48px;
-    text-align: center;
-}
-
-.errorText {
-    margin: 0;
-    font-size: 16px;
-}
-
-.retryButton {
-    min-width: 180px;
-    height: 48px;
-}
-
-@media screen and (min-width:768px) {
+@media screen and (min-width: 768px) {
     .editProfileWrapper {
         top: 0;
-    }
-
-    .editProfileTooltip {
         bottom: auto;
-        top: calc(30%);
-        right: 0;
     }
 }
 
 @media screen and (min-width: 1440px) {
     .main {
-        padding: 48px 0 72px 0;
+        padding: 48px 0 72px;
     }
 
     .travellerInfo {
@@ -122,10 +71,5 @@
     .editProfileIcon {
         width: 24px;
         height: 24px;
-    }
-
-    .errorText {
-        margin: 0;
-        font-size: 20px;
     }
 }

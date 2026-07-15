@@ -1,0 +1,51 @@
+.main {
+    padding-block: 32px 64px;
+}
+
+.heading {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 32px;
+}
+
+.delete {
+    position: absolute;
+    z-index: 10;
+    top:190%;
+    right: 0;
+    
+    display: inline-flex;
+    
+    transform: translateY(-50%);
+}
+
+@media screen and (max-width: 375px) {
+    .delete {
+        top: 50%;
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .delete {
+        top: 50%;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .main {
+        padding-block: 48px 72px;
+    }
+
+    .heading {
+        justify-content: left;
+        width: 1091px;
+    }
+
+    .title {
+        text-align: left;
+    }
+}

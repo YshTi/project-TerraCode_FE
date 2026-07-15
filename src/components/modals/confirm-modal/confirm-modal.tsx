@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { createPortal } from "react-dom";
 
 import { PageTitle } from '@/components/page-title/page-title';
 import { Button } from '@/components/buttons/button';
@@ -58,12 +59,21 @@ export default function ConfirmModal({
     }
   };
 
-  return (
-    <div className={styles.overlay} onClick={handleBackdropClick}>
+  return createPortal(
+    <div
+      className={styles.overlay}
+      onClick={handleBackdropClick}
+    >
       <div
         className={styles.modal}
         role="dialog"
         aria-modal="true"
+        aria-labelledby="confirm-modal-title"
+        aria-describedby={
+          description
+            ? "confirm-modal-description"
+            : undefined
+        }
       >
         <button
           type="button"
@@ -79,18 +89,25 @@ export default function ConfirmModal({
           />
         </button>
 
-        <PageTitle className={styles.title}>
+        <PageTitle
+          id="confirm-modal-title"
+          className={styles.title}
+        >
           {title}
         </PageTitle>
 
         {description && (
-          <p className={styles.subtitle}>
+          <p
+            id="confirm-modal-description"
+            className={styles.subtitle}
+          >
             {description}
           </p>
         )}
 
         <div className={styles.actions}>
           <Button
+            type="button"
             onClick={onCancel}
             className={styles.button}
             variant="secondary"
@@ -99,6 +116,7 @@ export default function ConfirmModal({
           </Button>
 
           <Button
+            type="button"
             onClick={onConfirm}
             className={styles.button}
             variant="primary"
@@ -107,6 +125,7 @@ export default function ConfirmModal({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

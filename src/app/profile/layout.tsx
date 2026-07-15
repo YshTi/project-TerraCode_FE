@@ -36,24 +36,14 @@ export default function ProfileLayout({
     }
   }, [isLoading, router, user]);
 
-  if (isLoading) {
-    return (
-      <main className={css.main}>
-        <div className={css.loaderWrapper}>
-          <Loader />
-        </div>
-      </main>
-    );
-  }
-
-  if (!user) {
+  if (!isLoading && !user) {
     return null;
   }
 
   return (
     <main className={css.main}>
       <Container>
-        {!isEditPage && (
+        {user && !isEditPage && (
           <>
             <div className={css.profileHeader}>
               <TravellerInfo
@@ -91,6 +81,16 @@ export default function ProfileLayout({
           {children}
         </section>
       </Container>
+
+      {isLoading && (
+        <div
+          className={css.loaderOverlay}
+          role="status"
+          aria-label="Завантаження профілю"
+        >
+          <Loader />
+        </div>
+      )}
     </main>
   );
 }

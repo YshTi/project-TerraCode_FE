@@ -49,12 +49,15 @@ export const getTravellers = async (
   page = 1,
   limit = 12,
 ): Promise<UsersResponse> => {
-  const response = await nextServer.get<UsersResponse>("/users", {
-    params: {
-      page,
-      limit,
+  const response = await nextServer.get<UsersResponse>(
+    "/users",
+    {
+      params: {
+        page,
+        limit,
+      },
     },
-  });
+  );
 
   return response.data;
 };
@@ -62,17 +65,30 @@ export const getTravellers = async (
 export const getTravellerById = async (
   userId: string,
 ): Promise<User> => {
-  const response = await nextServer.get<TravellerProfileResponse>(
-    `/users/${userId}`,
-    {
-      params: {
-        page: 1,
-        perPage: 1,
-      },
-    },
-  );
+  const normalizedUserId = userId.trim();
 
-  return response.data.data.user;
+  if (!normalizedUserId) {
+    throw new Error("User ID is required");
+  }
+
+  const response =
+    await nextServer.get<TravellerProfileResponse>(
+      `/users/${normalizedUserId}`,
+      {
+        params: {
+          page: 1,
+          perPage: 1,
+        },
+      },
+    );
+
+  const user = response.data.data?.user;
+
+  if (!user) {
+    throw new Error("Traveller was not found");
+  }
+
+  return user;
 };
 
 export const getTravellerStories = async ({
@@ -80,9 +96,15 @@ export const getTravellerStories = async ({
   page = 1,
   limit = 9,
 }: TravellerStoriesParams): Promise<TravellerStoriesResponse> => {
+  const normalizedUserId = userId.trim();
+
+  if (!normalizedUserId) {
+    throw new Error("User ID is required");
+  }
+
   const response =
     await nextServer.get<TravellerProfileResponse>(
-      `/users/${userId}`,
+      `/users/${normalizedUserId}`,
       {
         params: {
           page,
@@ -91,7 +113,8 @@ export const getTravellerStories = async ({
       },
     );
 
-  const { user, stories, pagination } = response.data.data;
+  const { user, stories, pagination } =
+    response.data.data;
 
   return {
     stories: stories.map((story) => ({
@@ -102,6 +125,7 @@ export const getTravellerStories = async ({
         avatarUrl: user.avatarUrl ?? "",
       },
     })),
+
     pagination: {
       page: pagination.page,
       limit: pagination.perPage,
@@ -109,7 +133,8 @@ export const getTravellerStories = async ({
       totalPages: pagination.totalPages,
       hasNextPage:
         pagination.page < pagination.totalPages,
-      hasPreviousPage: pagination.page > 1,
+      hasPreviousPage:
+        pagination.page > 1,
     },
   };
 };
