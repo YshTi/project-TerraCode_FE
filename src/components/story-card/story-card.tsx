@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-import { Story } from "@/types/story";
+import type { Story } from "@/types/story";
 
 import { ButtonLink } from "../buttons/button";
 import { ErrorWhileSavingModal } from "../modals/error-while-saving-modal/error-while-saving-modal";
@@ -19,34 +19,47 @@ interface StoryCardProps {
   canEdit?: boolean;
 }
 
+type PendingSaveChange = {
+  isSaved: boolean;
+  rate: number;
+};
+
 export default function StoryCard({
   story,
   isSaved,
   imagePriority = false,
   canEdit = false,
 }: StoryCardProps) {
-  const { _id, img, title, rate, ownerId } = story;
+  const { _id, img, title, rate, ownerId } =
+    story;
 
-  const [isAuthModalOpen, setIsAuthModalOpen] =
-    useState(false);
+  const [
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+  ] = useState(false);
 
-  /*
-   * null means: use the current isSaved prop.
-   * After a successful user action, temporarily use the
-   * locally selected state.
-   */
-  const [savedOverride, setSavedOverride] =
-    useState<boolean | null>(null);
+  const [
+    pendingSaveChange,
+    setPendingSaveChange,
+  ] = useState<PendingSaveChange | null>(
+    null,
+  );
 
-  const [rateChange, setRateChange] = useState(0);
+  const hasServerCaughtUp =
+    pendingSaveChange !== null &&
+    rate === pendingSaveChange.rate;
 
   const effectiveIsSaved =
-    savedOverride ?? isSaved;
+    pendingSaveChange &&
+    !hasServerCaughtUp
+      ? pendingSaveChange.isSaved
+      : isSaved;
 
-  const displayRate = Math.max(
-    0,
-    rate + rateChange,
-  );
+  const displayRate =
+    pendingSaveChange &&
+    !hasServerCaughtUp
+      ? pendingSaveChange.rate
+      : rate;
 
   const handleSavedChange = (
     nextIsSaved: boolean,
@@ -55,13 +68,16 @@ export default function StoryCard({
       return;
     }
 
-    setSavedOverride(nextIsSaved);
-
-    setRateChange(currentChange =>
-      nextIsSaved
-        ? currentChange + 1
-        : currentChange - 1,
+    const nextRate = Math.max(
+      0,
+      displayRate +
+        (nextIsSaved ? 1 : -1),
     );
+
+    setPendingSaveChange({
+      isSaved: nextIsSaved,
+      rate: nextRate,
+    });
   };
 
   return (
@@ -78,8 +94,16 @@ export default function StoryCard({
             421px
           "
           quality={70}
-          loading={imagePriority ? "eager" : "lazy"}
-          fetchPriority={imagePriority ? "high" : "auto"}
+          loading={
+            imagePriority
+              ? "eager"
+              : "lazy"
+          }
+          fetchPriority={
+            imagePriority
+              ? "high"
+              : "auto"
+          }
         />
 
         {canEdit && (
@@ -107,7 +131,9 @@ export default function StoryCard({
               : "Невідомий автор"}
           </span>
 
-          <span className={css.dot}>·</span>
+          <span className={css.dot}>
+            ·
+          </span>
 
           <span className={css.rate}>
             {displayRate}
@@ -130,7 +156,11 @@ export default function StoryCard({
             variant="secondary"
             className={css.viewButton}
           >
-            <span className={css.viewButtonText}>
+            <span
+              className={
+                css.viewButtonText
+              }
+            >
               Переглянути статтю
             </span>
           </ButtonLink>
@@ -141,7 +171,9 @@ export default function StoryCard({
             onRequireAuth={() => {
               setIsAuthModalOpen(true);
             }}
-            onSavedChange={handleSavedChange}
+            onSavedChange={
+              handleSavedChange
+            }
           />
         </div>
       </div>

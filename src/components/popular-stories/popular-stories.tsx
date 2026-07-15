@@ -93,7 +93,7 @@ export function PopularStories({
       <Container className={css.wrapper}>
         <div className={css.headingBtnWrap}>
           <h2 className={css.heading}>
-            Популярні статті
+            Вам також сподобається
           </h2>
 
           <ButtonLink

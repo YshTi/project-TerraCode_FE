@@ -5,24 +5,39 @@ import {
   useContext,
   useEffect,
   useState,
+  useSyncExternalStore,
 } from "react";
 
 type Theme = "light" | "dark";
 
 type ThemeContextValue = {
   theme: Theme;
+  isMounted: boolean;
   toggleTheme: () => void;
 };
 
 const ThemeContext =
   createContext<ThemeContextValue | null>(null);
 
+const subscribe = () => {
+  return () => {};
+};
+
+function useIsMounted() {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+}
+
 function getInitialTheme(): Theme {
   if (typeof window === "undefined") {
     return "light";
   }
 
-  return window.localStorage.getItem("theme") === "dark"
+  return window.localStorage.getItem("theme") ===
+    "dark"
     ? "dark"
     : "light";
 }
@@ -35,7 +50,13 @@ export function ThemeProvider({
   const [theme, setTheme] =
     useState<Theme>(getInitialTheme);
 
+  const isMounted = useIsMounted();
+
   useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
+
     document.documentElement.dataset.theme =
       theme;
 
@@ -43,7 +64,7 @@ export function ThemeProvider({
       "theme",
       theme,
     );
-  }, [theme]);
+  }, [theme, isMounted]);
 
   const toggleTheme = () => {
     setTheme(currentTheme =>
@@ -57,6 +78,7 @@ export function ThemeProvider({
     <ThemeContext.Provider
       value={{
         theme,
+        isMounted,
         toggleTheme,
       }}
     >
@@ -66,7 +88,8 @@ export function ThemeProvider({
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
+  const context =
+    useContext(ThemeContext);
 
   if (!context) {
     throw new Error(

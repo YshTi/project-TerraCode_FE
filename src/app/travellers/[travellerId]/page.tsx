@@ -73,7 +73,6 @@ export default async function TravellerPage({
                 buttonText: "Назад до історій",
                 linkTo: "/stories",
               }}
-              limit={6}
             />
           </div>
         </div>

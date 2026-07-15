@@ -116,8 +116,28 @@ export const getTravellerStories = async ({
   const { user, stories, pagination } =
     response.data.data;
 
+  const currentPage = Number(pagination.page);
+  const perPage = Number(pagination.perPage);
+  const totalStories = Number(
+    pagination.totalStories,
+  );
+  const totalPages = Number(
+    pagination.totalPages,
+  );
+
+  if (
+    !Number.isFinite(currentPage) ||
+    !Number.isFinite(perPage) ||
+    !Number.isFinite(totalStories) ||
+    !Number.isFinite(totalPages)
+  ) {
+    throw new Error(
+      "Invalid traveller pagination response",
+    );
+  }
+
   return {
-    stories: stories.map((story) => ({
+    stories: stories.map(story => ({
       ...story,
       ownerId: {
         _id: user._id,
@@ -127,14 +147,14 @@ export const getTravellerStories = async ({
     })),
 
     pagination: {
-      page: pagination.page,
-      limit: pagination.perPage,
-      total: pagination.totalStories,
-      totalPages: pagination.totalPages,
+      page: currentPage,
+      limit: perPage,
+      total: totalStories,
+      totalPages,
       hasNextPage:
-        pagination.page < pagination.totalPages,
+        currentPage < totalPages,
       hasPreviousPage:
-        pagination.page > 1,
+        currentPage > 1,
     },
   };
 };

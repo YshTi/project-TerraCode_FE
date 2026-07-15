@@ -6,7 +6,24 @@ import { useTheme } from "@/providers/theme-provider";
 import styles from "./theme-switch.module.css";
 
 export function ThemeSwitch() {
-  const { theme, toggleTheme } = useTheme();
+  const {
+    theme,
+    isMounted,
+    toggleTheme,
+  } = useTheme();
+
+  if (!isMounted) {
+    return (
+      <Button
+        type="button"
+        className={styles.themeSwitch}
+        aria-label="Змінити тему"
+        disabled
+      >
+        🌙
+      </Button>
+    );
+  }
 
   return (
     <Button
