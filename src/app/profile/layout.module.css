@@ -31,7 +31,7 @@
     padding: 0;
 
     color: var(--color-accent);
-    background: transparent;
+    background: var(--color-surface-subtle);
     border-radius: 50%;
 }
 

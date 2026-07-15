@@ -56,6 +56,7 @@
     --color-surface-subtle: rgba(0, 0, 0, 0.05);
     --color-active: var(--color-green-800);
     --color-button-accent: var(--color-green-600);
+    --loader-background: rgb(0 0 0 / 25%);
 
     --color-error: var(--color-red);
 }
@@ -90,6 +91,7 @@ html[data-theme="dark"] {
     --color-placeholder: rgba(255, 255, 255, 0.6);
     --color-surface-subtle: var(--color-green-800);
     --color-active: var(--color-green-500);
+    --loader-background: rgb(255 255 255 / 15%);
 
     --color-error: #ff6b6b;
 }

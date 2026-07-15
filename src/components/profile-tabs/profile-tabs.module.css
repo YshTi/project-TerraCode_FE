@@ -41,7 +41,7 @@
 
 .tab {
   font-weight: 400;
-  color: var(--color-text-secondary);
+  color: var(--color-green-900);
   background-color: transparent;
 }
 
@@ -51,7 +51,7 @@
 
 .tabActive {
   font-weight: 500;
-  background-color: var(--color-green-50);
+  background-color: var(--color-background-primary);
   opacity: 1;
   border-color: var(--color-border-subtle);
   color: var(--color-text-primary);
