@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/components/buttons/button";
 
-import styles from "./theme-switch.module.css";
+import styles from "./theme-switch.module.css";``
 
 export function ThemeSwitch() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -27,12 +28,12 @@ export function ThemeSwitch() {
   }, [theme]);
 
   return (
-    <button className={styles.themeSwitch}
+    <Button className={styles.themeSwitch}
       onClick={() =>
         setTheme(theme === "light" ? "dark" : "light")
       }
     >
       {theme === "light" ? "🌙" : "☀️"}
-    </button>
+    </Button>
   );
 }
