@@ -15,11 +15,13 @@ import css from "./story-card.module.css";
 interface StoryCardProps {
   story: Story;
   isSaved: boolean;
+  imagePriority?: boolean;
 }
 
 export default function StoryCard({
   story,
   isSaved,
+  imagePriority = false,
 }: StoryCardProps) {
   const { _id, img, title, rate, ownerId } = story;
 
@@ -49,7 +51,13 @@ export default function StoryCard({
           alt={title}
           fill
           className={css.image}
-          sizes="(max-width: 767px) 100vw, (max-width: 1439px) 340px, 421px"
+          sizes="
+            (max-width: 767px) calc(100vw - 40px),
+            (max-width: 1439px) 340px,
+            421px
+          "
+          quality={70}
+          priority={imagePriority}
         />
       </div>
 
@@ -63,6 +71,7 @@ export default function StoryCard({
 
           <span className={css.rate}>
             {displayRate}
+
             <SpriteIcon
               id="icon-bookmark"
               width={16}
@@ -71,7 +80,9 @@ export default function StoryCard({
           </span>
         </p>
 
-        <h3 className={css.title}>{title}</h3>
+        <h3 className={css.title}>
+          {title}
+        </h3>
 
         <div className={css.actions}>
           <ButtonLink

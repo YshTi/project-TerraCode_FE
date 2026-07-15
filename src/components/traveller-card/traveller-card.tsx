@@ -22,16 +22,22 @@ export function TravellerCard({
 
   return (
     <article className={styles.card}>
-      <Image
-        src={imageSrc}
-        alt={`${name} avatar`}
-        width={130}
-        height={130}
-        className={styles.photo}
-      />
+      <div className={styles.photoWrapper}>
+        <Image
+          src={imageSrc}
+          alt={`Фото мандрівника ${name}`}
+          width={130}
+          height={130}
+          sizes="130px"
+          quality={70}
+          className={styles.photo}
+        />
+      </div>
 
       <div className={styles.infoWrapper}>
-        <h3 className={styles.name}>{name}</h3>
+        <h3 className={styles.name}>
+          {name}
+        </h3>
 
         <p className={styles.articlesCount}>
           Статей: {articlesAmount}

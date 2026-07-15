@@ -1,18 +1,21 @@
 .section {
-  padding: 64px 0;
+  width: 100%;
   margin: 0 auto;
+  padding: 64px 0;
 }
 
 .topWrapper {
   display: flex;
   flex-direction: column;
+  gap: 24px;
+
   margin-bottom: 48px;
 }
 
 .title {
-  text-align: left;
   color: var(--color-black);
   font-weight: 700;
+  text-align: left;
 }
 
 .desktopBtn {
@@ -20,73 +23,78 @@
 }
 
 .mobileBtn {
-  display: flex;
-  width: 100%;
   order: 2;
+
+  display: flex;
+
+  width: 100%;
 }
 
-.mobileBtn button, 
+.mobileBtn button,
 .mobileBtn a {
   width: 100%;
   height: 48px;
-  margin-top: 48px;        
+  margin-top: 48px;
 }
 
 .sliderWrapper {
   width: 100%;
-}
-
-/* моб - 3 картки стовпчиком */
-
-.swiper {
-  width: 100%;
-  height: calc(317px * 3 + 48px);
   min-width: 0;
 }
 
-
-.swiperSlide {
-border-radius: 12px;
-background-color: var(--color-accent-light);
+.swiper {
+  width: 100%;
+  min-width: 0;
+  height: calc(317px * 3 + 48px);
 }
 
+.swiperSlide {
+  overflow: hidden;
 
+  background-color: var(--color-accent-light);
+  border-radius: 12px;
+}
 
 .swiper :global(.swiper-slide) {
   height: calc((100% - 48px) / 3) !important;
   box-sizing: border-box;
 }
 
-
-
-/* Навігація */
 .bottomWrapper {
   display: flex;
   flex-direction: column;
+
   padding-top: 48px;
-  }
+}
 
 .navigationButtons {
+  order: 1;
+
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  order: 1;
 }
 
 .navBtn {
   display: flex;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  width: 48px;
-  height: 48px; 
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: transparent;
-  color: var(--color-text-primary);
 
+  width: 48px;
+  height: 48px;
+  padding: 0;
+
+  color: var(--color-text-primary);
   background: var(--color-green-100);
+  border: 1px solid rgb(0 0 0 / 15%);
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    opacity 200ms ease;
 }
 
 .icon {
@@ -105,31 +113,108 @@ background-color: var(--color-accent-light);
 
 .navBtn.disabled,
 .navBtn:disabled {
-  border: 1px solid rgba(0, 0, 0, 0.15);
   opacity: 0.4;
-  background: transparent;
+
   background: var(--color-gray-50);
+  border-color: rgb(0 0 0 / 15%);
+
   cursor: not-allowed;
 }
 
+/* Loading skeleton */
 
-/* TABLET   */
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
 
-@media (min-width: 768px) {
+  width: 100%;
+}
+
+.skeletonCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+
+  min-height: 317px;
+  padding: 24px;
+
+  overflow: hidden;
+
+  background-color: var(--color-accent-light);
+  border-radius: 12px;
+}
+
+.skeletonAvatar {
+  width: 130px;
+  height: 130px;
+  flex-shrink: 0;
+
+  background-color: var(--color-green-200);
+  border-radius: 50%;
+}
+
+.skeletonName {
+  width: 65%;
+  height: 24px;
+
+  background-color: var(--color-green-200);
+  border-radius: 4px;
+}
+
+.skeletonMeta {
+  width: 45%;
+  height: 18px;
+
+  background-color: var(--color-green-200);
+  border-radius: 4px;
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+
+  min-height: 317px;
+}
+
+.emptyMessage {
+  min-height: 48px;
+
+  text-align: center;
+}
+
+/* Mobile: 3 cards in one column */
+
+@media screen and (max-width: 767px) {
+  .skeletonCard:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+/* Tablet */
+
+@media screen and (min-width: 768px) {
   .section {
     padding: 64px 0;
   }
 
   .topWrapper {
     flex-direction: row;
-    justify-content: space-between;
     align-items: center;
-   }
-   
+    justify-content: space-between;
+  }
+
   .desktopBtn {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     width: 166px;
-    height: 48px;   
+    height: 48px;
     padding: 8px 11px;
   }
 
@@ -138,41 +223,49 @@ background-color: var(--color-accent-light);
   }
 
   .bottomWrapper {
-    display: flex;
     flex-direction: row;
     justify-content: flex-end;
   }
 
   .swiper {
-    height: 658px !important; 
+    height: 658px !important;
   }
 
   .swiper :global(.swiper-slide) {
-   
-    height: calc((100% - 24px) / 2) !important; 
+    height: calc((100% - 24px) / 2) !important;
+  }
+
+  .skeletonGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+/* Desktop */
 
-/* DESKTOP */
-
-@media (min-width: 1440px) {
+@media screen and (min-width: 1440px) {
   .section {
-    padding: 72px 0;
     width: 100%;
+    padding: 72px 0;
   }
-
 
   .desktopBtn {
     width: 202px;
-    height: 48px;    
+    height: 48px;
   }
 
   .swiper {
-    height: 335px !important; 
+    height: 335px !important;
   }
 
   .swiper :global(.swiper-slide) {
-    height: auto !important; 
+    height: auto !important;
+  }
+
+  .skeletonGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .skeletonCard {
+    min-height: 335px;
   }
 }

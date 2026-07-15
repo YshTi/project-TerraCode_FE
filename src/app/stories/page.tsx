@@ -171,11 +171,12 @@ export default function StoriesPage() {
         {!isInitialLoading && stories.length > 0 && (
           <>
             <ul className={css.grid}>
-              {stories.map((story) => (
+              {stories.map((story, index) => (
                 <StoryCard
                   key={story._id}
                   story={story}
                   isSaved={savedIds.has(story._id)}
+                  imagePriority={index === 0}
                 />
               ))}
             </ul>

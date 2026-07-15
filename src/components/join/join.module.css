@@ -1,27 +1,43 @@
 .card {
+  position: relative;
+
   display: flex;
-  min-height: 365px;
+
+  width: 100%;
+  min-height: 397px;
   padding: 16px;
+
+  overflow: hidden;
 
   color: var(--color-white);
   background-color: var(--color-green-900);
-  background-image: url("/images/join-bg.webp");
-
-  background-position: 17% center;
-  background-repeat: no-repeat;
-  background-size: cover;
-
+  border: 1px solid rgb(0 0 0 / 15%);
   border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: 17% center;
 }
 
 .column {
+  position: relative;
+  z-index: 2;
+
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 32px;
 
   width: 100%;
+  min-height: 363px;
 }
 
 .content {
@@ -51,51 +67,67 @@
 
 .actions {
   width: 100%;
+  min-height: 48px;
+  margin-top: auto;
+}
+
+.button,
+.buttonPlaceholder {
+  width: 100%;
+  min-height: 48px;
 }
 
 .button {
-  width: 100%;
-  min-height: 48px;
   padding: 6px 12px;
 }
+
+.buttonPlaceholder {
+  border-radius: 6px;
+  background-color: rgb(255 255 255 / 18%);
+}
+
+/* TABLET */
 
 @media screen and (min-width: 768px) {
   .card {
     min-height: 284px;
-    height: 284px;
     padding: 16px;
+  }
 
-    background-position: 35% center;
+  .backgroundImage {
+    object-position: center;
   }
 
   .column {
     width: 100%;
     max-width: 672px;
-    min-height: 288px;
+    min-height: 250px;
   }
 
   .title {
     font-size: 32px;
   }
 
-  .button {
+  .button,
+  .buttonPlaceholder {
     width: 168px;
   }
 }
+
+/* DESKTOP */
 
 @media screen and (min-width: 1440px) {
   .card {
     min-height: 436px;
     padding: 63px 64px;
-
-    background-position: center;
   }
 
   .column {
     max-width: 768px;
-    gap: 32px;
+    min-height: auto;
 
     justify-content: space-between;
+    gap: 32px;
   }
 
   .title {
@@ -106,7 +138,8 @@
     font-size: 20px;
   }
 
-  .button {
+  .button,
+  .buttonPlaceholder {
     width: 204px;
   }
 }
