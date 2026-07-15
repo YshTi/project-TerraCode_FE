@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 
 import { Container } from "@/components/container/container";
+import { PopularStories } from "@/components/popular-stories/popular-stories";
+import { SaveStory } from "@/components/save-story/save-story";
 import { StoryDetails } from "@/components/story-details/story-details";
 import { getResolvedStoryDetails } from "@/lib/api/storyDetailsApi";
 
@@ -25,9 +27,11 @@ export default async function StoryPage({
 
   return (
     <main className={css.main}>
-      <Container>
+      <Container className={css.storyContainer}>
         <StoryDetails story={story} />
+        <SaveStory storyId={storyId} />
       </Container>
+      <PopularStories excludeStoryId={storyId}/>
     </main>
   );
 }
