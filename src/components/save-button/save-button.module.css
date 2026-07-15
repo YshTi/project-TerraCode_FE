@@ -9,9 +9,9 @@
 }
 
 .saved {
-  background-color: var(--color-accent);
-  color: var(--color-text-inverse);
-  border-color: var(--color-accent);
+  background-color: var(--color-button-accent);
+  color: var(--color-white);
+  border-color: var(--color-button-accent);
 }
 
 .spinner {

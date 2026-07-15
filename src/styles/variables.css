@@ -2,8 +2,7 @@
     /* Fonts */
     --font-main: "Montserrat", sans-serif;
 
-
-    /* Main colors */
+    /* Raw palette: never change between themes */
     --color-white: #fff;
     --color-black: #000;
 
@@ -26,44 +25,71 @@
 
     --color-red: #b00101;
 
-
-    /* Semantic colors */
+    /* Semantic theme tokens */
     --color-background: var(--color-white);
     --color-background-primary: var(--color-green-50);
     --color-background-secondary: var(--color-green-100);
     --color-background-soft: var(--color-gray-50);
     --color-background-green: var(--color-green-50);
 
+    --color-surface: var(--color-white);
+    --color-card-background: var(--color-green-100);
+    --color-input-background: transparent;
+    --color-header-background: var(--color-white);
+
     --color-text-primary: var(--color-green-900);
     --color-text-secondary: var(--color-gray-700);
     --color-text-muted: var(--color-gray-500);
     --color-text-inverse: var(--color-white);
+    --color-text-black: var(--color-black);
+
+    --color-border: var(--color-green-300);
+    --color-border-muted: var(--color-gray-100);
+    --color-border-subtle: rgba(0, 0, 0, 0.15);
 
     --color-accent: var(--color-green-600);
-    --color-accent-hover: var(--color-green-600);
+    --color-accent-hover: var(--color-green-500);
     --color-accent-light: var(--color-green-100);
     --color-accent-dark: var(--color-green-900);
+
+    --color-placeholder: rgba(0, 0, 0, 0.6);
+    --color-surface-subtle: rgba(0, 0, 0, 0.05);
+    --color-active: var(--color-green-800);
+    --color-button-accent: var(--color-green-600);
 
     --color-error: var(--color-red);
 }
 
-[data-theme="dark"] {
-    --color-black: #fff;
+html[data-theme="dark"] {
     --color-background: var(--color-gray-900);
     --color-background-primary: var(--color-gray-900);
     --color-background-secondary: #222;
     --color-background-soft: #252525;
     --color-background-green: #203320;
 
+    --color-surface: #222;
+    --color-card-background: #29452a;
+    --color-input-background: #222;
+    --color-header-background: #151515;
+
     --color-text-primary: var(--color-green-50);
     --color-text-secondary: var(--color-gray-100);
     --color-text-muted: var(--color-gray-300);
     --color-text-inverse: var(--color-gray-900);
+    --color-text-black: var(--color-white);
+
+    --color-border: #557455;
+    --color-border-muted: var(--color-gray-700);
+    --color-border-subtle: rgba(255, 255, 255, 0.2);
 
     --color-accent: var(--color-green-500);
     --color-accent-hover: var(--color-green-300);
     --color-accent-light: var(--color-green-800);
     --color-accent-dark: var(--color-green-50);
+
+    --color-placeholder: rgba(255, 255, 255, 0.6);
+    --color-surface-subtle: var(--color-green-800);
+    --color-active: var(--color-green-500);
 
     --color-error: #ff6b6b;
 }

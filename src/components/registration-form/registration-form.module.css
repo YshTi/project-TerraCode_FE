@@ -3,7 +3,7 @@
     max-width: 644px;
     margin: 0 auto;
 
-    color: var(--color-black);
+    color: var(--color-text-black);
 }
 
 .heading {
@@ -52,7 +52,7 @@
     height: 40px;
     padding: 8px;
 
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--color-border-subtle);
     border-radius: 6px;
 
     font-weight: 400;
@@ -81,7 +81,7 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 1.5;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--color-placeholder);
 }
 
 .submitButton {

@@ -53,7 +53,7 @@
   font-weight: 500;
   background-color: var(--color-green-50);
   opacity: 1;
-  border-color: rgba(0, 0, 0, 0.15);
+  border-color: var(--color-border-subtle);
   color: var(--color-text-primary);
 }
 

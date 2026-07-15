@@ -11,6 +11,8 @@ import { TanStackProvider } from "@/providers/tanstack-provider";
 import { AuthProvider } from "@/providers/auth-provider";
 import { AppToaster } from "@/components/toaster/toaster";
 
+import { ThemeProvider } from "@/providers/theme-provider";
+
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
   weight: ["400", "500", "600", "700"],
@@ -31,14 +33,16 @@ export default function RootLayout({
   return (
     <html lang="uk" className={montserrat.variable}>
       <body>
-        <TanStackProvider>
-          <AuthProvider>
-            <AppShell>
-              {children}
-              <AppToaster />
-            </AppShell>
-          </AuthProvider>
-        </TanStackProvider>
+        <ThemeProvider>
+          <TanStackProvider>
+            <AuthProvider>
+              <AppShell>
+                {children}
+                <AppToaster />
+              </AppShell>
+            </AuthProvider>
+          </TanStackProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
