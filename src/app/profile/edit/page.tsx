@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -23,7 +24,6 @@ import {
 } from "@/lib/api/profileEditApi";
 import { useAuth } from "@/providers/auth-provider";
 import { notify } from "@/utils/notify";
-import Image from "next/image";
 
 import styles from "./page.module.css";
 
@@ -44,7 +44,38 @@ const ACCEPTED_AVATAR_TYPES = [
   "image/png",
   "image/gif",
   "image/webp",
+  "image/heic",
+  "image/heif",
 ];
+
+const ACCEPTED_AVATAR_EXTENSIONS = [
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".gif",
+  ".webp",
+  ".heic",
+  ".heif",
+];
+
+const AVATAR_FORMAT_ERROR =
+  "Фото має бути у форматі JPG, PNG, GIF, WEBP, HEIC або HEIF";
+
+function isAcceptedAvatar(file: File) {
+  const fileName = file.name.toLowerCase();
+  const mimeType = file.type.toLowerCase();
+
+  const hasAcceptedMimeType =
+    mimeType.length > 0 &&
+    ACCEPTED_AVATAR_TYPES.includes(mimeType);
+
+  const hasAcceptedExtension =
+    ACCEPTED_AVATAR_EXTENSIONS.some((extension) =>
+      fileName.endsWith(extension),
+    );
+
+  return hasAcceptedMimeType || hasAcceptedExtension;
+}
 
 const profileEditSchema = Yup.object({
   name: Yup.string()
@@ -56,7 +87,7 @@ const profileEditSchema = Yup.object({
       "Введіть коректне ім'я та прізвище",
     )
     .required("Введіть ім'я та прізвище"),
-  
+
   email: Yup.string()
     .trim()
     .email("Введіть коректну електронну адресу")
@@ -71,8 +102,8 @@ const profileEditSchema = Yup.object({
     )
     .test(
       "file-type",
-      "Фото має бути у форматі JPG, PNG, GIF або WEBP",
-      (value) => !value || ACCEPTED_AVATAR_TYPES.includes(value.type),
+      AVATAR_FORMAT_ERROR,
+      (value) => !value || isAcceptedAvatar(value),
     ),
 
   currentPassword: Yup.string().test(
@@ -151,7 +182,8 @@ const profileEditSchema = Yup.object({
       "passwords-match",
       "Паролі не збігаються",
       function (value) {
-        const { newPassword } = this.parent as ProfileEditValues;
+        const { newPassword } =
+          this.parent as ProfileEditValues;
 
         if (!newPassword || !value) {
           return true;
@@ -186,16 +218,29 @@ function getProfileErrorMessage(error: unknown) {
       "Ця електронна адреса вже зареєстрована",
   };
 
-  return messages[error.message] ?? error.message ?? fallbackMessage;
+  return (
+    messages[error.message] ??
+    error.message ??
+    fallbackMessage
+  );
 }
 
 export default function ProfileEditPage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { user, isLoading, refreshUser } = useAuth();
+  const fileInputRef =
+    useRef<HTMLInputElement | null>(null);
 
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const {
+    user,
+    isLoading,
+    refreshUser,
+  } = useAuth();
+
+  const [
+    avatarPreview,
+    setAvatarPreview,
+  ] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -219,7 +264,9 @@ export default function ProfileEditPage() {
   };
 
   const currentAvatar =
-    avatarPreview || user.avatarUrl || DEFAULT_AVATAR_URL;
+    avatarPreview ||
+    user.avatarUrl ||
+    DEFAULT_AVATAR_URL;
 
   return (
     <section className={styles.section}>
@@ -250,12 +297,24 @@ export default function ProfileEditPage() {
           setStatus(undefined);
 
           const trimmedName = values.name.trim();
-          const trimmedEmail = values.email.trim().toLowerCase();
-          const currentEmail = user.email.trim().toLowerCase();
 
-          const isNameChanged = trimmedName !== user.name;
-          const isEmailChanged = trimmedEmail !== currentEmail;
-          const isAvatarChanged = Boolean(values.avatar);
+          const trimmedEmail = values.email
+            .trim()
+            .toLowerCase();
+
+          const currentEmail = user.email
+            .trim()
+            .toLowerCase();
+
+          const isNameChanged =
+            trimmedName !== user.name;
+
+          const isEmailChanged =
+            trimmedEmail !== currentEmail;
+
+          const isAvatarChanged =
+            Boolean(values.avatar);
+
           const isPasswordChanged = Boolean(
             values.currentPassword ||
               values.newPassword ||
@@ -268,11 +327,13 @@ export default function ProfileEditPage() {
             !isAvatarChanged &&
             !isPasswordChanged
           ) {
-            const message = "Немає змін для збереження";
+            const message =
+              "Немає змін для збереження";
 
             setStatus(message);
             notify.error(message);
             setSubmitting(false);
+
             return;
           }
 
@@ -291,9 +352,12 @@ export default function ProfileEditPage() {
 
             if (isPasswordChanged) {
               await updateProfilePassword({
-                currentPassword: values.currentPassword,
-                newPassword: values.newPassword,
-                confirmNewPassword: values.confirmNewPassword,
+                currentPassword:
+                  values.currentPassword,
+                newPassword:
+                  values.newPassword,
+                confirmNewPassword:
+                  values.confirmNewPassword,
               });
             }
 
@@ -304,7 +368,9 @@ export default function ProfileEditPage() {
                 `Лист для підтвердження надіслано на ${trimmedEmail}`,
               );
             } else {
-              notify.success("Профіль успішно оновлено");
+              notify.success(
+                "Профіль успішно оновлено",
+              );
             }
 
             resetForm({
@@ -319,7 +385,10 @@ export default function ProfileEditPage() {
             });
 
             if (avatarPreview) {
-              URL.revokeObjectURL(avatarPreview);
+              URL.revokeObjectURL(
+                avatarPreview,
+              );
+
               setAvatarPreview(null);
             }
 
@@ -333,7 +402,8 @@ export default function ProfileEditPage() {
 
             router.refresh();
           } catch (error) {
-            const message = getProfileErrorMessage(error);
+            const message =
+              getProfileErrorMessage(error);
 
             setStatus(message);
             notify.error(message);
@@ -364,7 +434,8 @@ export default function ProfileEditPage() {
               values.confirmNewPassword,
           );
 
-          const hasChanges = dirty || Boolean(values.avatar);
+          const hasChanges =
+            dirty || Boolean(values.avatar);
 
           const clearRequestError = () => {
             if (status) {
@@ -385,13 +456,19 @@ export default function ProfileEditPage() {
             event.preventDefault();
 
             if (!hasChanges) {
-              notify.error("Немає змін для збереження");
+              notify.error(
+                "Немає змін для збереження",
+              );
+
               return;
             }
 
-            const validationErrors = await validateForm();
+            const validationErrors =
+              await validateForm();
 
-            if (Object.keys(validationErrors).length > 0) {
+            if (
+              Object.keys(validationErrors).length > 0
+            ) {
               await setTouched(
                 {
                   name: true,
@@ -414,6 +491,7 @@ export default function ProfileEditPage() {
                 "Перевірте правильність заповнення форми";
 
               notify.error(String(firstError));
+
               return;
             }
 
@@ -440,16 +518,18 @@ export default function ProfileEditPage() {
               !errors.email,
           );
 
-          const currentPasswordHasError = Boolean(
-            touched.currentPassword &&
-              errors.currentPassword,
-          );
+          const currentPasswordHasError =
+            Boolean(
+              touched.currentPassword &&
+                errors.currentPassword,
+            );
 
-          const currentPasswordHasSuccess = Boolean(
-            touched.currentPassword &&
-              values.currentPassword &&
-              !errors.currentPassword,
-          );
+          const currentPasswordHasSuccess =
+            Boolean(
+              touched.currentPassword &&
+                values.currentPassword &&
+                !errors.currentPassword,
+            );
 
           const newPasswordHasError = Boolean(
             touched.newPassword &&
@@ -462,16 +542,18 @@ export default function ProfileEditPage() {
               !errors.newPassword,
           );
 
-          const confirmPasswordHasError = Boolean(
-            touched.confirmNewPassword &&
-              errors.confirmNewPassword,
-          );
+          const confirmPasswordHasError =
+            Boolean(
+              touched.confirmNewPassword &&
+                errors.confirmNewPassword,
+            );
 
-          const confirmPasswordHasSuccess = Boolean(
-            touched.confirmNewPassword &&
-              values.confirmNewPassword &&
-              !errors.confirmNewPassword,
-          );
+          const confirmPasswordHasSuccess =
+            Boolean(
+              touched.confirmNewPassword &&
+                values.confirmNewPassword &&
+                !errors.confirmNewPassword,
+            );
 
           return (
             <form
@@ -491,22 +573,90 @@ export default function ProfileEditPage() {
                   unoptimized
                 />
 
-                <div className={styles.avatarActions}>
+                <div
+                  className={styles.avatarActions}
+                >
                   <input
                     ref={fileInputRef}
-                    className={styles.hiddenFileInput}
+                    className={
+                      styles.hiddenFileInput
+                    }
                     id="avatar"
                     name="avatar"
                     type="file"
-                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.gif,.webp,.heic,.heif"
                     onChange={async (event) => {
                       clearRequestError();
 
+                      const input =
+                        event.currentTarget;
+
                       const file =
-                        event.currentTarget.files?.[0] ?? null;
+                        input.files?.[0] ?? null;
 
                       if (avatarPreview) {
-                        URL.revokeObjectURL(avatarPreview);
+                        URL.revokeObjectURL(
+                          avatarPreview,
+                        );
+
+                        setAvatarPreview(null);
+                      }
+
+                      if (!file) {
+                        await setFieldValue(
+                          "avatar",
+                          null,
+                          false,
+                        );
+
+                        return;
+                      }
+
+                      if (
+                        file.size >
+                        MAX_AVATAR_SIZE
+                      ) {
+                        await setFieldValue(
+                          "avatar",
+                          null,
+                          false,
+                        );
+
+                        await setFieldTouched(
+                          "avatar",
+                          true,
+                          false,
+                        );
+
+                        input.value = "";
+
+                        notify.error(
+                          "Фото має бути менше 1 MB",
+                        );
+
+                        return;
+                      }
+
+                      if (!isAcceptedAvatar(file)) {
+                        await setFieldValue(
+                          "avatar",
+                          null,
+                          false,
+                        );
+
+                        await setFieldTouched(
+                          "avatar",
+                          true,
+                          false,
+                        );
+
+                        input.value = "";
+
+                        notify.error(
+                          AVATAR_FORMAT_ERROR,
+                        );
+
+                        return;
                       }
 
                       await setFieldValue(
@@ -521,27 +671,6 @@ export default function ProfileEditPage() {
                         true,
                       );
 
-                      if (!file) {
-                        setAvatarPreview(null);
-                        return;
-                      }
-
-                      if (file.size > MAX_AVATAR_SIZE) {
-                        setAvatarPreview(null);
-                        notify.error("Фото має бути менше 1 MB");
-                        return;
-                      }
-
-                      if (
-                        !ACCEPTED_AVATAR_TYPES.includes(file.type)
-                      ) {
-                        setAvatarPreview(null);
-                        notify.error(
-                          "Фото має бути у форматі JPG, PNG, GIF або WEBP",
-                        );
-                        return;
-                      }
-
                       setAvatarPreview(
                         URL.createObjectURL(file),
                       );
@@ -551,7 +680,9 @@ export default function ProfileEditPage() {
                   <Button
                     type="button"
                     variant="secondary"
-                    className={styles.uploadButton}
+                    className={
+                      styles.uploadButton
+                    }
                     onClick={() =>
                       fileInputRef.current?.click()
                     }
@@ -561,7 +692,7 @@ export default function ProfileEditPage() {
                   </Button>
 
                   <p className={styles.avatarHint}>
-                    JPG, PNG, GIF або WEBP. До 1 MB.
+                    JPG, PNG, GIF, WEBP, HEIC або HEIF. До 1 MB.
                   </p>
 
                   <FieldError
@@ -669,7 +800,9 @@ export default function ProfileEditPage() {
                 )}
               </div>
 
-              <div className={styles.passwordBlock}>
+              <div
+                className={styles.passwordBlock}
+              >
                 <h2 className={styles.subtitle}>
                   Змінити пароль
                 </h2>
@@ -694,11 +827,17 @@ export default function ProfileEditPage() {
                     name="currentPassword"
                     type="password"
                     placeholder="Ваш поточний пароль"
-                    value={values.currentPassword}
-                    onChange={handleTextFieldChange}
+                    value={
+                      values.currentPassword
+                    }
+                    onChange={
+                      handleTextFieldChange
+                    }
                     onBlur={handleBlur}
                     onFocus={clearRequestError}
-                    aria-invalid={currentPasswordHasError}
+                    aria-invalid={
+                      currentPasswordHasError
+                    }
                     aria-describedby={
                       currentPasswordHasError
                         ? "current-password-error"
@@ -740,7 +879,9 @@ export default function ProfileEditPage() {
                     onChange={handleTextFieldChange}
                     onBlur={handleBlur}
                     onFocus={clearRequestError}
-                    aria-invalid={newPasswordHasError}
+                    aria-invalid={
+                      newPasswordHasError
+                    }
                     aria-describedby={
                       newPasswordHasError
                         ? "new-password-error"
@@ -778,11 +919,17 @@ export default function ProfileEditPage() {
                     name="confirmNewPassword"
                     type="password"
                     placeholder="Повторіть новий пароль"
-                    value={values.confirmNewPassword}
-                    onChange={handleTextFieldChange}
+                    value={
+                      values.confirmNewPassword
+                    }
+                    onChange={
+                      handleTextFieldChange
+                    }
                     onBlur={handleBlur}
                     onFocus={clearRequestError}
-                    aria-invalid={confirmPasswordHasError}
+                    aria-invalid={
+                      confirmPasswordHasError
+                    }
                     aria-describedby={
                       confirmPasswordHasError
                         ? "confirm-password-error"
@@ -801,7 +948,11 @@ export default function ProfileEditPage() {
                 </div>
 
                 {!hasPasswordValues && (
-                  <p className={styles.passwordHint}>
+                  <p
+                    className={
+                      styles.passwordHint
+                    }
+                  >
                     Залиште ці поля порожніми, якщо не хочете змінювати пароль.
                   </p>
                 )}
@@ -817,8 +968,13 @@ export default function ProfileEditPage() {
               <div className={styles.actions}>
                 <Button
                   type="submit"
-                  className={styles.submitButton}
-                  disabled={isSubmitting || !hasChanges}
+                  className={
+                    styles.submitButton
+                  }
+                  disabled={
+                    isSubmitting ||
+                    !hasChanges
+                  }
                 >
                   Зберегти
                 </Button>
@@ -826,9 +982,13 @@ export default function ProfileEditPage() {
                 <Button
                   type="button"
                   variant="secondary"
-                  className={styles.cancelButton}
+                  className={
+                    styles.cancelButton
+                  }
                   onClick={() =>
-                    router.push("/profile/saved")
+                    router.push(
+                      "/profile/saved",
+                    )
                   }
                   disabled={isSubmitting}
                 >
