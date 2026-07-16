@@ -31,6 +31,7 @@
     --color-background-secondary: var(--color-green-100);
     --color-background-soft: var(--color-gray-50);
     --color-background-green: var(--color-green-50);
+    --auth-background: var(--color-white);
 
     --color-surface: var(--color-white);
     --color-card-background: var(--color-green-100);
@@ -67,6 +68,7 @@ html[data-theme="dark"] {
     --color-background-secondary: #222;
     --color-background-soft: #252525;
     --color-background-green: #203320;
+    --auth-background: var(--color-background-green);
 
     --color-surface: #222;
     --color-card-background: #29452a;

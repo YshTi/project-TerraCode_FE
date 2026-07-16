@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
 
@@ -8,14 +11,34 @@ type AuthHeaderProps = {
   onNavigate?: () => void;
 };
 
-export function AuthHeader({ onNavigate }: AuthHeaderProps) {
+export function AuthHeader({
+  onNavigate,
+}: AuthHeaderProps) {
+  const pathname = usePathname();
+
+  const handleLogoClick = (
+    event: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
+    onNavigate?.();
+
+    if (pathname === "/") {
+      event.preventDefault();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <header className={styles.authHeader}>
       <Link
         className={styles.logoHeader}
         href="/"
-        onClick={onNavigate}
-        aria-label="Перейти на головну сторінку"
+        scroll
+        onClick={handleLogoClick}
+        aria-label="Перейти на початок головної сторінки"
       >
         <SpriteIcon
           id="icon-eco"
@@ -24,7 +47,9 @@ export function AuthHeader({ onNavigate }: AuthHeaderProps) {
           className={styles.logoIcon}
         />
 
-        <span className={styles.logoText}>Природні Мандри</span>
+        <span className={styles.logoText}>
+          Природні Мандри
+        </span>
       </Link>
     </header>
   );

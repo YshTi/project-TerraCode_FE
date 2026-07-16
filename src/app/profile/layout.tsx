@@ -36,6 +36,30 @@ export default function ProfileLayout({
     }
   }, [isLoading, router, user]);
 
+  useEffect(() => {
+    window.history.scrollRestoration = "manual";
+
+    let secondFrameId = 0;
+
+    const firstFrameId = window.requestAnimationFrame(() => {
+      secondFrameId = window.requestAnimationFrame(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: "auto",
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrameId);
+
+      if (secondFrameId) {
+        window.cancelAnimationFrame(secondFrameId);
+      }
+    };
+  }, [pathname]);
+
   if (!isLoading && !user) {
     return null;
   }

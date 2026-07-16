@@ -1,10 +1,15 @@
-import { Container } from "@/components/container/container";
+"use client";
+
+import type { MouseEvent } from "react";
+import { usePathname } from "next/navigation";
+
 import { AuthHeader } from "@/components/auth-header/auth-header";
-import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
 import { ButtonLink } from "@/components/buttons/button";
+import { Container } from "@/components/container/container";
+import { UserBar } from "@/components/header/user-bar/user-bar";
+import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
 import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
-import { UserBar } from "@/components/header/user-bar/user-bar";
 
 import styles from "./mobile-menu.module.css";
 
@@ -21,7 +26,8 @@ type MobileMenuProps = {
     label: string;
   }[];
   onClose: () => void;
-  onLogout: () => Promise<void> | void;
+  onNavigate: () => void;
+  onLogout: () => Promise<void>;
 };
 
 export function MobileMenu({
@@ -29,9 +35,37 @@ export function MobileMenu({
   isLoggedIn,
   navLinks,
   onClose,
+  onNavigate,
   onLogout,
 }: MobileMenuProps) {
-  const shouldShowUserMenu = isLoggedIn && user;
+  const pathname = usePathname();
+
+  const shouldShowUserMenu = Boolean(
+    isLoggedIn && user,
+  );
+
+  const isCurrentDestination = (
+    href: string,
+  ) => {
+    if (href === "/profile") {
+      return pathname.startsWith("/profile");
+    }
+
+    return pathname === href;
+  };
+
+  const handleInternalNavigation = (
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (isCurrentDestination(href)) {
+      event.preventDefault();
+      onNavigate();
+      return;
+    }
+
+    onClose();
+  };
 
   const handleLogout = async () => {
     await onLogout();
@@ -40,7 +74,9 @@ export function MobileMenu({
 
   return (
     <div className={styles.mobileMenu}>
-      <Container className={styles.mobileMenuContainer}>
+      <Container
+        className={styles.mobileMenuContainer}
+      >
         <div className={styles.mobileMenuTop}>
           <AuthHeader onNavigate={onClose} />
 
@@ -49,7 +85,12 @@ export function MobileMenu({
               <ButtonLink
                 href="/stories/new"
                 className={styles.tabletPublishButton}
-                onClick={onClose}
+                onClick={event =>
+                  handleInternalNavigation(
+                    event,
+                    "/stories/new",
+                  )
+                }
               >
                 Опублікувати статтю
               </ButtonLink>
@@ -64,7 +105,10 @@ export function MobileMenu({
             onClick={onClose}
             aria-label="Закрити меню"
           >
-            <SpriteIcon id="icon-close" className={styles.closeIcon} />
+            <SpriteIcon
+              id="icon-close"
+              className={styles.closeIcon}
+            />
           </button>
         </div>
 
@@ -77,7 +121,12 @@ export function MobileMenu({
               key={href}
               href={href}
               className={styles.mobileNavLink}
-              onClick={onClose}
+              onClick={event =>
+                handleInternalNavigation(
+                  event,
+                  href,
+                )
+              }
             >
               {label}
             </NavLink>
@@ -87,7 +136,12 @@ export function MobileMenu({
             <NavLink
               href="/profile"
               className={styles.mobileNavLink}
-              onClick={onClose}
+              onClick={event =>
+                handleInternalNavigation(
+                  event,
+                  "/profile",
+                )
+              }
             >
               Мій Профіль
             </NavLink>
@@ -95,27 +149,41 @@ export function MobileMenu({
         </nav>
 
         <div className={styles.mobileActions}>
-          {shouldShowUserMenu ? (
+          {shouldShowUserMenu && user ? (
             <>
               <ButtonLink
                 href="/stories/new"
                 className={styles.mobilePublishButton}
-                onClick={onClose}
+                onClick={event =>
+                  handleInternalNavigation(
+                    event,
+                    "/stories/new",
+                  )
+                }
               >
                 Опублікувати статтю
               </ButtonLink>
 
-              <div className={styles.userBarWrapper}>
+              <div
+                className={styles.userBarWrapper}
+              >
                 <UserBar
                   name={user.name}
                   avatarUrl={user.avatarUrl}
                   profileHref="/profile"
                   onLogout={handleLogout}
+                  onNavigate={
+                    pathname.startsWith("/profile")
+                      ? onNavigate
+                      : onClose
+                  }
                 />
               </div>
             </>
           ) : (
-            <div className={styles.mobileOnlyAuth}>
+            <div
+              className={styles.mobileOnlyAuth}
+            >
               <MainAuthNav onNavigate={onClose} />
             </div>
           )}

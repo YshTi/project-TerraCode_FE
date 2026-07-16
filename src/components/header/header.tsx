@@ -1,42 +1,103 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import type { MouseEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation";
 
-import { Container } from "@/components/container/container";
 import { AuthHeader } from "@/components/auth-header/auth-header";
-import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
 import { ButtonLink } from "@/components/buttons/button";
+import { Container } from "@/components/container/container";
+import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
+import { UserBar } from "@/components/header/user-bar/user-bar";
+import { MainAuthNav } from "@/components/main-auth-nav/main-auth-nav";
 import { NavLink } from "@/components/nav-link/nav-link";
 import { SpriteIcon } from "@/components/sprite-icon/sprite-icon";
-import { UserBar } from "@/components/header/user-bar/user-bar";
-import { MobileMenu } from "@/components/header/mobile-menu/mobile-menu";
-import { useAuth } from "@/providers/auth-provider";
 import { ThemeSwitch } from "@/components/theme-switch/theme-switch";
+import { useAuth } from "@/providers/auth-provider";
 
 import styles from "./header.module.css";
 
 const navLinks = [
-  { href: "/", label: "Головна" },
-  { href: "/stories", label: "Статті" },
-  { href: "/travellers", label: "Еко-Мандрівники" },
+  {
+    href: "/",
+    label: "Головна",
+  },
+  {
+    href: "/stories",
+    label: "Статті",
+  },
+  {
+    href: "/travellers",
+    label: "Еко-Мандрівники",
+  },
 ];
 
+function isSameDestination(
+  pathname: string,
+  href: string,
+) {
+  if (href === "/profile") {
+    return pathname.startsWith("/profile");
+  }
+
+  return pathname === href;
+}
+
 export function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const router = useRouter();
+  const pathname = usePathname();
 
-  const { user, isLoading, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] =
+    useState(false);
+
+  const shouldScrollToTopRef =
+    useRef(false);
+
+  const { user, isLoading, logout } =
+    useAuth();
 
   const isLoggedIn = Boolean(user);
+
+  const scrollToPageTop = (
+    behavior: ScrollBehavior = "smooth",
+  ) => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior,
+    });
+  };
 
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
 
+  const closeMenuAndScrollTop = () => {
+    shouldScrollToTopRef.current = true;
+    setIsMenuOpen(false);
+  };
+
   const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
+    setIsMenuOpen(previous => !previous);
+  };
+
+  const handleCurrentPageNavigation = (
+    event: MouseEvent<HTMLAnchorElement>,
+    href: string,
+  ) => {
+    if (!isSameDestination(pathname, href)) {
+      return;
+    }
+
+    event.preventDefault();
+    scrollToPageTop();
   };
 
   const handleLogout = async () => {
@@ -47,7 +108,9 @@ export function Header() {
   };
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(min-width: 1440px)");
+    const mediaQuery = window.matchMedia(
+      "(min-width: 1440px)",
+    );
 
     const handleResize = () => {
       if (mediaQuery.matches) {
@@ -57,45 +120,106 @@ export function Header() {
 
     handleResize();
 
-    mediaQuery.addEventListener("change", handleResize);
+    mediaQuery.addEventListener(
+      "change",
+      handleResize,
+    );
 
     return () => {
-      mediaQuery.removeEventListener("change", handleResize);
+      mediaQuery.removeEventListener(
+        "change",
+        handleResize,
+      );
     };
   }, []);
 
   useEffect(() => {
-    if (!isMenuOpen) return;
+    if (!isMenuOpen) {
+      return;
+    }
 
-    const handleEscape = (event: KeyboardEvent) => {
+    const handleEscape = (
+      event: KeyboardEvent,
+    ) => {
       if (event.key === "Escape") {
         closeMenu();
       }
     };
 
-    document.addEventListener("keydown", handleEscape);
-    document.body.style.overflow = "hidden";
+    document.addEventListener(
+      "keydown",
+      handleEscape,
+    );
+
+    document.body.style.overflow =
+      "hidden";
 
     return () => {
-      document.removeEventListener("keydown", handleEscape);
+      document.removeEventListener(
+        "keydown",
+        handleEscape,
+      );
+
       document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (
+      isMenuOpen ||
+      !shouldScrollToTopRef.current
+    ) {
+      return;
+    }
+
+    shouldScrollToTopRef.current = false;
+
+    const timeoutId = window.setTimeout(() => {
+      scrollToPageTop("auto");
+    }, 50);
+
+    return () => {
+      window.clearTimeout(timeoutId);
     };
   }, [isMenuOpen]);
 
   return (
     <header className={styles.header}>
-      <Container className={styles.headerContainer}>
+      <Container
+        className={styles.headerContainer}
+      >
         <AuthHeader />
 
         <nav className={styles.nav}>
-          {navLinks.map(({ href, label }) => (
-            <NavLink key={href} href={href} className={styles.navLink}>
-              {label}
-            </NavLink>
-          ))}
+          {navLinks.map(
+            ({ href, label }) => (
+              <NavLink
+                key={href}
+                href={href}
+                className={styles.navLink}
+                onClick={event =>
+                  handleCurrentPageNavigation(
+                    event,
+                    href,
+                  )
+                }
+              >
+                {label}
+              </NavLink>
+            ),
+          )}
 
           {isLoggedIn && (
-            <NavLink href="/profile" className={styles.navLink}>
+            <NavLink
+              href="/profile"
+              className={styles.navLink}
+              onClick={event =>
+                handleCurrentPageNavigation(
+                  event,
+                  "/profile",
+                )
+              }
+            >
               Мій Профіль
             </NavLink>
           )}
@@ -103,12 +227,22 @@ export function Header() {
 
         <ThemeSwitch />
 
-        <div className={styles.desktopActions}>
+        <div
+          className={styles.desktopActions}
+        >
           {isLoading ? null : user ? (
             <>
               <ButtonLink
                 href="/stories/new"
-                className={styles.publishButton}
+                className={
+                  styles.publishButton
+                }
+                onClick={event =>
+                  handleCurrentPageNavigation(
+                    event,
+                    "/stories/new",
+                  )
+                }
               >
                 Опублікувати статтю
               </ButtonLink>
@@ -118,6 +252,15 @@ export function Header() {
                 avatarUrl={user.avatarUrl}
                 profileHref="/profile"
                 onLogout={handleLogout}
+                onNavigate={() => {
+                  if (
+                    pathname.startsWith(
+                      "/profile",
+                    )
+                  ) {
+                    scrollToPageTop();
+                  }
+                }}
               />
             </>
           ) : (
@@ -125,11 +268,21 @@ export function Header() {
           )}
         </div>
 
-        <div className={styles.tabletActions}>
+        <div
+          className={styles.tabletActions}
+        >
           {isLoading ? null : user ? (
             <ButtonLink
               href="/stories/new"
-              className={styles.publishButton}
+              className={
+                styles.publishButton
+              }
+              onClick={event =>
+                handleCurrentPageNavigation(
+                  event,
+                  "/stories/new",
+                )
+              }
             >
               Опублікувати статтю
             </ButtonLink>
@@ -142,12 +295,22 @@ export function Header() {
           type="button"
           className={styles.burgerButton}
           onClick={toggleMenu}
-          aria-label={isMenuOpen ? "Закрити меню" : "Відкрити меню"}
+          aria-label={
+            isMenuOpen
+              ? "Закрити меню"
+              : "Відкрити меню"
+          }
           aria-expanded={isMenuOpen}
         >
           <SpriteIcon
-            id={isMenuOpen ? "icon-close" : "icon-menu"}
-            className={styles.burgerIcon}
+            id={
+              isMenuOpen
+                ? "icon-close"
+                : "icon-menu"
+            }
+            className={
+              styles.burgerIcon
+            }
           />
         </button>
       </Container>
@@ -158,6 +321,9 @@ export function Header() {
           isLoggedIn={isLoggedIn}
           navLinks={navLinks}
           onClose={closeMenu}
+          onNavigate={
+            closeMenuAndScrollTop
+          }
           onLogout={handleLogout}
         />
       )}
