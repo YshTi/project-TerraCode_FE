@@ -31,7 +31,7 @@ export default async function StoryPage({
         <StoryDetails story={story} />
         <SaveStory storyId={storyId} />
       </Container>
-      <PopularStories excludeStoryId={storyId}/>
+      <PopularStories excludeStoryId={storyId} title="Вам також сподобається"/>
     </main>
   );
 }
