@@ -1,14 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { ButtonLink } from "@/components/buttons/button";
 import { Loader } from "@/components/loader/loader";
-import { useAuth } from "@/providers/auth-provider";
 
 import styles from "./page.module.css";
 
@@ -17,11 +13,12 @@ type VerificationState =
   | "success"
   | "error";
 
-export default function VerifyEmailPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { refreshUser } = useAuth();
+type VerificationResponse = {
+  message?: string;
+};
 
+export default function VerifyEmailPage() {
+  const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
   const [state, setState] =
@@ -41,9 +38,7 @@ export default function VerifyEmailPage() {
     }
 
     const verificationToken = token;
-
     let isCancelled = false;
-    let redirectTimeout: number | null = null;
 
     async function verifyEmail() {
       try {
@@ -57,12 +52,11 @@ export default function VerifyEmailPage() {
           },
         );
 
-        const data = await response
-          .json()
-          .catch(() => ({
+        const data =
+          (await response.json().catch(() => ({
             message:
               "Не вдалося прочитати відповідь сервера",
-          }));
+          }))) as VerificationResponse;
 
         if (!response.ok) {
           throw new Error(
@@ -75,25 +69,31 @@ export default function VerifyEmailPage() {
           return;
         }
 
-        await refreshUser();
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "include",
+        }).catch(() => {
+          // Verification still succeeded even if logout cleanup failed.
+        });
 
         if (isCancelled) {
           return;
         }
 
+        if ("BroadcastChannel" in window) {
+          const authChannel =
+            new BroadcastChannel("auth");
+
+          authChannel.postMessage({
+            type: "logout",
+          });
+
+          authChannel.close();
+        }
+
         setState("success");
         setMessage(
-          "Електронну адресу успішно підтверджено та оновлено.",
-        );
-
-        redirectTimeout = window.setTimeout(
-          () => {
-            if (!isCancelled) {
-              router.replace("/profile/edit");
-              router.refresh();
-            }
-          },
-          2500,
+          "Електронну адресу успішно підтверджено та оновлено. Попередню сесію завершено. Тепер увійдіть із новою адресою.",
         );
       } catch (error) {
         if (isCancelled) {
@@ -101,6 +101,7 @@ export default function VerifyEmailPage() {
         }
 
         setState("error");
+
         setMessage(
           error instanceof Error
             ? error.message
@@ -113,14 +114,8 @@ export default function VerifyEmailPage() {
 
     return () => {
       isCancelled = true;
-
-      if (redirectTimeout !== null) {
-        window.clearTimeout(
-          redirectTimeout,
-        );
-      }
     };
-  }, [refreshUser, router, token]);
+  }, [token]);
 
   if (state === "loading") {
     return (
@@ -165,17 +160,23 @@ export default function VerifyEmailPage() {
         </p>
 
         <div className={styles.actions}>
-          <ButtonLink href="/profile/edit">
-            Повернутися до профілю
-          </ButtonLink>
-
-          {state === "error" && (
-            <ButtonLink
-              href="/"
-              variant="secondary"
-            >
-              На головну
+          {state === "success" ? (
+            <ButtonLink href="/auth/login">
+              Увійти з новою поштою
             </ButtonLink>
+          ) : (
+            <>
+              <ButtonLink href="/profile/edit">
+                Повернутися до профілю
+              </ButtonLink>
+
+              <ButtonLink
+                href="/"
+                variant="secondary"
+              >
+                На головну
+              </ButtonLink>
+            </>
           )}
         </div>
       </section>
