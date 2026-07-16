@@ -49,6 +49,7 @@
 
     .categoryButton:hover:not(:disabled) {
         background-color: rgba(74, 159, 79, 0.1);
+        color: var(--color-text-primary);
     }
 
     .categoryButton:focus-visible {
