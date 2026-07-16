@@ -1,3 +1,5 @@
+import { authFetch } from "@/lib/api/authFetch";
+
 type ApiErrorResponse = {
   message?: string;
   errors?: Record<string, string[]>;
@@ -11,12 +13,17 @@ async function parseJsonResponse(response: Response) {
   }
 }
 
-function getErrorMessage(data: ApiErrorResponse, fallback: string) {
+function getErrorMessage(
+  data: ApiErrorResponse,
+  fallback: string,
+) {
   return data.message || fallback;
 }
 
-export async function updateProfileName(name: string) {
-  const response = await fetch("/api/profile", {
+export async function updateProfileName(
+  name: string,
+) {
+  const response = await authFetch("/api/profile", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -29,26 +36,41 @@ export async function updateProfileName(name: string) {
   const data = await parseJsonResponse(response);
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Не вдалося оновити профіль"));
+    throw new Error(
+      getErrorMessage(
+        data,
+        "Не вдалося оновити профіль",
+      ),
+    );
   }
 
   return data;
 }
 
-export async function updateProfileAvatar(avatar: File) {
+export async function updateProfileAvatar(
+  avatar: File,
+) {
   const formData = new FormData();
 
   formData.append("avatar", avatar);
 
-  const response = await fetch("/api/profile/avatar", {
-    method: "PATCH",
-    body: formData,
-  });
+  const response = await authFetch(
+    "/api/profile/avatar",
+    {
+      method: "PATCH",
+      body: formData,
+    },
+  );
 
   const data = await parseJsonResponse(response);
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Не вдалося оновити фото профілю"));
+    throw new Error(
+      getErrorMessage(
+        data,
+        "Не вдалося оновити фото профілю",
+      ),
+    );
   }
 
   return data;
@@ -63,22 +85,30 @@ export async function updateProfilePassword({
   newPassword: string;
   confirmNewPassword: string;
 }) {
-  const response = await fetch("/api/profile/password", {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await authFetch(
+    "/api/profile/password",
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        currentPassword,
+        newPassword,
+        confirmNewPassword,
+      }),
     },
-    body: JSON.stringify({
-      currentPassword,
-      newPassword,
-      confirmNewPassword,
-    }),
-  });
+  );
 
   const data = await parseJsonResponse(response);
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Не вдалося оновити пароль"));
+    throw new Error(
+      getErrorMessage(
+        data,
+        "Не вдалося оновити пароль",
+      ),
+    );
   }
 
   return data;
@@ -87,7 +117,7 @@ export async function updateProfilePassword({
 export async function updateProfileEmail(
   email: string,
 ) {
-  const response = await fetch("/api/profile", {
+  const response = await authFetch("/api/profile", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
