@@ -17,6 +17,7 @@ import { Loader } from "@/components/loader/loader";
 import { DEFAULT_AVATAR_URL } from "@/constants/user";
 import {
   updateProfileAvatar,
+  updateProfileEmail,
   updateProfileName,
   updateProfilePassword,
 } from "@/lib/api/profileEditApi";
@@ -28,6 +29,7 @@ import styles from "./page.module.css";
 
 type ProfileEditValues = {
   name: string;
+  email: string;
   avatar: File | null;
   currentPassword: string;
   newPassword: string;
@@ -54,6 +56,11 @@ const profileEditSchema = Yup.object({
       "Введіть коректне ім'я та прізвище",
     )
     .required("Введіть ім'я та прізвище"),
+  
+  email: Yup.string()
+    .trim()
+    .email("Введіть коректну електронну адресу")
+    .required("Введіть електронну адресу"),
 
   avatar: Yup.mixed<File>()
     .nullable()
@@ -171,6 +178,12 @@ function getProfileErrorMessage(error: unknown) {
       "Користувача не знайдено",
     "Not authorized":
       "Ви не авторизовані",
+    "Email already in use":
+      "Ця електронна адреса вже використовується",
+    "Email already exists":
+      "Ця електронна адреса вже використовується",
+    "Email is already registered":
+      "Ця електронна адреса вже зареєстрована",
   };
 
   return messages[error.message] ?? error.message ?? fallbackMessage;
@@ -198,6 +211,7 @@ export default function ProfileEditPage() {
 
   const initialValues: ProfileEditValues = {
     name: user.name,
+    email: user.email,
     avatar: null,
     currentPassword: "",
     newPassword: "",
@@ -215,7 +229,7 @@ export default function ProfileEditPage() {
         </h1>
 
         <p className={styles.description}>
-          Оновіть фото, ім&apos;я або пароль.
+          Оновіть фото, ім&apos;я, електронну пошту або пароль.
         </p>
       </div>
 
@@ -236,7 +250,11 @@ export default function ProfileEditPage() {
           setStatus(undefined);
 
           const trimmedName = values.name.trim();
+          const trimmedEmail = values.email.trim().toLowerCase();
+          const currentEmail = user.email.trim().toLowerCase();
+
           const isNameChanged = trimmedName !== user.name;
+          const isEmailChanged = trimmedEmail !== currentEmail;
           const isAvatarChanged = Boolean(values.avatar);
           const isPasswordChanged = Boolean(
             values.currentPassword ||
@@ -246,6 +264,7 @@ export default function ProfileEditPage() {
 
           if (
             !isNameChanged &&
+            !isEmailChanged &&
             !isAvatarChanged &&
             !isPasswordChanged
           ) {
@@ -262,6 +281,10 @@ export default function ProfileEditPage() {
               await updateProfileName(trimmedName);
             }
 
+            if (isEmailChanged) {
+              await updateProfileEmail(trimmedEmail);
+            }
+
             if (values.avatar) {
               await updateProfileAvatar(values.avatar);
             }
@@ -276,11 +299,18 @@ export default function ProfileEditPage() {
 
             await refreshUser();
 
-            notify.success("Профіль успішно оновлено");
+            if (isEmailChanged) {
+              notify.success(
+                `Лист для підтвердження надіслано на ${trimmedEmail}`,
+              );
+            } else {
+              notify.success("Профіль успішно оновлено");
+            }
 
             resetForm({
               values: {
                 name: trimmedName,
+                email: user.email,
                 avatar: null,
                 currentPassword: "",
                 newPassword: "",
@@ -297,7 +327,10 @@ export default function ProfileEditPage() {
               fileInputRef.current.value = "";
             }
 
-            router.push("/profile/saved");
+            if (!isEmailChanged) {
+              router.push("/profile/saved");
+            }
+
             router.refresh();
           } catch (error) {
             const message = getProfileErrorMessage(error);
@@ -362,6 +395,7 @@ export default function ProfileEditPage() {
               await setTouched(
                 {
                   name: true,
+                  email: true,
                   avatar: true,
                   currentPassword: true,
                   newPassword: true,
@@ -372,6 +406,7 @@ export default function ProfileEditPage() {
 
               const firstError =
                 validationErrors.name ||
+                validationErrors.email ||
                 validationErrors.avatar ||
                 validationErrors.currentPassword ||
                 validationErrors.newPassword ||
@@ -393,6 +428,16 @@ export default function ProfileEditPage() {
             touched.name &&
               values.name.trim() &&
               !errors.name,
+          );
+
+          const emailHasError = Boolean(
+            touched.email && errors.email,
+          );
+
+          const emailHasSuccess = Boolean(
+            touched.email &&
+              values.email.trim() &&
+              !errors.email,
           );
 
           const currentPasswordHasError = Boolean(
@@ -570,6 +615,58 @@ export default function ProfileEditPage() {
                       : undefined
                   }
                 />
+              </div>
+
+              <div className={styles.field}>
+                <label
+                  className={styles.label}
+                  htmlFor="email"
+                >
+                  Електронна пошта
+                </label>
+
+                <input
+                  className={`${styles.input} ${
+                    emailHasError
+                      ? styles.inputError
+                      : emailHasSuccess
+                        ? styles.inputSuccess
+                        : ""
+                  }`}
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="example@email.com"
+                  value={values.email}
+                  onChange={handleTextFieldChange}
+                  onBlur={handleBlur}
+                  onFocus={clearRequestError}
+                  autoComplete="email"
+                  aria-invalid={emailHasError}
+                  aria-describedby={
+                    emailHasError
+                      ? "email-error"
+                      : "email-hint"
+                  }
+                />
+
+                <FieldError
+                  id="email-error"
+                  message={
+                    touched.email
+                      ? errors.email
+                      : undefined
+                  }
+                />
+
+                {!emailHasError && (
+                  <p
+                    id="email-hint"
+                    className={styles.passwordHint}
+                  >
+                    На нову адресу буде надіслано лист для підтвердження.
+                  </p>
+                )}
               </div>
 
               <div className={styles.passwordBlock}>

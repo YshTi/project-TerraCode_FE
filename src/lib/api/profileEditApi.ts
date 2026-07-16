@@ -83,3 +83,30 @@ export async function updateProfilePassword({
 
   return data;
 }
+
+export async function updateProfileEmail(
+  email: string,
+) {
+  const response = await fetch("/api/profile", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+    }),
+  });
+
+  const data = await parseJsonResponse(response);
+
+  if (!response.ok) {
+    throw new Error(
+      getErrorMessage(
+        data,
+        "Не вдалося надіслати лист для підтвердження нової пошти",
+      ),
+    );
+  }
+
+  return data;
+}
