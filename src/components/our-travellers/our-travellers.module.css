@@ -26,13 +26,13 @@
   display: flex;
 
   width: 100%;
+  height: 48px;
 }
 
 .mobileBtn button,
 .mobileBtn a {
   width: 100%;
   height: 48px;
-  margin-top: 48px;
 }
 
 .sliderWrapper {
@@ -61,6 +61,7 @@
 .bottomWrapper {
   display: flex;
   flex-direction: column;
+  gap: 48px;
 
   padding-top: 48px;
 }
@@ -223,6 +224,7 @@
   .bottomWrapper {
     flex-direction: row;
     justify-content: flex-end;
+    gap: 0;
   }
 
   .swiper {
