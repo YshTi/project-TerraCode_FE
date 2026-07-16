@@ -224,13 +224,18 @@ git clone https://github.com/YshTi/project-TerraCode_FE.git
 
 
 # Collaborators:
-- [Anna Smyrnova](https://github.com/Anna-Smyrnova)
-- [grytsaidmitry](https://github.com/grytsaidmitry)
-- [Tymofii-Danilov](https://github.com/Tymofii-Danilov)
-- [Valentyna Modyrka](https://github.com/MoVa-ops)
-- [vitalii-sementsov](https://github.com/vitalii-sementsov)
-- [Yurii Davydiuk](https://github.com/YuriiDavydiuk)
-- [Erik](https://github.com/AvalianY)
-- [Lara Kosta](https://github.com/Larimar4you)
-- [Maksym Orlenko](https://github.com/MaksOrlenko)
-- [ROMAN LUBENNIKOV](https://github.com/RomanLubennikov)
+- Fullstack
+  - [Anna Smyrnova](https://github.com/Anna-Smyrnova)
+  - [grytsaidmitry](https://github.com/grytsaidmitry)
+  - [Tymofii-Danilov](https://github.com/Tymofii-Danilov)
+  - [Valentyna Modyrka](https://github.com/MoVa-ops)
+  - [vitalii-sementsov](https://github.com/vitalii-sementsov)
+  - [Yurii Davydiuk](https://github.com/YuriiDavydiuk)
+  - [Erik](https://github.com/AvalianY)
+  - [Lara Kosta](https://github.com/Larimar4you)
+  - [Maksym Orlenko](https://github.com/MaksOrlenko)
+  - [ROMAN LUBENNIKOV](https://github.com/RomanLubennikov)
+- QA:
+  - [doroninroma93](https://github.com/doroninroma93)
+  - [Yaroslava Rozhkova](https://github.com/slava-rozh)
+  - [Anastasiia Tkachyck](https://github.com/weaver-ast)
