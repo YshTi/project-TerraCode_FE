@@ -163,7 +163,7 @@ export function LoginForm() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Ваш пароль"
+                placeholder="********"
                 value={values.password}
                 onChange={(event) => {
                   if (hasAuthError) {
