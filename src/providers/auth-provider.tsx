@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useRouter } from "next/navigation";
 
 export type AuthUser = {
   id: string;
@@ -23,12 +24,15 @@ type AuthContextValue = {
   logout: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const AuthContext = createContext<AuthContextValue | null>(
+  null,
+);
 
 async function getSessionUser(): Promise<AuthUser | null> {
   const response = await fetch("/api/auth/session", {
     method: "GET",
     cache: "no-store",
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -40,15 +44,26 @@ async function getSessionUser(): Promise<AuthUser | null> {
   return data.user ?? null;
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const router = useRouter();
+
+  const [user, setUser] =
+    useState<AuthUser | null>(null);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
 
   const refreshUser = async () => {
     setIsLoading(true);
 
     try {
-      const sessionUser = await getSessionUser();
+      const sessionUser =
+        await getSessionUser();
+
       setUser(sessionUser);
     } catch {
       setUser(null);
@@ -61,9 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: "include",
       });
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error(
+        "Logout failed:",
+        error,
+      );
     } finally {
       setUser(null);
     }
@@ -94,6 +113,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !("BroadcastChannel" in window)
+    ) {
+      return;
+    }
+
+    const authChannel =
+      new BroadcastChannel("auth");
+
+    const handleAuthMessage = (
+      event: MessageEvent,
+    ) => {
+      if (
+        event.data?.type !== "logout"
+      ) {
+        return;
+      }
+
+      setUser(null);
+      setIsLoading(false);
+
+      router.replace("/auth/login");
+      router.refresh();
+    };
+
+    authChannel.addEventListener(
+      "message",
+      handleAuthMessage,
+    );
+
+    return () => {
+      authChannel.removeEventListener(
+        "message",
+        handleAuthMessage,
+      );
+
+      authChannel.close();
+    };
+  }, [router]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -109,10 +170,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(
+    AuthContext,
+  );
 
   if (!context) {
-    throw new Error("useAuth must be used inside AuthProvider");
+    throw new Error(
+      "useAuth must be used inside AuthProvider",
+    );
   }
 
   return context;
