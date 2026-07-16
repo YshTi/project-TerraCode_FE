@@ -22,6 +22,7 @@ import css from "./popular-stories.module.css";
 
 interface PopularStoriesProps {
   excludeStoryId?: string;
+  title?: string;
 }
 
 const MAX_VISIBLE_STORIES = 10;
@@ -29,6 +30,7 @@ const QUERY_STALE_TIME = 5 * 60 * 1000;
 
 export function PopularStories({
   excludeStoryId,
+  title = "Популярні статті",
 }: PopularStoriesProps) {
   const { user } = useAuth();
 
@@ -93,7 +95,7 @@ export function PopularStories({
       <Container className={css.wrapper}>
         <div className={css.headingBtnWrap}>
           <h2 className={css.heading}>
-            Вам також сподобається
+            {title}
           </h2>
 
           <ButtonLink
